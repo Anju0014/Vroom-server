@@ -55,3 +55,5 @@ export const sendOTP = async (email: string, otp: string) => {
     console.log("error sending mail")
 }
 }
+
+

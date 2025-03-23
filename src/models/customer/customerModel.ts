@@ -12,6 +12,8 @@ interface ICustomer extends Document{
     otp?:string|null;
     otpExpires?:Date|null;
     profilePic:string;
+    googleId:string;
+    provider:string;
     refreshToken:string;
     role:"customer";
     updatedAt?:Date;
@@ -34,7 +36,7 @@ const CustomerSchema = new Schema<ICustomer>({
     },
     password: {
         type: String,
-        required: true
+      
     },
     isVerified: {
         type: Boolean, 
@@ -63,7 +65,7 @@ const CustomerSchema = new Schema<ICustomer>({
         type: Date,
         default: Date.now
     },
-    refreshToken: { type: String }
+    refreshToken: { type: String, default:null }
 }, { timestamps: true })
 
 

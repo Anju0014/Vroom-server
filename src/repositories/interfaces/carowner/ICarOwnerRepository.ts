@@ -1,5 +1,5 @@
 import { ICarOwner } from '../../../models/carowner/carOwnerModel';
-import {ICustomer} from '../../../models/customer/customerModel';
+
 
 
 interface ICarOwnerRepository{

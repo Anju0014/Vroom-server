@@ -23,7 +23,9 @@ carOwnerRouter.post("/login",(req,res)=>carOwnerController.loginOwner(req,res))
 
 carOwnerRouter.post("/logout",(req,res)=>carOwnerController.logout(req,res))
 
+carOwnerRouter.post("/googleSignIn",(req,res)=>carOwnerController.googleSignIn(req,res))
+// carOwnerRouter.post("/googleSignOut",(req,res)=>carOwnerController.googleSignOut(req,res))
 
 
-
+// carOwnerRouter.post("/getOwnerDetails",(req,res)=>carOwnerController.dashBoardDetails(req,res))
 export default carOwnerRouter

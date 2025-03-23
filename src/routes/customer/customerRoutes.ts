@@ -23,6 +23,9 @@ customerRouter.post("/login",(req,res)=>customerController.login(req,res))
 
 customerRouter.post('/logout',(req,res)=>customerController.logout(req,res))
 
+customerRouter.post('/googleSignIn',(req,res)=>customerController.googleSignIn(req,res))
+
+customerRouter.post('/googleSignOut',(req,res)=>customerController.googleSignOut(req,res))
 // router.post('/forgot-password', forgotPassword);
 // router.post('/reset-password', resetPassword);
 

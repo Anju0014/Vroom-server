@@ -172,6 +172,62 @@ class CarOwnerController implements ICarOwnerController{
             }
     }
       
+
+
+
+
+
+    async googleSignIn(req: Request, res: Response): Promise<void> {
+        try {
+
+            console.log("reached here at google signin")
+          const { fullName, email, image, provider, role } = req.body;
+      
+          if (!email || !provider) {
+            res.status(400).json({ message: "Missing required fields" });
+            return;
+          }
+      
+          const { accessToken, refreshToken, carOwner } = await this._carOwnerService.loginOwnerGoogle(fullName, email, image, provider, role);
+      
+         
+          res.cookie("carOwnerRefreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+          });
+      
+          if (!carOwner) {
+            res.status(400).json({ error: "Customer not found" });
+            return;
+          }
+      
+        
+          res.status(200).json({
+            success: true,
+            message: "Login successful",
+            accessToken,
+            user: {
+              id: carOwner._id,
+              fullName: carOwner.fullName,
+              email: carOwner.email,
+              role: carOwner.role,
+            },
+          });
+        } catch (error) {
+          console.log("LoginError:", error);
+          res.status(400).json({ error: error instanceof Error ? error.message : "Login failed" });
+        }
+      }
+
+    
+      
+
+
+
+
+    
     }
 
     export default CarOwnerController

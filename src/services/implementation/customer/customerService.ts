@@ -198,13 +198,45 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
 
 
 async logoutCustomer(refreshToken: string): Promise<void> {
-   
+    
+    console.log("reached")
+    console.log(refreshToken)
     const customer = await this._customerRepository.findUserByRefreshToken(refreshToken);
   if (!customer) {
+    console.log("error no customer")
     throw new Error("User not found");
   }
   await this._customerRepository.clearRefreshToken(customer._id.toString());
 }
 
+
+
+async loginCustomerGoogle(fullName: string, email: string,googleId: string, image: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}> {
+ 
+
+    console.log("helloooooooo")
+    let customer = await this._customerRepository.findUserByEmail(email);
+  
+  
+    if (!customer) {
+      customer = await this._customerRepository.create({
+        fullName,
+        email,
+        googleId,
+        profilePic:image,
+        provider,
+        // role: role || "customer", // Default to "customer" if role isn't provided
+      });
+    }
+  
+
+    const accessToken = JwtUtils.generateAccessToken({ id: customer._id, email: customer.email });
+    const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
+  
+    await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
+    
+    return { accessToken, refreshToken, customer };
+  }
+  
 }
 export default CustomerService

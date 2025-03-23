@@ -23,6 +23,7 @@ async registerBasicDetails(carOwnerDetails: Partial<ICarOwner>): Promise<{ carOw
     console.log(carOwnerDetails)
 
     if (!fullName || !email || !password) {
+        console.log("here2 ")
         throw new Error("All fields are required")
     }
 
@@ -54,7 +55,7 @@ async registerBasicDetails(carOwnerDetails: Partial<ICarOwner>): Promise<{ carOw
 
     await sendOTP(email, otp)
     console.log("create new carOwner: ", carOwner);
-    return {carOwner }
+    return { carOwner }
 }
 
 
@@ -199,6 +200,33 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
       }
       await this._carOwnerRepository.clearRefreshToken(carOwner._id.toString());
     }
+
+
+
+    async loginOwnerGoogle(fullName: string, email: string,googleId: string, image: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}> {
+        console.log("helloooooooo")
+        let carOwner = await this._carOwnerRepository.findUserByEmail(email);
+      
+      
+        if (!carOwner) {
+            carOwner = await this._carOwnerRepository.create({
+            fullName,
+            email,
+            googleId,
+            profilePic:image,
+            provider,
+            // role: role || "customer", // Default to "customer" if role isn't provided
+          });
+        }
+      
+    
+        const accessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email });
+        const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
+      
+        await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
+        
+        return { accessToken, refreshToken, carOwner };
+      }
 }
 export default CarOwnerService
 

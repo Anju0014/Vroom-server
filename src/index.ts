@@ -6,6 +6,7 @@ import connectDB from './config/dbConfig';
 import cookieParser from 'cookie-parser';
 import customerRouter from './routes/customer/customerRoutes';
 import carOwnerRouter from './routes/carOwner/carOwner';
+import adminRouter from './routes/admin/admin';
 
 dotenv.config();
 connectDB();
@@ -27,7 +28,8 @@ app.use(cors({
 }))
 
 app.use("/",customerRouter);
-app.use("/owner",carOwnerRouter)
+app.use("/owner",carOwnerRouter);
+app.use("/admin",adminRouter);
 
 server.listen(PORT,()=>{
     console.log(`Server Connected to ${PORT}`)

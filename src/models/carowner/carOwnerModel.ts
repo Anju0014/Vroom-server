@@ -12,6 +12,8 @@ interface ICarOwner extends Document{
     otp?:string|null;
     otpExpires?:Date|null;
     profilePic:string;
+    googleId:string;
+    provider:string;
     refreshToken:string;
     role:"carOwner";
     updatedAt?:Date;

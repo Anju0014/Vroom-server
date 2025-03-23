@@ -11,9 +11,6 @@ class CustomerContoller implements ICustomerController{
         this._customerService = _customerService
     }
 
-   
-
-    
     async registerBasicDetails(req: Request, res: Response): Promise<void> {
         
         try {
@@ -163,6 +160,8 @@ class CustomerContoller implements ICustomerController{
 
     async logout(req:Request,res:Response): Promise<void>{
         try{
+
+            console.log("reached");
             const refreshToken=req.cookies.customerRefreshToken
             if(!refreshToken){
                 res.status(400).json({error:"No refresh Token"})
@@ -179,7 +178,59 @@ class CustomerContoller implements ICustomerController{
             }
     }
 
+    async googleSignIn(req: Request, res: Response): Promise<void> {
+        try {
+
+            console.log("reached here at google signin")
+          const { fullName, email, image, provider, role } = req.body;
+      
+          if (!email || !provider) {
+            res.status(400).json({ message: "Missing required fields" });
+            return;
+          }
+      
+          const { accessToken, refreshToken, customer } = await this._customerService.loginCustomerGoogle(fullName, email, image, provider, role);
+      
+         
+          res.cookie("customerRefreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+          });
+      
+          if (!customer) {
+            res.status(400).json({ error: "Customer not found" });
+            return;
+          }
+      
+        
+          res.status(200).json({
+            success: true,
+            message: "Login successful",
+            accessToken,
+            user: {
+              id: customer._id,
+              fullName: customer.fullName,
+              email: customer.email,
+              role: customer.role,
+            },
+          });
+        } catch (error) {
+          console.log("LoginError:", error);
+          res.status(400).json({ error: error instanceof Error ? error.message : "Login failed" });
+        }
+      }
+
+      async googleSignOut(req:Request,res:Response):Promise<void>{
+         
+
+      }
+      
+
 }
+
+
 
 export default CustomerContoller
 

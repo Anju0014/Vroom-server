@@ -9,4 +9,5 @@ export interface ICarOwnerService{
     forgotPassword(email: string): Promise<void> 
     resetPassword  (token: string, newPassword: string, role:string):Promise<string>
     logoutCarOwner(refreshToken: string): Promise<void>
+    loginOwnerGoogle(fullName: string, email: string,googleId: string, image: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}>
 }
