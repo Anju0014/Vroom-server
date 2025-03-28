@@ -89,39 +89,6 @@ async logoutAdmin(req:Request,res:Response): Promise<void>{
 }
 
 
-async getAllCustomers(req: Request, res: Response):Promise<void>{
-    try {
-        const customers = await this._adminService.listAllCustomers();
-        res.status(200).json({ success: true, data: customers });
-    } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-async updateCustomerStatus(req: Request, res: Response):Promise<void> {
-    try {
-        const { customerId } = req.params;
-        const { status } = req.body;
-
-        const updatedCustomer = await this._adminService.updateCustomerStatus(customerId, status);
-        res.status(200).json({ success: true, data: updatedCustomer });
-    } catch (error: any) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-}
-
-async verifyCustomer(req: Request, res: Response):Promise<void> {
-    try {
-        const { customerId } = req.params;
-        const { verificationType } = req.body;
-
-        const verifiedCustomer = await this._adminService.verifyCustomer(customerId, verificationType);
-        res.status(200).json({ success: true, data: verifiedCustomer });
-    } catch (error: any) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-}
-
 
 
 }
