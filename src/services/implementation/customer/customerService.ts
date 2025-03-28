@@ -211,32 +211,80 @@ async logoutCustomer(refreshToken: string): Promise<void> {
 
 
 
-async loginCustomerGoogle(fullName: string, email: string,googleId: string, image: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}> {
+async loginCustomerGoogle(fullName: string, email: string, profileImage: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}> {
  
-
+   console.log(profileImage)
     console.log("helloooooooo")
-    let customer = await this._customerRepository.findUserByEmail(email);
-  
-  
+    let customer;
+    customer = await this._customerRepository.findUserByEmail(email);
+    console.log("1//////////",customer)
     if (!customer) {
-      customer = await this._customerRepository.create({
+     customer = await this._customerRepository.create({
         fullName,
         email,
-        googleId,
-        profilePic:image,
+        profileImage,
         provider,
         // role: role || "customer", // Default to "customer" if role isn't provided
       });
     }
-  
-
     const accessToken = JwtUtils.generateAccessToken({ id: customer._id, email: customer.email });
     const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
   
+    
     await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
+    console.log(refreshToken);
+    let customer2 = await this._customerRepository.findUserByEmail(email);
+    console.log(customer2)
     
     return { accessToken, refreshToken, customer };
   }
+
+
+    async getCustomerProfile(customerId: string):Promise<{customer:ICustomer}> {
+        const customer = await this._customerRepository.findById(customerId);
+        if (!customer) throw new Error("customer not found");
+    
+        return {customer};
+      }
+
+
+      async updateCustomerProfile(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> {
+
+        if (updatedData.phoneNumber && !/^\d{10}$/.test(updatedData.phoneNumber)) {
+          throw new Error("Invalid phone number format. Must be 10 digits.");
+        }
+    
+     
+        if (updatedData.address) {
+          const requiredFields = ["addressLine1", "city", "state", "postalCode", "country"];
+          for (const field of requiredFields) {
+            if (!(updatedData.address as any)[field]) {
+              throw new Error(`Missing address field: ${field}`);
+            }
+          }
+        }
+    
+        const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
+        if (!updatedcustomer) {
+          throw new Error("Ccustomer not found or update failed.");
+        }
+    
+        return updatedcustomer;
+      }
+
+      async updateCustomerProfileId(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> {
+
+        console.log("id",updatedData.idProof)
+        const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
+        console.log("updatedcustomer",updatedcustomer)
+        if (!updatedcustomer) {
+          console.log("error2")
+          throw new Error("Car customer not found or update failed.");
+        }
+        return updatedcustomer;
+      }
+      
+      
   
 }
 export default CustomerService

@@ -154,13 +154,20 @@ async loginCarOwner(email:string, password:string): Promise<{accessToken:string,
 async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
     
         const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
-
+    
+        console.log("did reach")
         if (!decoded || typeof decoded === 'string' || !decoded.id) {
+            console.log("error heree")
             throw new Error("Invalid refresh token");
         }
 
-        const carOwner = await this._carOwnerRepository.findUserByEmail(decoded.id);
+        const carOwner = await this._carOwnerRepository.findById(decoded.id);
+        console.log(carOwner)
+        console.log(carOwner?.refreshToken)
+        console.log(oldRefreshToken)
         if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
+            
+            console.log("error here77e")
             throw new Error("Invalid refresh token")
         }
         const accessToken=JwtUtils.generateAccessToken({id:carOwner._id,email:carOwner.email});
@@ -203,7 +210,7 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
 
 
 
-    async loginOwnerGoogle(fullName: string, email: string,googleId: string, image: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}> {
+    async loginOwnerGoogle(fullName: string, email: string,profileImage: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}> {
         console.log("helloooooooo")
         let carOwner = await this._carOwnerRepository.findUserByEmail(email);
       
@@ -212,8 +219,8 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
             carOwner = await this._carOwnerRepository.create({
             fullName,
             email,
-            googleId,
-            profilePic:image,
+            // googleId,
+            profileImage,
             provider,
             // role: role || "customer", // Default to "customer" if role isn't provided
           });
@@ -224,10 +231,56 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
       
         await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
-        
+        let carOwner2 = await this._carOwnerRepository.findUserByEmail(email);
         return { accessToken, refreshToken, carOwner };
       }
+
+
+      async getOwnerProfile(ownerId: string):Promise<{carOwner:ICarOwner}> {
+        const carOwner = await this._carOwnerRepository.findById(ownerId);
+        if (!carOwner) throw new Error("Owner not found");
+    
+        return {carOwner};
+      }
+
+
+      async updateCarOwnerProfile(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> {
+
+        if (updatedData.phoneNumber && !/^\d{10}$/.test(updatedData.phoneNumber)) {
+          throw new Error("Invalid phone number format. Must be 10 digits.");
+        }
+    
+     
+        if (updatedData.address) {
+          const requiredFields = ["addressLine1", "city", "state", "postalCode", "country"];
+          for (const field of requiredFields) {
+            if (!(updatedData.address as any)[field]) {
+              throw new Error(`Missing address field: ${field}`);
+            }
+          }
+        }
+    
+        const updatedOwner = await this._carOwnerRepository.updateCarOwner(carOwnerId, updatedData);
+        if (!updatedOwner) {
+          throw new Error("Car owner not found or update failed.");
+        }
+    
+        return updatedOwner;
+      }
+
+      async updateCarOwnerProfileId(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> {
+
+        console.log("id",updatedData.idProof)
+        const updatedOwner = await this._carOwnerRepository.updateCarOwner(carOwnerId, updatedData);
+        console.log("updatedOwner",updatedOwner)
+        if (!updatedOwner) {
+          console.log("error2")
+          throw new Error("Car owner not found or update failed.");
+        }
+        return updatedOwner;
+      }
 }
+
 export default CarOwnerService
 
 

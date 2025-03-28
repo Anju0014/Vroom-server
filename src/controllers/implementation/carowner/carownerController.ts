@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
 import ICarOwnerController from "../../interfaces/carowner/ICarOwnerContoller"
 import { ICarOwnerService } from '../../../services/interfaces/carOwner/ICarOwnerServices';
-
+import { CustomRequest } from "../../../middlewares/authMiddleWare";
 
 class CarOwnerController implements ICarOwnerController{
     private _carOwnerService: ICarOwnerService
@@ -93,7 +93,9 @@ class CarOwnerController implements ICarOwnerController{
                   id:carOwner._id,
                   fullName: carOwner.fullName,
                   email: carOwner.email,
-                  role: carOwner.role,  // Optional if roles exist
+                  role: carOwner.role,  
+                  profileImage:carOwner.profileImage,
+              
                 }
             })
            
@@ -108,6 +110,7 @@ class CarOwnerController implements ICarOwnerController{
 
     async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
         try {
+            console.log("hellooooooo mi")
           const oldRefreshToken = req.cookies.carOwnerRefreshToken;
           if (!oldRefreshToken) {
             res.status(401).json({ error: "Unauthorized" });
@@ -181,14 +184,14 @@ class CarOwnerController implements ICarOwnerController{
         try {
 
             console.log("reached here at google signin")
-          const { fullName, email, image, provider, role } = req.body;
+          const { fullName, email, profileImage, provider, role } = req.body;
       
           if (!email || !provider) {
             res.status(400).json({ message: "Missing required fields" });
             return;
           }
       
-          const { accessToken, refreshToken, carOwner } = await this._carOwnerService.loginOwnerGoogle(fullName, email, image, provider, role);
+          const { accessToken, refreshToken, carOwner } = await this._carOwnerService.loginOwnerGoogle(fullName, email, profileImage, provider, role);
       
          
           res.cookie("carOwnerRefreshToken", refreshToken, {
@@ -213,6 +216,7 @@ class CarOwnerController implements ICarOwnerController{
               fullName: carOwner.fullName,
               email: carOwner.email,
               role: carOwner.role,
+              profileImage:carOwner.profileImage
             },
           });
         } catch (error) {
@@ -221,13 +225,76 @@ class CarOwnerController implements ICarOwnerController{
         }
       }
 
+
+      async getOwnerProfile(req: CustomRequest, res: Response): Promise<void> {
+        try {
+            console.log("helloooooo")
+        const ownerId = req.userId;
+        console.log(ownerId)
+        // const ownerId='134';
+          if (!ownerId) {
+            res.status(401).json({ success: false, message: "Unauthorized" });
+            return;
+          }
+          const ownerProfile = await this._carOwnerService.getOwnerProfile(ownerId);
+          res.status(200).json({ success: true, owner: ownerProfile });
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          res.status(500).json({ success: false, message: error instanceof Error ? error.message : "Internal Server Error" });
+        }
+      }
+
+
+
+      async updateProfileOwner(req: CustomRequest, res: Response): Promise<void> {
+        try {
+          const carOwnerId = req.userId;
+          console.log("reached heriii")
+          console.log(carOwnerId)
+          if(!carOwnerId){
+            res.status(403).json({message: "Forbidden: No car owner ID found"})
+             return  
+        }
+          const { phoneNumber, address, profileImage } = req.body;
+          if (!phoneNumber && !address) {
+            res.status(400).json({ message: "No data provided to update." });
+            return 
+          }
+          const updatedOwner = await this._carOwnerService.updateCarOwnerProfile(carOwnerId, { phoneNumber, address, profileImage });
+          res.status(200).json({ message: "Profile updated successfully", updatedOwner });
+        } catch (error: any) {
+          console.error("Error updating profile:", error.message);
+          res.status(500).json({ message: error.message });
+        }
+      }
+
+      async updateProfileOwnerIdProof(req: CustomRequest, res: Response): Promise<void> {
+        try {
+          const carOwnerId = req.userId;
+          console.log("reached heriii")
+          console.log(carOwnerId)
+          if(!carOwnerId){
+            res.status(403).json({message: "Forbidden: No car owner ID found"})
+             return  
+        }
+          const { idProof } = req.body;
+          console.log("id",idProof)
+          if (!idProof) {
+            console.log("error1")
+            res.status(400).json({ message: "No data provided to update." });
+            return 
+          }
     
-      
-
-
-
-
-    
+          const updatedOwner = await this._carOwnerService.updateCarOwnerProfileId(carOwnerId, {idProof});
+          
+          res.status(200).json({ message: "IdProof updated successfully", updatedOwner });
+        } catch (error: any) {
+          console.error("Error updating profile:", error.message);
+          res.status(500).json({ message: error.message });
+        }
+      }
     }
+    
+
 
     export default CarOwnerController

@@ -2,6 +2,7 @@ import { Request, Response} from "express";
 import { ICustomer } from "../../../models/customer/customerModel";
 import ICustomerController from "../../interfaces/customer/ICustomerContoller"
 import { ICustomerService } from "../../../services/interfaces/customer/ICustomerServices";
+import { CustomRequest } from "../../../middlewares/authMiddleWare";
 
 
 class CustomerContoller implements ICustomerController{
@@ -181,15 +182,16 @@ class CustomerContoller implements ICustomerController{
     async googleSignIn(req: Request, res: Response): Promise<void> {
         try {
 
-            console.log("reached here at google signin")
-          const { fullName, email, image, provider, role } = req.body;
+            console.log("*******************reached here at google signin")
+          const { fullName, email, profileImage, provider, role } = req.body;
       
+          console.log(profileImage)
           if (!email || !provider) {
             res.status(400).json({ message: "Missing required fields" });
             return;
           }
       
-          const { accessToken, refreshToken, customer } = await this._customerService.loginCustomerGoogle(fullName, email, image, provider, role);
+          const { accessToken, refreshToken, customer } = await this._customerService.loginCustomerGoogle(fullName, email, profileImage, provider, role);
       
          
           res.cookie("customerRefreshToken", refreshToken, {
@@ -213,6 +215,7 @@ class CustomerContoller implements ICustomerController{
               id: customer._id,
               fullName: customer.fullName,
               email: customer.email,
+              profileImage:customer.profileImage,
               role: customer.role,
             },
           });
@@ -226,6 +229,77 @@ class CustomerContoller implements ICustomerController{
          
 
       }
+
+
+      async getCustomerProfile(req: CustomRequest, res: Response): Promise<void> {
+              try {
+                  console.log("helloooooo")
+              const customerId = req.userId;
+              console.log(customerId)
+            
+                if (!customerId) {
+                  console.log("hdhuhdi")
+                  res.status(401).json({ success: false, message: "Unauthorized" });
+                  return;
+                }
+                const customerProfile = await this._customerService.getCustomerProfile(customerId);
+                console.log(customerProfile)
+                res.status(200).json({ success: true, customer: customerProfile });
+              } catch (error) {
+                console.error("Error fetching profile:", error);
+                res.status(500).json({ success: false, message: error instanceof Error ? error.message : "Internal Server Error" });
+              }
+            }
+      
+      
+      
+            async updateProfileCustomer(req: CustomRequest, res: Response): Promise<void> {
+              try {
+                const customerId = req.userId;
+                console.log("reached heriii")
+                console.log(customerId)
+                if(!customerId){
+                  res.status(403).json({message: "Forbidden: No customer ID found"})
+                   return  
+              }
+                const { phoneNumber, address, profileImage } = req.body;
+                if (!phoneNumber && !address) {
+                  res.status(400).json({ message: "No data provided to update." });
+                  return 
+                }
+                const updatedCustomer = await this._customerService.updateCustomerProfile(customerId, { phoneNumber, address, profileImage });
+                res.status(200).json({ message: "Profile updated successfully", updatedCustomer });
+              } catch (error: any) {
+                console.error("Error updating profile:", error.message);
+                res.status(500).json({ message: error.message });
+              }
+            }
+      
+            async updateProfileCustomerIdProof(req: CustomRequest, res: Response): Promise<void> {
+              try {
+                const customerId = req.userId;
+                console.log("reached heriii")
+                console.log(customerId)
+                if(!customerId){
+                  res.status(403).json({message: "Forbidden: No customer ID found"})
+                   return  
+              }
+                const { idProof } = req.body;
+                console.log("id",idProof)
+                if (!idProof) {
+                  console.log("error1")
+                  res.status(400).json({ message: "No data provided to update." });
+                  return 
+                }
+          
+                const updatedCustomer = await this._customerService.updateCustomerProfileId(customerId, {idProof});
+                
+                res.status(200).json({ message: "IdProof updated successfully", updatedCustomer });
+              } catch (error: any) {
+                console.error("Error updating profile:", error.message);
+                res.status(500).json({ message: error.message });
+              }
+            }
       
 
 }

@@ -11,6 +11,7 @@ interface ICarOwnerRepository{
     updatePassword(id:string,password:string):Promise<void>
     clearRefreshToken(id:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICarOwner | null>
+    findById(id:string): Promise<ICarOwner |null>
 }
 
 

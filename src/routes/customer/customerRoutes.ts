@@ -2,6 +2,7 @@ import {Router} from "express";
 import  CustomerController from "../../controllers/implementation/customer/customerController"
 import CustomerService from "../../services/implementation/customer/customerService"
 import CustomerRepository from "../../repositories/implementation/customer/customerRepository";
+import authMiddleware from "../../middlewares/authMiddleWare";
 
 const customerRouter=Router();
 
@@ -26,6 +27,12 @@ customerRouter.post('/logout',(req,res)=>customerController.logout(req,res))
 customerRouter.post('/googleSignIn',(req,res)=>customerController.googleSignIn(req,res))
 
 customerRouter.post('/googleSignOut',(req,res)=>customerController.googleSignOut(req,res))
+
+customerRouter.get("/getCustomerProfile",authMiddleware,(req,res)=>customerController.getCustomerProfile(req,res))
+
+customerRouter.put("/updateProfile", authMiddleware,(req,res)=>customerController.updateProfileCustomer(req,res));
+
+customerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>customerController.updateProfileCustomerIdProof(req,res));
 // router.post('/forgot-password', forgotPassword);
 // router.post('/reset-password', resetPassword);
 

@@ -10,6 +10,9 @@ export interface ICustomerService{
     resetPassword  (token: string, newPassword: string, role:string):Promise<string>
     logoutCustomer(refreshToken: string): Promise<void>
     loginCustomerGoogle(fullName: string, email: string, image: string, provider: string, role?: string) :Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}>
+    getCustomerProfile(customerId: string):Promise<{customer:ICustomer}>
+    updateCustomerProfile(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer>
+    updateCustomerProfileId(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> 
 }
 
 

@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import customerRouter from './routes/customer/customerRoutes';
 import carOwnerRouter from './routes/carOwner/carOwner';
 import adminRouter from './routes/admin/admin';
+import s3Routes from './routes/s3Routes'
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.use(express.json({limit:"50mb"}));
 app.use(express.urlencoded({ extended: true,limit:"50mb"}));
 app.use(cookieParser());
 
+
 app.use(cors({
     origin:"http://localhost:3000",
     credentials:true,
@@ -30,6 +32,7 @@ app.use(cors({
 app.use("/",customerRouter);
 app.use("/owner",carOwnerRouter);
 app.use("/admin",adminRouter);
+app.use("/api/s3", s3Routes);
 
 server.listen(PORT,()=>{
     console.log(`Server Connected to ${PORT}`)

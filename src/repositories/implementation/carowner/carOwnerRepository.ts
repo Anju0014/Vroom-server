@@ -4,7 +4,6 @@ import { BaseRepository } from "../../base/BaseRepository";
 
 
 class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerRepository {
-
      constructor(){
         super(CarOwner);
      }
@@ -29,5 +28,8 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
     async clearRefreshToken(carOwnerId: string): Promise<void> {
         await CarOwner.updateOne({ _id: carOwnerId }, { $set: { refreshToken: null } });
       }
+      async findById(carOwnerId:string): Promise<ICarOwner |null>{
+        return await CarOwner.findOne({_id:carOwnerId})
+    }
 }
 export default CarOwnerRepository

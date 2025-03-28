@@ -10,7 +10,7 @@ interface ICustomerRepository{
     updatePassword(id:string,password:string):Promise<void>
     clearRefreshToken(id:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICustomer | null>
-    
+    findById(id:string): Promise<ICustomer |null>
 }
 
 

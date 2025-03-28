@@ -2,6 +2,7 @@ import {Router} from "express";
 import  CarOwnerController from "../../controllers/implementation/carowner/carownerController"
 import CarOwnerService from "../../services/implementation/carOwner/carOwnerService"
 import CarOwnerRepository from "../../repositories/implementation/carowner/carOwnerRepository";
+import authMiddleware from "../../middlewares/authMiddleWare";
 
 const carOwnerRouter=Router();
 
@@ -19,6 +20,8 @@ carOwnerRouter.post("/forgotpassword",(req,res)=>carOwnerController.forgotPasswo
 
 carOwnerRouter.post("/resetpassword",(req,res)=>carOwnerController.resetPasswordOwner(req,res))
 
+carOwnerRouter.post("/refreshToken",(req,res)=>carOwnerController.renewRefreshAccessTokenOwner(req,res))
+
 carOwnerRouter.post("/login",(req,res)=>carOwnerController.loginOwner(req,res))
 
 carOwnerRouter.post("/logout",(req,res)=>carOwnerController.logout(req,res))
@@ -26,6 +29,11 @@ carOwnerRouter.post("/logout",(req,res)=>carOwnerController.logout(req,res))
 carOwnerRouter.post("/googleSignIn",(req,res)=>carOwnerController.googleSignIn(req,res))
 // carOwnerRouter.post("/googleSignOut",(req,res)=>carOwnerController.googleSignOut(req,res))
 
+carOwnerRouter.get("/getOwnerProfile",authMiddleware,(req,res)=>carOwnerController.getOwnerProfile(req,res))
 
-// carOwnerRouter.post("/getOwnerDetails",(req,res)=>carOwnerController.dashBoardDetails(req,res))
+carOwnerRouter.put("/updateProfile", authMiddleware,(req,res)=>carOwnerController.updateProfileOwner(req,res));
+
+carOwnerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>carOwnerController.updateProfileOwnerIdProof(req,res));
+
+
 export default carOwnerRouter
