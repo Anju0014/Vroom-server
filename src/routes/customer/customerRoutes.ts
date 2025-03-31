@@ -33,8 +33,6 @@ customerRouter.get("/getCustomerProfile",authMiddleware,(req,res)=>customerContr
 customerRouter.put("/updateProfile", authMiddleware,(req,res)=>customerController.updateProfileCustomer(req,res));
 
 customerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>customerController.updateProfileCustomerIdProof(req,res));
-// router.post('/forgot-password', forgotPassword);
-// router.post('/reset-password', resetPassword);
 
 
 

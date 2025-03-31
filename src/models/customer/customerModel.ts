@@ -18,12 +18,13 @@ interface ICustomer extends Document{
     password:string;
     isVerified:boolean;
     status:number;
+    previousStatus:number|null;
     otp?:string|null;
     otpExpires?:Date|null;
     profileImage:string;
     googleId:string;
     idProof:string;
-    idVerified:false;
+    idVerified:boolean;
     provider:string;
     refreshToken:string;
     role:"customer";
@@ -64,9 +65,12 @@ const CustomerSchema = new Schema<ICustomer>({
     },
     status: {
         type: Number,
-        enum: [-1, 0, 1],// -1 => blocked 0 => not verified 1 => verified
-        default: 0
-    },
+        enum: [-2, -1, 0, 1, 2, 3 ], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified 
+        default: 0,
+      },
+  
+    
+    previousStatus: { type: Number, enum: [-1, 0, 1, 2], default: 0 },
 
     otp: { type: String, required: false },
     otpExpires: { type: Date, required: false, expires: 300 },

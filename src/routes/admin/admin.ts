@@ -24,6 +24,26 @@ adminRouter.post("/login",(req,res)=>adminController.loginAdmin(req,res))
 adminRouter.post("/logout",(req,res)=>adminController.logoutAdmin(req,res))
 
 
+adminRouter.get('/customers', (req,res)=>adminController.getAllCustomers(req,res));
+
+adminRouter.get('/owners',(req,res)=>adminController.getAllOwners(req,res));
+
+// Update customer status (-2 to 2)
+// adminRouter.patch('/customer/:customerId/status', adminController.updateCustomerStatus);
+
+// Verify customer (document or full)
+// adminRouter.patch('/customers/:customerId/verify', adminController.verifyCustomer);
+
+adminRouter.patch('/customers/updatestatus/:userId', (req,res)=>adminController.updateCustomerStatus(req,res));
+
+adminRouter.patch('/owners/updatestatus/:userId', (req,res)=>adminController.updateOwnerStatus(req,res));
+// adminRouter.patch('/owners/updatestatus/:userId', (req,res)=>adminController.updateOwnerStatus(req,res));
+
+// adminRouter.patch('/customers/verifycustomer/:customerId',adminController.verifyCustomer)
+
+// adminRouter.patch('/owners/verifydocument/:ownerId', adminController.verifyOwner);
+
+// adminRouter.patch('/owners/verifyowner/:ownerId',adminController.verifyOwner)
 
 
 export default adminRouter

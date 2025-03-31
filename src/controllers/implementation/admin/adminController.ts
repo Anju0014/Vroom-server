@@ -89,6 +89,127 @@ async logoutAdmin(req:Request,res:Response): Promise<void>{
 }
 
 
+async getAllCustomers(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllCustomers()...");
+        const customers = await this._adminService.listAllCustomers();
+        console.log("Finished calling listAllCustomers()");
+        console.log(customers)
+        res.status(200).json({ success: true, data: customers });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+async getAllOwners(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllCustomers()...");
+        const owners = await this._adminService.listAllCarOwners();
+        console.log("Finished calling listAllCustomers()");
+        console.log(owners)
+        res.status(200).json({ success: true, data: owners });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+// async updateCustomerStatus(req: Request, res: Response):Promise<void> {
+//     try {
+//         const { customerId } = req.params;
+//         const { status } = req.body;
+
+//         if (![1, 2, -1, -2, 0].includes(status)) {
+//             res.status(400).json({ success: false, message: "Invalid status value" });
+//             return
+//         }
+//         const updatedCustomer = await this._adminService.updateCustomerStatus(customerId, status);
+//         if (!updatedCustomer) {
+//      res.status(404).json({ success: false, message: "Customer not found" });
+//      return
+//         }
+
+//         res.status(200).json({ success: true, data: updatedCustomer });
+//     } catch (error: any) {
+//         res.status(400).json({ success: false, message: error.message });
+//     }
+// }
+
+// async updateOwnerStatus(req: Request, res: Response):Promise<void> {
+//     try {
+//         const { ownerId } = req.params;
+//         const { status } = req.body;
+
+//         if (![1, 2, -1, -2, 0].includes(status)) {
+//             res.status(400).json({ success: false, message: "Invalid status value" });
+//             return
+//         }
+//         const updatedOwner = await this._adminService.updateOwnerStatus(ownerId, status);
+//         if (!updatedOwner) {
+//      res.status(404).json({ success: false, message: "Owner not found" });
+//      return
+//         }
+//         res.status(200).json({ success: true, data: updatedOwner });
+//     } catch (error: any) {
+//         res.status(400).json({ success: false, message: error.message });
+//     }
+// }
+
+// async verifyCustomer(req: Request, res: Response):Promise<void> {
+//     try {
+//         const { customerId } = req.params;
+//         const { verificationType } = req.body;
+//         const verifiedCustomer = await this._adminService.verifyCustomer(customerId, verificationType);
+//         res.status(200).json({ success: true, data: verifiedCustomer });
+//     } catch (error: any) {
+//         res.status(400).json({ success: false, message: error.message });
+//     }
+// }
+
+
+async updateCustomerStatus(req: Request, res: Response): Promise<void> {
+    // const { userId, newStatus } = req.body;
+
+    console.log("hihihi")
+    const { userId } = req.params;  
+        const { status } = req.body;  
+    console.log(userId, status)
+        if (!userId || status === undefined) {
+            res.status(400).json({ message: "Missing userId or status" });
+            return
+        }
+    console.log(userId)
+    console.log("hujuhuju,,,,....")
+
+    try {
+      const updatedUser = await this._adminService.updateCustomerStatus(userId, status);
+      res.json({ message: "Status updated successfully", user: updatedUser });
+    } catch (error:any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateOwnerStatus(req: Request, res: Response): Promise<void> {
+    console.log("hihihi")
+    const { userId } = req.params;  
+        const { status } = req.body;  
+    console.log(userId, status)
+        if (!userId || status === undefined) {
+            res.status(400).json({ message: "Missing userId or status" });
+            return
+        }
+    console.log(userId)
+    console.log("hujuhuju,,,,....")
+    try {
+      const updatedUser = await this._adminService.updateOwnerStatus(userId, status);
+      res.json({ message: "Status updated successfully", user: updatedUser });
+    } catch (error:any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+
 
 
 }

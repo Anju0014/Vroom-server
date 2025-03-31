@@ -109,6 +109,7 @@ class CustomerContoller implements ICustomerController{
 
     async renewRefreshAccessToken(req: Request, res: Response): Promise<void> {
         try {
+          console.log("reached here at renewal")
           const oldRefreshToken = req.cookies.customerRefreshToken;
           if (!oldRefreshToken) {
             res.status(401).json({ error: "Unauthorized" });
