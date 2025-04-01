@@ -3,6 +3,8 @@ import { ICustomer } from "../../../models/customer/customerModel";
 import ICustomerController from "../../interfaces/customer/ICustomerContoller"
 import { ICustomerService } from "../../../services/interfaces/customer/ICustomerServices";
 import { CustomRequest } from "../../../middlewares/authMiddleWare";
+import { MESSAGES } from "../../../constants/message";
+import { StatusCode } from "../../../constants/statusCode";
 
 
 class CustomerContoller implements ICustomerController{
@@ -13,20 +15,25 @@ class CustomerContoller implements ICustomerController{
     }
 
     async registerBasicDetails(req: Request, res: Response): Promise<void> {
-        
         try {
-
             const { customer } = await this._customerService.registerBasicDetails(req.body)
 
-            res.status(201).json({ message: "OTP sent to email", email: customer.email })
+            // res.status(201).json({ message: "OTP sent to email", email: customer.email })
 
+            
+            res.status(StatusCode.CREATED).json({
+              success: true,
+              message: MESSAGES.SUCCESS.OTP_SENT,
+              email: customer.email,
+            });
         } catch (error) {
-            let errorMessage = "an unexpected error occured";
-            if (error instanceof Error) {
-                errorMessage = error.message
-            }
-            res.status(400).json({ error: errorMessage })
-        }
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
+        //     let errorMessage = "an unexpected error occured";
+        //     if (error instanceof Error) {
+        //         errorMessage = error.message
+        //     }
+        //     res.status(400).json({ error: errorMessage })
+         }
     }
 
     async verifyOtp(req: Request, res: Response): Promise<void> {
@@ -36,13 +43,11 @@ class CustomerContoller implements ICustomerController{
             console.log("reached pt3 ")
 
             const { customer } = await this._customerService.otpVerify(email, otp);
-            res.status(200).json({ message: "OTP verified successfully", customer });
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: MESSAGES.SUCCESS.OTP_VERIFIED, customer });
         } catch (error) {
-            let errorMessage = "An unexpected error occurred";
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            }
-            res.status(400).json({ error: errorMessage });
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
     }
 
@@ -51,18 +56,15 @@ class CustomerContoller implements ICustomerController{
             const { email } = req.body;
     
             if (!email) {
-              res.status(400).json({ error: "Email is required" });
+              res.status(StatusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.ERROR.EMAIL_REQUIRED });
+              return
             }
     
             const customer = await this._customerService.resendOtp(email); // Resend OTP logic
     
-             res.status(200).json({ message: "OTP resent successfully" });
+            res.status(StatusCode.OK).json({ success: true, message: MESSAGES.SUCCESS.OTP_RESENT });
         } catch (error) {
-            let errorMessage = "An unexpected error occurred";
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            }
-             res.status(400).json({ error: errorMessage || "Failed to resend OTP" });
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
     }
 
@@ -71,7 +73,8 @@ class CustomerContoller implements ICustomerController{
             console.log("reeached login1")
             const {email,password}=req.body;
             if(!email||!password){
-                res.status(400).json({error:"Email and Password are required"})
+              res.status(StatusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.ERROR.MISSING_FIELDS });
+              return
             }
 
             const {accessToken,refreshToken,customer}= await this._customerService.loginCustomer(email,password)
@@ -86,23 +89,22 @@ class CustomerContoller implements ICustomerController{
                 res.status(400).json({error:"Customer not found"})
                 return
             }
-            res.status(200).json({
-                success: true,
-                message: "Login successful",
-                accessToken,
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
+              accessToken,
                 user: {
                   id: customer._id,
                   fullName: customer.fullName,
                   email: customer.email,
-                  role: customer.role,  // Optional if roles exist
+                  role: customer.role,
+                  profileImage: customer.profileImage,  // Optional if roles exist
                 }
             })
             // res.status(200).json({accessToken,customer})
 
         }catch(error){
-            console.log("LoginError:" ,error)
-
-            res.status(400).json({ error: error instanceof Error ? error.message : "Login failed" })
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
     }
 
@@ -112,7 +114,8 @@ class CustomerContoller implements ICustomerController{
           console.log("reached here at renewal")
           const oldRefreshToken = req.cookies.customerRefreshToken;
           if (!oldRefreshToken) {
-            res.status(401).json({ error: "Unauthorized" });
+            res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
+            // res.status(401).json({ error: "Unauthorized" });
             return;
           }
           const { accessToken, refreshToken } = await this._customerService.renewAuthToken(oldRefreshToken)
@@ -123,20 +126,26 @@ class CustomerContoller implements ICustomerController{
                 sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
-            res.status(200).json({ accessToken});
+            // res.status(200).json({ accessToken});
+            res.status(StatusCode.OK).json({ success: true, accessToken });
         } catch (error) {
-          console.error("Token refresh error:", error);
-          res.status(500).json({ error: "Internal Server Error" });
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
     }
 
      async forgotPassword (req: Request, res: Response):Promise<void> {
         try {
             const { email } = req.body;
+            if (!email) {
+                          res.status(StatusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.ERROR.EMAIL_REQUIRED });
+                          return;
+                      }
             await this._customerService.forgotPassword(email);
-            res.status(200).json({ message: 'Password reset email sent' });
-          } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            // res.status(200).json({ message: 'Password reset email sent' });
+            res.status(StatusCode.OK).json({ success: true, message: MESSAGES.SUCCESS.PASSWORD_RESET_SENT });
+                    
+          } catch (error) {
+            this.handleError(res, error, StatusCode.BAD_REQUEST);
           }
       };
 
@@ -152,11 +161,24 @@ class CustomerContoller implements ICustomerController{
         //    res.status(400).json({ message: "Invalid role" });
         //    return
         //   }
+
+        if (!token || !newPassword) {
+          res.status(StatusCode.BAD_REQUEST).json({ 
+              success: false, 
+              message: MESSAGES.ERROR.MISSING_FIELDS 
+          });
+          return;
+      }
         let role="customer"
           const message = await this._customerService.resetPassword(token, newPassword, role);
-          res.status(200).json({ message });
-        } catch (error: any) {
-          res.status(400).json({ message: error.message });
+          // res.status(200).json({ message });
+          res.status(StatusCode.OK).json({ 
+            success: true, 
+            message 
+        });
+
+        } catch (error) {
+          this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
       };
 
@@ -165,18 +187,29 @@ class CustomerContoller implements ICustomerController{
 
             console.log("reached");
             const refreshToken=req.cookies.customerRefreshToken
-            if(!refreshToken){
-                res.status(400).json({error:"No refresh Token"})
-            }
+            // if(!refreshToken){
+            //     res.status(400).json({error:"No refresh Token"})
+            // }
+            if (!refreshToken) {
+              res.status(StatusCode.BAD_REQUEST).json({ 
+                  success: false, 
+                  message: MESSAGES.ERROR.NO_REFRESH_TOKEN 
+              });
+              return;
+          }
             await this._customerService.logoutCustomer(refreshToken)
             res.clearCookie("customerRefreshToken", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
               });
-              res.status(200).json({ success: true, message: "Logout successful" });
+              res.status(StatusCode.OK).json({ 
+                success: true, 
+                message: MESSAGES.SUCCESS.LOGOUT_SUCCESS 
+            });
+              // res.status(200).json({ success: true, message: "Logout successful" });
         }catch (error) {
-                res.status(500).json({ error: "Logout failed" });
+          this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
             }
     }
 
@@ -188,7 +221,11 @@ class CustomerContoller implements ICustomerController{
       
           console.log(profileImage)
           if (!email || !provider) {
-            res.status(400).json({ message: "Missing required fields" });
+            // res.status(400).json({ message: "Missing required fields" });
+            res.status(StatusCode.BAD_REQUEST).json({
+              success: false,
+              message: MESSAGES.ERROR.MISSING_FIELDS
+          });
             return;
           }
       
@@ -221,8 +258,7 @@ class CustomerContoller implements ICustomerController{
             },
           });
         } catch (error) {
-          console.log("LoginError:", error);
-          res.status(400).json({ error: error instanceof Error ? error.message : "Login failed" });
+          this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
         }
       }
 
@@ -240,15 +276,20 @@ class CustomerContoller implements ICustomerController{
             
                 if (!customerId) {
                   console.log("hdhuhdi")
-                  res.status(401).json({ success: false, message: "Unauthorized" });
+                  res.status(StatusCode.UNAUTHORIZED).json({
+                    success: false,
+                    message: MESSAGES.ERROR.UNAUTHORIZED
+                });
+                  
+                  // res.status(401).json({ success: false, message: "Unauthorized" });
                   return;
                 }
                 const customerProfile = await this._customerService.getCustomerProfile(customerId);
                 console.log(customerProfile)
-                res.status(200).json({ success: true, customer: customerProfile });
+                res.status(StatusCode.OK).json({
+                  success: true,customer: customerProfile });
               } catch (error) {
-                console.error("Error fetching profile:", error);
-                res.status(500).json({ success: false, message: error instanceof Error ? error.message : "Internal Server Error" });
+                this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
               }
             }
       
@@ -260,19 +301,23 @@ class CustomerContoller implements ICustomerController{
                 console.log("reached heriii")
                 console.log(customerId)
                 if(!customerId){
-                  res.status(403).json({message: "Forbidden: No customer ID found"})
-                   return  
-              }
+                  res.status(StatusCode.FORBIDDEN).json({
+                    success: false,
+                    message: MESSAGES.ERROR.NO_CUSTOMER_ID_FOUND
+                });
+              return}
                 const { phoneNumber, address, profileImage } = req.body;
                 if (!phoneNumber && !address) {
-                  res.status(400).json({ message: "No data provided to update." });
+                  res.status(StatusCode.BAD_REQUEST).json({
+                    success: false,
+                    message: MESSAGES.ERROR.NO_UPDATE_DATA
+                });
                   return 
                 }
                 const updatedCustomer = await this._customerService.updateCustomerProfile(customerId, { phoneNumber, address, profileImage });
                 res.status(200).json({ message: "Profile updated successfully", updatedCustomer });
-              } catch (error: any) {
-                console.error("Error updating profile:", error.message);
-                res.status(500).json({ message: error.message });
+              } catch (error) {
+                this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
               }
             }
       
@@ -282,25 +327,46 @@ class CustomerContoller implements ICustomerController{
                 console.log("reached heriii")
                 console.log(customerId)
                 if(!customerId){
-                  res.status(403).json({message: "Forbidden: No customer ID found"})
+                  res.status(StatusCode.FORBIDDEN).json({
+                    success: false,
+                    message: MESSAGES.ERROR.NO_CUSTOMER_ID_FOUND
+                });
                    return  
               }
                 const { idProof } = req.body;
                 console.log("id",idProof)
                 if (!idProof) {
                   console.log("error1")
-                  res.status(400).json({ message: "No data provided to update." });
+                  // res.status(400).json({ message: "No data provided to update." });
+                  res.status(StatusCode.BAD_REQUEST).json({
+                    success: false,
+                    message: MESSAGES.ERROR.NO_UPDATE_DATA
+                });
                   return 
                 }
           
                 const updatedCustomer = await this._customerService.updateCustomerProfileId(customerId, {idProof});
                 
-                res.status(200).json({ message: "IdProof updated successfully", updatedCustomer });
-              } catch (error: any) {
-                console.error("Error updating profile:", error.message);
-                res.status(500).json({ message: error.message });
+                res.status(StatusCode.OK).json({
+                  success: true,
+                  message: MESSAGES.SUCCESS.ID_PROOF_UPDATED, updatedCustomer });
+              } catch (error) {
+                this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
               }
             }
+
+
+
+            private handleError(res: Response, error: unknown, statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR): void {
+              console.error("Error:", error);
+      
+              const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+      
+              res.status(statusCode).json({
+                  success: false,
+                  message: errorMessage,
+              });
+          }
       
 
 }

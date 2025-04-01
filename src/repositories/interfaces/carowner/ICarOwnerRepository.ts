@@ -1,3 +1,4 @@
+import { ICar } from '../../../models/car/carModel';
 import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 
 
@@ -12,6 +13,8 @@ interface ICarOwnerRepository{
     clearRefreshToken(id:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICarOwner | null>
     findById(id:string): Promise<ICarOwner |null>
+    createCar(car:Partial<ICar>): Promise<ICar>
+    getCarsByOwner(ownerId: string): Promise<ICar[]> 
 }
 
 

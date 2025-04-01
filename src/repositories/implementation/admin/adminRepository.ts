@@ -21,10 +21,17 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
         await Admin.findByIdAndUpdate(adminId,{password})
     }
     async findUserByRefreshToken(refreshToken: string): Promise<IAdmin | null> {
-        return await Admin.findOne({ refreshToken });
+        console.log(refreshToken);
+
+        const admin=await Admin.findOne({ refreshToken });
+        console.log(admin);
+        return admin
       }
     async updateRefreshToken(adminId:string,refreshToken:string): Promise<void>{
-        await Admin.findByIdAndUpdate(adminId,{refreshToken})
+        console.log("gyubb",refreshToken)
+        const admin=await Admin.findByIdAndUpdate(adminId,{refreshToken})
+        console.log("//////",admin)
+        
     }
     async clearRefreshToken(adminId: string): Promise<void> {
         await Admin.updateOne({ _id: adminId }, { $set: { refreshToken: null } });

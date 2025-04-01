@@ -1,6 +1,7 @@
 import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
 import ICarOwnerRepository from "../../interfaces/carowner/ICarOwnerRepository";
 import { BaseRepository } from "../../base/BaseRepository";
+import { Car, ICar } from "../../../models/car/carModel";
 
 
 class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerRepository {
@@ -17,7 +18,10 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
         return await CarOwner.findByIdAndUpdate(carOwnerId, updatedData, { new: true }) as ICarOwner;
     }
     async updateRefreshToken(carOwnerId:string,refreshToken:string): Promise<void>{
-        await CarOwner.findByIdAndUpdate(carOwnerId,{refreshToken})
+        const result=await CarOwner.findByIdAndUpdate(carOwnerId,{refreshToken})
+        if(!result){
+            console.log("not updating")
+        }
     }
     async updatePassword(carOwnerId:string,password:string):Promise<void>{
         await CarOwner.findByIdAndUpdate(carOwnerId,{password})
@@ -31,5 +35,12 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
       async findById(carOwnerId:string): Promise<ICarOwner |null>{
         return await CarOwner.findOne({_id:carOwnerId})
     }
+
+    async createCar(car:Partial<ICar>): Promise<ICar>{
+        return await Car.create(car)
+    }
+    async getCarsByOwner(ownerId: string): Promise<ICar[]> {
+        return await Car.find({ owner: ownerId });
+      }
 }
 export default CarOwnerRepository

@@ -4,6 +4,8 @@ import { sendOTP,sendResetEmail } from "../../../utils/emailconfirm";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
 import PasswordUtils from "../../../utils/passwordUtils";
 import JwtUtils from "../../../utils/jwtUtils";
+import { ICar } from "../../../models/car/carModel";
+import mongoose from "mongoose";
 
 
 class CarOwnerService implements ICarOwnerService {
@@ -132,12 +134,10 @@ async loginCarOwner(email:string, password:string): Promise<{accessToken:string,
         throw new Error("Invalid Credentials");
     }
     
-//     if (carOwner.status === -1) {
-//         throw new Error("This user is blocked by admin")
-//     }
-//     if (carOwner.status === 0) {
-//         throw new Error("Signup is not completed")
-//     }
+    if (carOwner.status === -2) {
+        throw new Error("This user is blocked by admin")
+    }
+
     const passwordTrue = await PasswordUtils.comparePassword(password,carOwner.password)
     if(!passwordTrue){
         console.log("not correct")
@@ -146,7 +146,8 @@ async loginCarOwner(email:string, password:string): Promise<{accessToken:string,
     const accessToken=JwtUtils.generateAccessToken({id:carOwner._id, email:carOwner.email});
     const newRefreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
 
-    await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), newRefreshToken);
+    this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), newRefreshToken);
+
 
     return {accessToken,refreshToken:newRefreshToken,carOwner}
 }
@@ -279,6 +280,25 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         }
         return updatedOwner;
       }
+async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
+  console.log("registering car for owner",ownerId)
+    if (!ownerId) throw new Error("Owner ID is required");
+  
+    const carData: Partial<ICar> = {
+      ...carDetails,
+      owner: new mongoose.Types.ObjectId(ownerId), // Ensure ObjectId is used
+      images: carDetails.images && Array.isArray(carDetails.images) ? carDetails.images : [],
+      videos: carDetails.videos && Array.isArray(carDetails.videos) ? carDetails.videos : [],
+    };
+  
+    return await this._carOwnerRepository.createCar(carData);
+  }
+
+
+  async getCarsByOwner(ownerId: string): Promise<ICar[]> {
+    return await this._carOwnerRepository.getCarsByOwner(ownerId);
+  }
+      
 }
 
 export default CarOwnerService

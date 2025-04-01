@@ -1,3 +1,4 @@
+import { ICar } from "../../../models/car/carModel";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
 
 export interface ICarOwnerService{
@@ -13,4 +14,6 @@ export interface ICarOwnerService{
     getOwnerProfile(ownerId: string):Promise<{carOwner:ICarOwner}>
     updateCarOwnerProfile(OwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner>
     updateCarOwnerProfileId(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> 
+    registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar>
+    getCarsByOwner(ownerId: string): Promise<ICar[]>
 }

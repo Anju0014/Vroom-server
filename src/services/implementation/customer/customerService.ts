@@ -134,9 +134,9 @@ async loginCustomer(email:string, password:string): Promise<{accessToken:string,
         throw new Error("Invalid Credentials");
     }
     
-//     if (user.status === -1) {
-//         throw new Error("This user is blocked by admin")
-//     }
+    if (customer.status === -2 ) {
+        throw new Error("This user is blocked by admin")
+    }
 //     if (user.status === 0) {
 //         throw new Error("Signup is not completed")
 //     }

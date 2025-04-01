@@ -5,8 +5,8 @@ import IAdminController from '../../interfaces/admin/IAdminController';
 import { IAdminService} from '../../../services/interfaces/admin/IAdminServices';
 import { ICustomer } from '../../../models/customer/customerModel';
 import { ICarOwner } from '../../../models/carowner/carOwnerModel';
-
-
+import { StatusCode } from '../../../constants/statusCode';
+import { MESSAGES } from '../../../constants/message';
 class AdminController implements IAdminController{
     private _adminService: IAdminService
 
@@ -72,9 +72,12 @@ class AdminController implements IAdminController{
 
 async logoutAdmin(req:Request,res:Response): Promise<void>{
     try{
+        console.log("here?")
         const refreshToken=req.cookies.adminRefreshToken
         if(!refreshToken){
+            console.log("error")
             res.status(400).json({error:"No refresh Token"})
+            return
         }
         await this._adminService.logoutAdmin(refreshToken)
         res.clearCookie("adminRefreshToken", {

@@ -35,5 +35,8 @@ carOwnerRouter.put("/updateProfile", authMiddleware,(req,res)=>carOwnerControlle
 
 carOwnerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>carOwnerController.updateProfileOwnerIdProof(req,res));
 
+carOwnerRouter.post("/carupload", authMiddleware, (req,res)=>carOwnerController.uploadCar(req,res));
+
+carOwnerRouter.get("/getcars", authMiddleware, (req,res)=>carOwnerController.getCarList(req,res));
 
 export default carOwnerRouter

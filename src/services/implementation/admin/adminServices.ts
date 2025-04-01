@@ -31,6 +31,9 @@ async loginAdmin(email:string, password:string): Promise<{accessToken:string,ref
     const newRefreshToken=JwtUtils.generateRefreshToken({id:admin._id});
 
     await this._adminRepository.updateRefreshToken(admin._id.toString(), newRefreshToken);
+    const admin2 = await this._adminRepository.findUserByRefreshToken(newRefreshToken);
+    console.log(admin2)
+    console.log(newRefreshToken)
 
     return {accessToken,refreshToken:newRefreshToken,admin}
 }
@@ -38,11 +41,14 @@ async loginAdmin(email:string, password:string): Promise<{accessToken:string,ref
 
 async logoutAdmin(refreshToken: string): Promise<void> {
    
-    const carOwner = await this._adminRepository.findUserByRefreshToken(refreshToken);
-  if (!carOwner) {
+    console.log(refreshToken)
+    const admin = await this._adminRepository.findUserByRefreshToken(refreshToken);
+    console.log(admin)
+  if (!admin) {
+    console.log("error")
     throw new Error("User not found");
   }
-  await this._adminRepository.clearRefreshToken(carOwner._id.toString());
+  await this._adminRepository.clearRefreshToken(admin._id.toString());
 }
 
 
