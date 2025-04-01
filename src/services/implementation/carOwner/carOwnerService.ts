@@ -215,6 +215,9 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         console.log("helloooooooo")
         let carOwner = await this._carOwnerRepository.findUserByEmail(email);
       
+        if (carOwner && carOwner.status === -2) {
+          throw new Error("User is blocked.");
+        }
       
         if (!carOwner) {
             carOwner = await this._carOwnerRepository.create({

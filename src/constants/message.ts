@@ -13,6 +13,9 @@ export const MESSAGES = {
       CARS_FETCHED: "Cars fetched successfully",
       PROFILE_FETCHED: "Profile fetched successfully",
       ID_PROOF_UPDATED: "ID Proof updated successfully",
+      STATUS_UPDATED: "Status updated successfully",    
+      OWNERS_FETCHED: "Car owners fetched successfully",  
+      CUSTOMERS_FETCHED: "Customers fetched successfully",
     },
     ERROR: {
       MISSING_FIELDS: "Required fields are missing",
@@ -30,6 +33,7 @@ export const MESSAGES = {
       OTP_INVALID: "Invalid OTP",
       NO_REFRESH_TOKEN: "No refresh token found",
       INTERNAL_SERVER_ERROR: "Internal server error",
+    ADMIN_NOT_FOUND: "Admin not found"
     },
   };
   

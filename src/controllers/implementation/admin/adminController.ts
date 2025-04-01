@@ -20,11 +20,22 @@ class AdminController implements IAdminController{
         console.log("reeached login1 of Admin")
         const {email,password}=req.body;
         if(!email||!password){
-            res.status(400).json({error:"Email and Password are required"})
+            res.status(StatusCode.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.ERROR.MISSING_FIELDS
+            });
+            return;
         }
 
         const {accessToken,refreshToken,admin}= await this._adminService.loginAdmin(email,password)
 
+        if (!admin) {
+            res.status(StatusCode.NOT_FOUND).json({
+                success: false,
+                message: MESSAGES.ERROR.ADMIN_NOT_FOUND
+            });
+            return;
+        }
         res.cookie("adminRefreshToken",refreshToken,{
             httpOnly:true,
             secure:process.env.NODE_ENV==="production",
@@ -37,12 +48,12 @@ class AdminController implements IAdminController{
         }
         res.status(200).json({
             success: true,
-            message: "Login successful",
+            message:MESSAGES.SUCCESS.LOGIN_SUCCESS,
             accessToken,
             user: {
               id:admin._id,
               email: admin.email,
-              role: 'admin'  // Optional if roles exist
+              role: 'admin'  
             }
         })
        
@@ -75,9 +86,12 @@ async logoutAdmin(req:Request,res:Response): Promise<void>{
         console.log("here?")
         const refreshToken=req.cookies.adminRefreshToken
         if(!refreshToken){
-            console.log("error")
-            res.status(400).json({error:"No refresh Token"})
-            return
+            console.log("No refresh token found");
+            res.status(StatusCode.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.ERROR.NO_REFRESH_TOKEN
+            });
+            return;
         }
         await this._adminService.logoutAdmin(refreshToken)
         res.clearCookie("adminRefreshToken", {
@@ -85,9 +99,16 @@ async logoutAdmin(req:Request,res:Response): Promise<void>{
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           });
-          res.status(200).json({ success: true, message: "Logout successful" });
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.LOGOUT_SUCCESS
+        });
+        //   res.status(200).json({ success: true, message: "Logout successful" });
     }catch (error) {
-            res.status(500).json({ error: "Logout failed" });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
         }
 }
 
@@ -99,9 +120,19 @@ async getAllCustomers(req: Request, res: Response):Promise<void>{
         const customers = await this._adminService.listAllCustomers();
         console.log("Finished calling listAllCustomers()");
         console.log(customers)
-        res.status(200).json({ success: true, data: customers });
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.CUSTOMERS_FETCHED || "Customers fetched successfully",
+            data: customers
+        });
+
+        // res.status(200).json({ success: true, data: customers });
     } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
+        // res.status(500).json({ success: false, message: error.message });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
     }
 }
 
@@ -113,9 +144,18 @@ async getAllOwners(req: Request, res: Response):Promise<void>{
         const owners = await this._adminService.listAllCarOwners();
         console.log("Finished calling listAllCustomers()");
         console.log(owners)
-        res.status(200).json({ success: true, data: owners });
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.OWNERS_FETCHED || "Car owners fetched successfully",
+            data: owners
+        });
+        // res.status(200).json({ success: true, data: owners });
     } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
+        // res.status(500).json({ success: false, message: error.message });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
     }
 }
 // async updateCustomerStatus(req: Request, res: Response):Promise<void> {
@@ -173,23 +213,37 @@ async getAllOwners(req: Request, res: Response):Promise<void>{
 
 async updateCustomerStatus(req: Request, res: Response): Promise<void> {
     // const { userId, newStatus } = req.body;
-
+    try {
     console.log("hihihi")
     const { userId } = req.params;  
         const { status } = req.body;  
     console.log(userId, status)
         if (!userId || status === undefined) {
-            res.status(400).json({ message: "Missing userId or status" });
+            // res.status(400).json({ message: "Missing userId or status" });
+            res.status(StatusCode.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.ERROR.MISSING_FIELDS
+            });
             return
         }
     console.log(userId)
     console.log("hujuhuju,,,,....")
 
-    try {
+   
       const updatedUser = await this._adminService.updateCustomerStatus(userId, status);
-      res.json({ message: "Status updated successfully", user: updatedUser });
-    } catch (error:any) {
-      res.status(500).json({ message: error.message });
+
+      res.status(StatusCode.OK).json({
+        success: true,
+        message: MESSAGES.SUCCESS.STATUS_UPDATED || "Customer status updated successfully",
+        user: updatedUser
+    });
+    //   res.json({ message: "Status updated successfully", user: updatedUser });
+    } catch (error) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+    //   res.status(500).json({ message: error.message });
     }
   }
 
@@ -199,16 +253,28 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
         const { status } = req.body;  
     console.log(userId, status)
         if (!userId || status === undefined) {
-            res.status(400).json({ message: "Missing userId or status" });
-            return
+            res.status(StatusCode.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.ERROR.MISSING_FIELDS
+            });
+            return;
         }
     console.log(userId)
     console.log("hujuhuju,,,,....")
     try {
       const updatedUser = await this._adminService.updateOwnerStatus(userId, status);
-      res.json({ message: "Status updated successfully", user: updatedUser });
+      res.status(StatusCode.OK).json({
+        success: true,
+        message: MESSAGES.SUCCESS.STATUS_UPDATED || "Owner status updated successfully",
+        user: updatedUser
+    });
+    //   res.json({ message: "Status updated successfully", user: updatedUser });
     } catch (error:any) {
-      res.status(500).json({ message: error.message });
+    //   res.status(500).json({ message: error.message });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: MESSAGES.ERROR.SERVER_ERROR
+    });
     }
   }
 
