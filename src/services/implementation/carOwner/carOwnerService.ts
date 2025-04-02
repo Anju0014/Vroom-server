@@ -92,7 +92,7 @@ async otpVerify(email: string, otp: string): Promise<{ carOwner:ICarOwner }> {
         throw new Error("OTP has expired");
     }
   
-    carOwner.status = 1; 
+    carOwner.status = -1; 
     carOwner.otp = null;
     carOwner.otpExpires = null;
 
@@ -283,6 +283,9 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         }
         return updatedOwner;
       }
+
+
+      
 async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
   console.log("registering car for owner",ownerId)
     if (!ownerId) throw new Error("Owner ID is required");

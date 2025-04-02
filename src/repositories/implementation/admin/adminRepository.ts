@@ -40,10 +40,10 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
       async getAllCustomers(): Promise<ICustomer[]> {
         try {
             console.log("reached ,,,,6");
-            const customers = await Customer.find({}, "-password -refreshToken");
+            const customers = await Customer.find({}, "-password -refreshToken",);
             console.log("Customers fetched:", customers);
             if (!customers || !Array.isArray(customers)) {  
-                console.error("❌ No customers found or invalid format.");
+                console.error(" No customers found or invalid format.");
                 return [];
             }
             return customers;
@@ -60,7 +60,7 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
             const carowners = await CarOwner.find({}, "-password -refreshToken");
             console.log("Customers fetched:", carowners);
             if (!carowners || !Array.isArray(carowners)) {  
-                console.error("❌ No customers found or invalid format.");
+                console.error("No customers found or invalid format.");
                 return [];
             }
             return carowners;

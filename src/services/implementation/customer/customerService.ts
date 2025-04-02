@@ -92,7 +92,7 @@ async otpVerify(email: string, otp: string): Promise<{ customer:ICustomer }> {
         throw new Error("OTP has expired");
     }
   
-    customer.status = 1; 
+    customer.status = -1; 
     customer.otp = null;
     customer.otpExpires = null;
 

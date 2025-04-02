@@ -112,7 +112,9 @@ class CarOwnerController implements ICarOwnerController{
 
         }catch(error){
           this.handleError(res, error, StatusCode.BAD_REQUEST);
-           
+            // console.log("LoginError:" ,error)
+
+            // res.status(400).json({ error: error instanceof Error ? error.message : "Login failed" })
         }
     }
 
@@ -123,7 +125,7 @@ class CarOwnerController implements ICarOwnerController{
           const oldRefreshToken = req.cookies.carOwnerRefreshToken;
           if (!oldRefreshToken) {
             res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
-          
+            // res.status(401).json({ error: "Unauthorized" });
             return;
           }
           const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken)
@@ -134,12 +136,13 @@ class CarOwnerController implements ICarOwnerController{
                 sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
-          
+            // res.status(200).json({ accessToken});
             res.status(StatusCode.OK).json({ success: true, accessToken });
         } catch (error) {
           console.error("Error renewing token:", error);
         this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-         
+          // console.error("Token refresh error:", error);
+          // res.status(500).json({ error: "Internal Server Error" });
         }
     }
 
