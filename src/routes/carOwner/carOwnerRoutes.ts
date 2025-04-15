@@ -2,7 +2,7 @@ import {Router} from "express";
 import  CarOwnerController from "../../controllers/implementation/carowner/carownerController"
 import CarOwnerService from "../../services/implementation/carOwner/carOwnerService"
 import CarOwnerRepository from "../../repositories/implementation/carowner/carOwnerRepository";
-import authMiddleware from "../../middlewares/authMiddleWare";
+import authMiddleware,{verifyRole} from "../../middlewares/authMiddleWare";
 
 const carOwnerRouter=Router();
 
@@ -22,7 +22,11 @@ carOwnerRouter.post("/resetpassword",(req,res)=>carOwnerController.resetPassword
 
 carOwnerRouter.post("/refreshToken",(req,res)=>carOwnerController.renewRefreshAccessTokenOwner(req,res))
 
+carOwnerRouter.post('/completeregistration',authMiddleware, verifyRole(["carOwner"]),(req,res)=>carOwnerController.completeRegistration(req,res))
+
 carOwnerRouter.post("/login",(req,res)=>carOwnerController.loginOwner(req,res))
+
+carOwnerRouter.post("/changepassword",authMiddleware,(req,res)=>carOwnerController.changePasswordOwner(req,res))
 
 carOwnerRouter.post("/logout",(req,res)=>carOwnerController.logout(req,res))
 
@@ -33,10 +37,16 @@ carOwnerRouter.get("/getOwnerProfile",authMiddleware,(req,res)=>carOwnerControll
 
 carOwnerRouter.put("/updateProfile", authMiddleware,(req,res)=>carOwnerController.updateProfileOwner(req,res));
 
-carOwnerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>carOwnerController.updateProfileOwnerIdProof(req,res));
+// carOwnerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>carOwnerController.updateProfileOwnerIdProof(req,res));
 
-carOwnerRouter.post("/carupload", authMiddleware, (req,res)=>carOwnerController.uploadCar(req,res));
+// carOwnerRouter.post("/carupload", authMiddleware, (req,res)=>carOwnerController.uploadCar(req,res));
 
-carOwnerRouter.get("/getcars", authMiddleware, (req,res)=>carOwnerController.getCarList(req,res));
+// carOwnerRouter.get("/getcars", authMiddleware, (req,res)=>carOwnerController.getCarList(req,res));
+
+
+// router.put('/car-owner/cars/:id', updateCar);
+// router.delete('/car-owner/cars/:id', deleteCar);
+
+
 
 export default carOwnerRouter

@@ -13,8 +13,7 @@ interface ICarOwnerRepository{
     clearRefreshToken(ownerId:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICarOwner | null>
     findById(ownerId:string): Promise<ICarOwner |null>
-    createCar(car:Partial<ICar>): Promise<ICar>
-    getCarsByOwner(ownerId: string): Promise<ICar[]> 
+   
 }
 
 

@@ -52,7 +52,7 @@ async registerBasicDetails(carOwnerDetails: Partial<ICarOwner>): Promise<{ carOw
         phoneNumber,
         otp,
         otpExpires,
-        status: 0
+        processStatus: 0
     })
 
     await sendOTP(email, otp)
@@ -92,7 +92,7 @@ async otpVerify(email: string, otp: string): Promise<{ carOwner:ICarOwner }> {
         throw new Error("OTP has expired");
     }
   
-    carOwner.status = -1; 
+    carOwner.processStatus = 1; 
     carOwner.otp = null;
     carOwner.otpExpires = null;
 
@@ -125,7 +125,7 @@ async resendOtp(email:string): Promise<{message:string}>{
     return {message:"OTP resend successfully"}
 }
 
-async loginCarOwner(email:string, password:string): Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}>{
+async loginCarOwner(email:string, password:string): Promise<{ownerAccessToken:string,refreshToken:string,carOwner:ICarOwner|null}>{
     console.log(`checking login things`);
     const carOwner=await this._carOwnerRepository.findUserByEmail(email);
     console.log(carOwner)
@@ -134,7 +134,11 @@ async loginCarOwner(email:string, password:string): Promise<{accessToken:string,
         throw new Error("Invalid Credentials");
     }
     
-    if (carOwner.status === -2) {
+    if (carOwner.processStatus < 1) {
+      throw new Error("Not a  verified User")
+  }
+
+    if (carOwner.blockStatus === 1) {
         throw new Error("This user is blocked by admin")
     }
 
@@ -143,40 +147,110 @@ async loginCarOwner(email:string, password:string): Promise<{accessToken:string,
         console.log("not correct")
         throw new Error("Invalid Credentials")
     }
-    const accessToken=JwtUtils.generateAccessToken({id:carOwner._id, email:carOwner.email});
+    const ownerAccessToken=JwtUtils.generateAccessToken({id:carOwner._id, email:carOwner.email,role:'owner'});
     const newRefreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
 
     this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), newRefreshToken);
 
 
-    return {accessToken,refreshToken:newRefreshToken,carOwner}
+    return {ownerAccessToken,refreshToken:newRefreshToken,carOwner}
 }
 
-async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
+// async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
     
-        const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
+//         const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
     
-        console.log("did reach")
-        if (!decoded || typeof decoded === 'string' || !decoded.id) {
-            console.log("error heree")
-            throw new Error("Invalid refresh token");
-        }
+//         console.log("did reach")
+//         if (!decoded || typeof decoded === 'string' || !decoded.id) {
+//             console.log("error heree")
+//             throw new Error("Invalid refresh token");
+//         }
 
-        const carOwner = await this._carOwnerRepository.findById(decoded.id);
-        console.log(carOwner)
-        console.log(carOwner?.refreshToken)
-        console.log(oldRefreshToken)
-        if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
+//         const carOwner = await this._carOwnerRepository.findById(decoded.id);
+//         console.log(carOwner)
+//         console.log(carOwner?.refreshToken)
+//         console.log(oldRefreshToken)
+//         if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
             
-            console.log("error here77e")
-            throw new Error("Invalid refresh token")
-        }
-        const accessToken=JwtUtils.generateAccessToken({id:carOwner._id,email:carOwner.email});
-        const refreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
-        await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
+//             console.log("error here77e")
+//             throw new Error("Invalid refresh token")
+//         }
+//         const accessToken=JwtUtils.generateAccessToken({id:carOwner._id,email:carOwner.email, role:'owner'});
+//         const refreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
+//         await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
          
-        return {accessToken,refreshToken}
+//         return {accessToken,refreshToken}
+//     }
+
+async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, refreshToken: string }> {
+  const decoded = JwtUtils.verifyToken(oldRefreshToken, true);
+
+  console.log("Decoded refresh token:", decoded);
+
+  // Handle token verification results
+  if (!decoded || typeof decoded === "string") {
+    console.log("Invalid or malformed refresh token");
+    throw new Error("Invalid refresh token");
+  }
+  if (decoded.message === "Token expired") {
+    console.log("Refresh token has expired");
+    throw new Error("Refresh token expired");
+  }
+  if (!decoded.id) {
+    console.log("No ID in refresh token payload");
+    throw new Error("Invalid refresh token");
+  }
+
+  const carOwner = await this._carOwnerRepository.findById(decoded.id);
+  console.log("Car owner:", carOwner);
+  console.log("Stored refresh token:", carOwner?.refreshToken);
+  console.log("Provided refresh token:", oldRefreshToken);
+
+  if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
+    console.log("Refresh token mismatch or user not found");
+    throw new Error("Invalid refresh token");
+  }
+
+  const accessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email, role: "owner" });
+  const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
+  await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
+
+  return { accessToken, refreshToken };
+}
+
+
+
+    async completeRegister(ownerId:string,ownerDetails:Partial<ICarOwner>):Promise<ICarOwner>{
+      const carOwner=await this._carOwnerRepository.findById(ownerId);
+      if(!carOwner){
+        throw new Error('Owner Not Found')
+      }
+
+      if (ownerDetails.phoneNumber && !/^\d{10}$/.test(ownerDetails.phoneNumber)) {
+        throw new Error("Invalid phone number format. Must be 10 digits.");
+      }
+  
+   
+      if (ownerDetails.address) {
+        const requiredFields = ["addressLine1", "city", "state", "postalCode", "country"];
+        for (const field of requiredFields) {
+          if (!(ownerDetails.address as any)[field]) {
+            throw new Error(`Missing address field: ${field}`);
+          }
+        }
+      }
+      ownerDetails.processStatus = 2;
+
+      const updatedOwner = await this._carOwnerRepository.updateCarOwner(ownerId, ownerDetails);
+      if (!updatedOwner) {
+        throw new Error("Car owner not found or update failed.");
+      }
+
+     updatedOwner.processStatus =2;
+
+      return updatedOwner;
     }
+
 
     async forgotPassword(email: string): Promise<void> {
         const carOwner = await this._carOwnerRepository.findUserByEmail(email);
@@ -186,6 +260,7 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         const resetToken = JwtUtils.generateResetToken({ userId: carOwner._id });
         await sendResetEmail(email, resetToken, 'carOwner');
       }
+
     async resetPassword  (token: string, newPassword: string, role: "customer" | "carOwner"):Promise<string>{
         console.log("reached pt 2")
         const decoded = JwtUtils.verifyResetToken(token);
@@ -200,6 +275,32 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         return "Password reset successful. Please log in.";
       };
 
+
+
+
+      async changePassword(ownerId: string, passwordDetails: { oldPassword: string; newPassword: string }): Promise<{ success: boolean; message: string }> {
+        const { oldPassword, newPassword } = passwordDetails;
+    
+   
+        const carOwner = await this._carOwnerRepository.findById(ownerId);
+        if (!carOwner) {
+            throw new Error("Car Owner not found");
+        }
+
+        const passwordMatch = await PasswordUtils.comparePassword(oldPassword, carOwner.password);
+        if (!passwordMatch) {
+            return { success: false, message: "Old password is incorrect" };
+        }
+
+        const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+
+        await this._carOwnerRepository.updatePassword(ownerId, hashedPassword);
+    
+        return { success: true,message: "Password updated successfully" };
+    }
+    
+
+
     async logoutCarOwner(refreshToken: string): Promise<void> {
    
         const carOwner = await this._carOwnerRepository.findUserByRefreshToken(refreshToken);
@@ -211,12 +312,12 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
 
 
 
-    async loginOwnerGoogle(fullName: string, email: string,profileImage: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,carOwner:ICarOwner|null}> {
+    async loginOwnerGoogle(fullName: string, email: string,profileImage: string, provider: string, role?: string):Promise<{ownerAccessToken:string,refreshToken:string,carOwner:ICarOwner|null}> {
         console.log("helloooooooo")
         let carOwner = await this._carOwnerRepository.findUserByEmail(email);
       
-        if (carOwner && carOwner.status === -2) {
-          throw new Error("User is blocked.");
+        if (carOwner && carOwner.blockStatus === 1) {
+          throw new Error("User is blocked by the Admin.");
         }
       
         if (!carOwner) {
@@ -226,17 +327,18 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
             // googleId,
             profileImage,
             provider,
+            processStatus:1,
             // role: role || "customer", // Default to "customer" if role isn't provided
           });
         }
       
     
-        const accessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email });
+        const ownerAccessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email,role:'owner' });
         const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
       
         await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
         let carOwner2 = await this._carOwnerRepository.findUserByEmail(email);
-        return { accessToken, refreshToken, carOwner };
+        return { ownerAccessToken, refreshToken, carOwner };
       }
 
 
@@ -272,39 +374,23 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
         return updatedOwner;
       }
 
-      async updateCarOwnerProfileId(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> {
 
-        console.log("id",updatedData.idProof)
-        const updatedOwner = await this._carOwnerRepository.updateCarOwner(carOwnerId, updatedData);
-        console.log("updatedOwner",updatedOwner)
-        if (!updatedOwner) {
-          console.log("error2")
-          throw new Error("Car owner not found or update failed.");
-        }
-        return updatedOwner;
-      }
+
+      // async updateCarOwnerProfileId(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> {
+
+      //   console.log("id",updatedData.idProof)
+      //   const updatedOwner = await this._carOwnerRepository.updateCarOwner(carOwnerId, updatedData);
+      //   console.log("updatedOwner",updatedOwner)
+      //   if (!updatedOwner) {
+      //     console.log("error2")
+      //     throw new Error("Car owner not found or update failed.");
+      //   }
+      //   return updatedOwner;
+      // }
 
 
       
-async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
-  console.log("registering car for owner",ownerId)
-    if (!ownerId) throw new Error("Owner ID is required");
-  
-    const carData: Partial<ICar> = {
-      ...carDetails,
-      owner: new mongoose.Types.ObjectId(ownerId), // Ensure ObjectId is used
-      images: carDetails.images && Array.isArray(carDetails.images) ? carDetails.images : [],
-      videos: carDetails.videos && Array.isArray(carDetails.videos) ? carDetails.videos : [],
-    };
-  
-    return await this._carOwnerRepository.createCar(carData);
-  }
 
-
-  async getCarsByOwner(ownerId: string): Promise<ICar[]> {
-    return await this._carOwnerRepository.getCarsByOwner(ownerId);
-  }
-      
 }
 
 export default CarOwnerService

@@ -85,7 +85,7 @@ class CarOwnerController implements ICarOwnerController{
               return
             }
 
-            const {accessToken,refreshToken,carOwner}= await this._carOwnerService.loginCarOwner(email,password)
+            const {ownerAccessToken,refreshToken,carOwner}= await this._carOwnerService.loginCarOwner(email,password)
 
             res.cookie("carOwnerRefreshToken",refreshToken,{
                 httpOnly:true,
@@ -100,7 +100,7 @@ class CarOwnerController implements ICarOwnerController{
             res.status(StatusCode.OK).json({
               success: true,
               message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
-              accessToken,
+              ownerAccessToken,
               user: {
                 id: carOwner._id,
                 fullName: carOwner.fullName,
@@ -119,33 +119,91 @@ class CarOwnerController implements ICarOwnerController{
     }
 
 
-    async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
-        try {
-            console.log("hellooooooo mi")
-          const oldRefreshToken = req.cookies.carOwnerRefreshToken;
-          if (!oldRefreshToken) {
-            res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
-            // res.status(401).json({ error: "Unauthorized" });
-            return;
-          }
-          const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken)
+    // async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
+    //     try {
+    //         console.log("hellooooooo mi at carowner")
+    //       const oldRefreshToken = req.cookies.carOwnerRefreshToken;
+    //       if (!oldRefreshToken) {
+    //         res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
+    //         // res.status(401).json({ error: "Unauthorized" });
+    //         return;
+    //       }
+    //       const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken)
 
-            res.cookie("carOwnerRefreshToken", refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-            })
-            // res.status(200).json({ accessToken});
-            res.status(StatusCode.OK).json({ success: true, accessToken });
-        } catch (error) {
-          console.error("Error renewing token:", error);
-        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-          // console.error("Token refresh error:", error);
-          // res.status(500).json({ error: "Internal Server Error" });
+    //         res.cookie("carOwnerRefreshToken", refreshToken, {
+    //             httpOnly: true,
+    //             secure: process.env.NODE_ENV === "production",
+    //             sameSite: "strict",
+    //             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    //         })
+          
+    //         res.status(StatusCode.OK).json({ success: true, accessToken });
+    //     } catch (error) {
+    //       console.error("Error renewing token:", error);
+    //     this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+          
+    //     }
+    // }
+
+
+    async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
+      try {
+        console.log("Reached renewRefreshAccessTokenOwner");
+        const oldRefreshToken = req.cookies.carOwnerRefreshToken;
+        if (!oldRefreshToken) {
+          res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
+          return;
         }
+    
+        const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken);
+    
+        res.cookie("carOwnerRefreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+    
+        res.status(StatusCode.OK).json({ success: true, accessToken });
+      } catch (error) {
+        if(error instanceof Error){
+        console.error("Error renewing token:", error.message);
+        if (error.message === "Refresh token expired" || error.message === "Invalid refresh token") {
+          res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: "Invalid or expired refresh token" });
+        } else {
+          this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+        }}
+      }
     }
 
+    async completeRegistration(req: CustomRequest, res: Response): Promise<void> {
+    // async completeRegistration(req:CustomRequest,res:Request): Promise<void>{
+      try{
+        console.log("reached at new Registratipo")
+        const carOwnerId = req.userId;
+          console.log("data from frontend",req.body)
+          console.log(carOwnerId)
+          if(!carOwnerId){
+            res.status(StatusCode.FORBIDDEN).json({
+              success: false,
+              message: MESSAGES.ERROR.NO_OWNER_ID_FOUND
+          });
+            // res.status(403).json({message: "Forbidden: No car owner ID found"})
+             return  
+        }
+
+        const completeOwner= await this._carOwnerService.completeRegister(carOwnerId,req.body)
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: MESSAGES.SUCCESS.COMPLETED_REGISTRATION_FORM,
+          completeOwner
+      });
+    
+    }catch(error){
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
+
+    }
+    }
      async forgotPasswordOwner (req: Request, res: Response):Promise<void> {
         try {
             const { email } = req.body;
@@ -195,14 +253,33 @@ class CarOwnerController implements ICarOwnerController{
       };
 
 
-
+    async changePasswordOwner(req: CustomRequest, res: Response): Promise<void> {
+      try {
+          const ownerId = req.userId; // Set in middleware
+          console.log()
+          if (!ownerId) {
+              res.status(StatusCode.UNAUTHORIZED).json({
+                  success: false,
+                  message: MESSAGES.ERROR.UNAUTHORIZED,
+              });
+              return;
+          }
+          const result = await this._carOwnerService.changePassword(ownerId, req.body);
+          if (!result.success) {
+              res.status(StatusCode.BAD_REQUEST).json(result);
+              return;
+          }
+          res.status(StatusCode.OK).json(result);
+      } catch (error) {
+        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      }
+  }
+  
 
       async logout(req:Request,res:Response): Promise<void>{
         try{
             const refreshToken=req.cookies.carOwnerRefreshToken
-            // if(!refreshToken){
-            //     res.status(400).json({error:"No refresh Token"})
-            // }
+        
             if (!refreshToken) {
               res.status(StatusCode.BAD_REQUEST).json({ 
                   success: false, 
@@ -250,7 +327,7 @@ class CarOwnerController implements ICarOwnerController{
             return;
           }
       
-          const { accessToken, refreshToken, carOwner } = await this._carOwnerService.loginOwnerGoogle(fullName, email, profileImage, provider, role);
+          const { ownerAccessToken, refreshToken, carOwner } = await this._carOwnerService.loginOwnerGoogle(fullName, email, profileImage, provider, role);
       
          
           res.cookie("carOwnerRefreshToken", refreshToken, {
@@ -271,7 +348,7 @@ class CarOwnerController implements ICarOwnerController{
           res.status(StatusCode.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
-            accessToken,
+            ownerAccessToken,
             user: {
                 id: carOwner._id,
                 fullName: carOwner.fullName,
@@ -373,123 +450,49 @@ class CarOwnerController implements ICarOwnerController{
         }
       }
 
-      async updateProfileOwnerIdProof(req: CustomRequest, res: Response): Promise<void> {
-        try {
-          const carOwnerId = req.userId;
-          console.log("reached heriii")
-          console.log(carOwnerId)
-          if(!carOwnerId){
-            res.status(StatusCode.FORBIDDEN).json({
-              success: false,
-              message: MESSAGES.ERROR.NO_OWNER_ID_FOUND
-          });
-            // res.status(403).json({message: "Forbidden: No car owner ID found"})
-             return  
-        }
-          const { idProof } = req.body;
-          console.log("id",idProof)
-          if (!idProof) {
-            console.log("error1")
-            res.status(StatusCode.BAD_REQUEST).json({
-              success: false,
-              message: MESSAGES.ERROR.NO_UPDATE_DATA
-          });
-            // res.status(400).json({ message: "No data provided to update." });
-            return 
-          }
+      // async updateProfileOwnerIdProof(req: CustomRequest, res: Response): Promise<void> {
+      //   try {
+      //     const carOwnerId = req.userId;
+      //     console.log("reached heriii")
+      //     console.log(carOwnerId)
+      //     if(!carOwnerId){
+      //       res.status(StatusCode.FORBIDDEN).json({
+      //         success: false,
+      //         message: MESSAGES.ERROR.NO_OWNER_ID_FOUND
+      //     });
+      //       // res.status(403).json({message: "Forbidden: No car owner ID found"})
+      //        return  
+      //   }
+      //     const { idProof } = req.body;
+      //     console.log("id",idProof)
+      //     if (!idProof) {
+      //       console.log("error1")
+      //       res.status(StatusCode.BAD_REQUEST).json({
+      //         success: false,
+      //         message: MESSAGES.ERROR.NO_UPDATE_DATA
+      //     });
+      //       // res.status(400).json({ message: "No data provided to update." });
+      //       return 
+      //     }
     
-          const updatedOwner = await this._carOwnerService.updateCarOwnerProfileId(carOwnerId, {idProof});
+      //     const updatedOwner = await this._carOwnerService.updateCarOwnerProfileId(carOwnerId, {idProof});
           
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: MESSAGES.SUCCESS.ID_PROOF_UPDATED,
-            updatedOwner
-        });
+      //     res.status(StatusCode.OK).json({
+      //       success: true,
+      //       message: MESSAGES.SUCCESS.ID_PROOF_UPDATED,
+      //       updatedOwner
+      //   });
 
-          // res.status(200).json({ message: "IdProof updated successfully", updatedOwner });
-        } catch (error) {
-          console.error("Error updating ID Proof:", error);
-          this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-        }
-      }
+      //     // res.status(200).json({ message: "IdProof updated successfully", updatedOwner });
+      //   } catch (error) {
+      //     console.error("Error updating ID Proof:", error);
+      //     this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      //   }
+      // }
 
 
 
-      async uploadCar(req: CustomRequest, res: Response): Promise<void> {
-        try {
-          const {carName,brand,year,fuelType,rcBookNo,expectedWage,location,images,videos,} = req.body;
-    
-          const ownerId = req.userId; 
       
-          if (!ownerId) {
-            res.status(StatusCode.UNAUTHORIZED).json({
-                success: false,
-                message: MESSAGES.ERROR.UNAUTHORIZED,
-            });
-            return;
-        }
-
-        if (!carName || !brand || !expectedWage || !location || !images || (Array.isArray(images) && images.length === 0)) {
-            res.status(StatusCode.BAD_REQUEST).json({
-                success: false,
-                message: MESSAGES.ERROR.MISSING_FIELDS,
-            });
-            return;
-        }
-          console.log("Owner ID:", ownerId);
-          console.log("Car details:", req.body);
-          const carData: Partial<ICar> = {
-            carName,
-            brand,
-            year,
-            fuelType,
-            rcBookNo,
-            expectedWage,
-            location,
-            images: Array.isArray(images) ? images : [images], // Ensure images is an array
-            videos: videos && Array.isArray(videos) ? videos : [], // Default empty array if not provided
-          };
-          const newCar = await this._carOwnerService.registerNewCar(carData, ownerId);
-      
-          res.status(StatusCode.CREATED).json({
-            success: true,
-            message: MESSAGES.SUCCESS.CAR_UPLOADED,
-            car: newCar,
-        });
-
-          // res.status(201).json({ message: "Car uploaded successfully", car: newCar });
-        } catch (error) {
-          console.error("Car upload error:", error);
-        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-        }
-      }
-      
-      async getCarList(req: CustomRequest, res: Response): Promise<void> {
-        try {
-          const ownerId = req.userId; // Assuming this is set in the middleware
-          if (!ownerId) {
-            // res.status(400).json({ message: "Owner ID is required" });
-            res.status(StatusCode.UNAUTHORIZED).json({
-              success: false,
-              message: MESSAGES.ERROR.UNAUTHORIZED,
-          });
-            return;
-          }
-    
-          const cars = await this._carOwnerService.getCarsByOwner(ownerId);
-    
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: MESSAGES.SUCCESS.CARS_FETCHED,
-            cars,
-        });
-          // res.status(200).json({ message: "Cars fetched successfully", cars });
-        } catch (error) {
-          console.error("Error fetching cars:", error);
-        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-        }
-      }
-
 
       
 

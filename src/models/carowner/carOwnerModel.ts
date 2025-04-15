@@ -14,8 +14,12 @@ interface ICarOwner extends Document{
     fullName:string;
     email:string;
     phoneNumber:string;
+    altPhoneNumber:string;
     password:string;
     isVerified:boolean;
+    processStatus:number;
+    verifyStatus:number;
+    blockStatus:number;
     status:number;
     previousStatus:number|null;
     otp?:string|null;
@@ -27,6 +31,7 @@ interface ICarOwner extends Document{
     idVerified:boolean;
     address:IAddress;
     refreshToken:string;
+    rejectionReason:string;
     role:"carOwner";
     updatedAt?:Date;
     createdAt?: Date;
@@ -46,6 +51,9 @@ const CarOwnerSchema = new Schema<ICarOwner>({
     phoneNumber: {
         type: String,
     },
+    altPhoneNumber: {
+        type: String,
+    },
     password: {
         type: String,
         
@@ -62,6 +70,24 @@ const CarOwnerSchema = new Schema<ICarOwner>({
         enum:["carOwner"],
         default:"carOwner"
     },
+    processStatus:{
+        type: Number,
+        enum: [0, 1, 2, 3], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
+    },
+    blockStatus:{
+        type: Number,
+        enum: [0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
+    },
+    verifyStatus:{
+        type: Number,
+        enum: [-1,0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
+    },
+    rejectionReason:{
+        type:String
+    },
     status: {
         type: Number,
         enum: [-2, -1, 0, 1, 2], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
@@ -70,6 +96,9 @@ const CarOwnerSchema = new Schema<ICarOwner>({
   
       // ✅ To store previous status before blocking
       previousStatus: { type: Number, enum: [-1, 0, 1, 2], default: 0 },
+
+
+
     otp: { type: String, required: false },
     otpExpires: { type: Date, required: false, expires: 300 },
     updatedAt: {

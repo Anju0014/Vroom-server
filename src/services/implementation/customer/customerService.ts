@@ -49,7 +49,7 @@ async registerBasicDetails(customerDetails: Partial<ICustomer>): Promise<{ custo
         phoneNumber,
         otp,
         otpExpires,
-        status: 0
+        processStatus: 0
     })
 
     await sendOTP(email, otp)
@@ -92,7 +92,8 @@ async otpVerify(email: string, otp: string): Promise<{ customer:ICustomer }> {
         throw new Error("OTP has expired");
     }
   
-    customer.status = -1; 
+    customer.processStatus = 2; 
+    customer.verifyStatus = 1;
     customer.otp = null;
     customer.otpExpires = null;
 
@@ -125,7 +126,7 @@ async resendOtp(email:string): Promise<{message:string}>{
     return {message:"OTP resend successfully"}
 }
 
-async loginCustomer(email:string, password:string): Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}>{
+async loginCustomer(email:string, password:string): Promise<{customerAccessToken:string,refreshToken:string,customer:ICustomer|null}>{
     console.log(`checking login things`);
     const customer=await this._customerRepository.findUserByEmail(email);
     console.log(customer)
@@ -134,9 +135,14 @@ async loginCustomer(email:string, password:string): Promise<{accessToken:string,
         throw new Error("Invalid Credentials");
     }
     
-    if (customer.status === -2 ) {
+    if (customer.blockStatus === 1) {
         throw new Error("This user is blocked by admin")
     }
+
+    if(customer.processStatus === 0){
+      throw new Error("Signup is not completed")
+    }
+
 //     if (user.status === 0) {
 //         throw new Error("Signup is not completed")
 //     }
@@ -145,12 +151,12 @@ async loginCustomer(email:string, password:string): Promise<{accessToken:string,
         console.log("not correct")
         throw new Error("Invalid Credentials")
     }
-    const accessToken=JwtUtils.generateAccessToken({id:customer._id, email:customer.email});
+    const customerAccessToken=JwtUtils.generateAccessToken({id:customer._id, email:customer.email,role:'customer'});
     const newRefreshToken=JwtUtils.generateRefreshToken({id:customer._id});
 
     await this._customerRepository.updateRefreshToken(customer._id.toString(), newRefreshToken);
 
-    return {accessToken,refreshToken:newRefreshToken,customer}
+    return {customerAccessToken,refreshToken:newRefreshToken,customer}
 }
 
 async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
@@ -197,6 +203,33 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
 
 
 
+       async changePassword(customerId: string, passwordDetails: { oldPassword: string; newPassword: string }): Promise<string > {
+              const { oldPassword, newPassword } = passwordDetails;
+              console.log("reachedkjkkf")
+          
+         
+              const customer = await this._customerRepository.findById(customerId);
+              if (!customer) {
+                console.log("ijhjebhigbhinjdsn")
+                  throw new Error("Car Owner not found");
+              }
+      
+              const passwordMatch = await PasswordUtils.comparePassword(oldPassword, customer.password);
+              if (!passwordMatch) {
+                console.log("jdjfu??")
+                  throw new Error("Old password is incorrect" );
+              }
+      
+              const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+      
+              await this._customerRepository.updatePassword(customerId, hashedPassword);
+           
+              return "Password updated successfully" ;
+          }
+          
+      
+
+
 async logoutCustomer(refreshToken: string): Promise<void> {
     
     console.log("reached")
@@ -211,23 +244,32 @@ async logoutCustomer(refreshToken: string): Promise<void> {
 
 
 
-async loginCustomerGoogle(fullName: string, email: string, profileImage: string, provider: string, role?: string):Promise<{accessToken:string,refreshToken:string,customer:ICustomer|null}> {
+async loginCustomerGoogle(fullName: string, email: string, profileImage: string, provider: string, role?: string):Promise<{customerAccessToken:string,refreshToken:string,customer:ICustomer|null}> {
  
    console.log(profileImage)
     console.log("helloooooooo")
-    let customer;
-    customer = await this._customerRepository.findUserByEmail(email);
+    // let customer;
+    let customer = await this._customerRepository.findUserByEmail(email);
+
     console.log("1//////////",customer)
+
+    if (customer&& customer.blockStatus === 1) {
+      throw new Error("User is blocked by the Admin .");
+    }
+  
     if (!customer) {
      customer = await this._customerRepository.create({
         fullName,
         email,
         profileImage,
         provider,
+        processStatus:2,
+        verifyStatus:1,
         // role: role || "customer", // Default to "customer" if role isn't provided
       });
     }
-    const accessToken = JwtUtils.generateAccessToken({ id: customer._id, email: customer.email });
+
+    const customerAccessToken = JwtUtils.generateAccessToken({ id: customer._id, email: customer.email,role:'customer' });
     const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
   
     
@@ -236,7 +278,7 @@ async loginCustomerGoogle(fullName: string, email: string, profileImage: string,
     let customer2 = await this._customerRepository.findUserByEmail(email);
     console.log(customer2)
     
-    return { accessToken, refreshToken, customer };
+    return { customerAccessToken, refreshToken, customer };
   }
 
 
@@ -272,9 +314,12 @@ async loginCustomerGoogle(fullName: string, email: string, profileImage: string,
         return updatedcustomer;
       }
 
+
+
       async updateCustomerProfileId(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> {
 
         console.log("id",updatedData.idProof)
+        updatedData.processStatus=1;
         const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
         console.log("updatedcustomer",updatedcustomer)
         if (!updatedcustomer) {
@@ -283,8 +328,7 @@ async loginCustomerGoogle(fullName: string, email: string, profileImage: string,
         }
         return updatedcustomer;
       }
-      
-      
-  
+
+
 }
 export default CustomerService

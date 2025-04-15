@@ -10,8 +10,8 @@ interface IAdminController{
     // verifyCustomer(req: Request, res: Response): Promise<void>
     // updateOwnerStatus(req: Request, res: Response): Promise<void>
     // verifyOwner(req: Request, res: Response): Promise<void>
-    updateCustomerStatus(req: Request, res: Response): Promise<void>
-    updateOwnerStatus(req: Request, res: Response): Promise<void>
+    updateCustomerBlockStatus(req: Request, res: Response): Promise<void>
+    updateOwnerBlockStatus(req: Request, res: Response): Promise<void>
 }
 
 export default IAdminController

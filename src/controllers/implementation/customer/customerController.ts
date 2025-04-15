@@ -19,8 +19,6 @@ class CustomerContoller implements ICustomerController{
             const { customer } = await this._customerService.registerBasicDetails(req.body)
 
             // res.status(201).json({ message: "OTP sent to email", email: customer.email })
-
-            
             res.status(StatusCode.CREATED).json({
               success: true,
               message: MESSAGES.SUCCESS.OTP_SENT,
@@ -77,7 +75,7 @@ class CustomerContoller implements ICustomerController{
               return
             }
 
-            const {accessToken,refreshToken,customer}= await this._customerService.loginCustomer(email,password)
+            const {customerAccessToken,refreshToken,customer}= await this._customerService.loginCustomer(email,password)
 
             res.cookie("customerRefreshToken",refreshToken,{
                 httpOnly:true,
@@ -92,7 +90,7 @@ class CustomerContoller implements ICustomerController{
             res.status(StatusCode.OK).json({
               success: true,
               message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
-              accessToken,
+              customerAccessToken,
                 user: {
                   id: customer._id,
                   fullName: customer.fullName,
@@ -127,7 +125,7 @@ class CustomerContoller implements ICustomerController{
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
             // res.status(200).json({ accessToken});
-            res.status(StatusCode.OK).json({ success: true, accessToken });
+            res.status(StatusCode.OK).json({ success: true,accessToken });
         } catch (error) {
           this.handleError(res, error, StatusCode.BAD_REQUEST);
         }
@@ -182,6 +180,39 @@ class CustomerContoller implements ICustomerController{
         }
       };
 
+       async changePassword(req: CustomRequest, res: Response): Promise<void> {
+            try {
+                const customerId = req.userId; // Set in middleware
+                console.log("reached at change password")
+                console.log(customerId)
+                if (!customerId) {
+                  console.log("reached  noy at change password")
+                    res.status(StatusCode.UNAUTHORIZED).json({
+                        success: false,
+                        message: MESSAGES.ERROR.UNAUTHORIZED,
+                    });
+                    return;
+                }
+                const message = await this._customerService.changePassword(customerId, req.body);
+             
+                res.status(StatusCode.OK).json({
+                  success: true,
+                  message
+                });
+            } catch (error:unknown) {
+              if(error instanceof Error){
+                res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+                  success:false,
+                  message:error.message
+                });
+
+              }
+             
+
+            }
+        }
+        
+
     async logout(req:Request,res:Response): Promise<void>{
         try{
 
@@ -229,7 +260,7 @@ class CustomerContoller implements ICustomerController{
             return;
           }
       
-          const { accessToken, refreshToken, customer } = await this._customerService.loginCustomerGoogle(fullName, email, profileImage, provider, role);
+          const { customerAccessToken, refreshToken, customer } = await this._customerService.loginCustomerGoogle(fullName, email, profileImage, provider, role);
       
          
           res.cookie("customerRefreshToken", refreshToken, {
@@ -248,7 +279,7 @@ class CustomerContoller implements ICustomerController{
           res.status(200).json({
             success: true,
             message: "Login successful",
-            accessToken,
+            customerAccessToken,
             user: {
               id: customer._id,
               fullName: customer.fullName,

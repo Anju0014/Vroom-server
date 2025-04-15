@@ -27,7 +27,7 @@ class AdminController implements IAdminController{
             return;
         }
 
-        const {accessToken,refreshToken,admin}= await this._adminService.loginAdmin(email,password)
+        const {adminAccessToken,refreshToken,admin}= await this._adminService.loginAdmin(email,password)
 
         if (!admin) {
             res.status(StatusCode.NOT_FOUND).json({
@@ -49,7 +49,7 @@ class AdminController implements IAdminController{
         res.status(200).json({
             success: true,
             message:MESSAGES.SUCCESS.LOGIN_SUCCESS,
-            accessToken,
+            adminAccessToken,
             user: {
               id:admin._id,
               email: admin.email,
@@ -158,6 +158,72 @@ async getAllOwners(req: Request, res: Response):Promise<void>{
         });
     }
 }
+
+
+
+async getAllOwnersforVerify(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllCustomers()...");
+        const owners = await this._adminService.listAllOwnerVerify();
+        console.log("Finished calling listAllCustomers()");
+        console.log(owners)
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.OWNERS_FETCHED || "Car owners fetched successfully",
+            data: owners
+        });
+        // res.status(200).json({ success: true, data: owners });
+    } catch (error: any) {
+        // res.status(500).json({ success: false, message: error.message });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+    }
+}
+
+
+async getAllCarsforVerify(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllCustomers()...");
+        const cars = await this._adminService.listAllCarsVerify();
+        console.log("Finished calling listAllCustomers()");
+        console.log(cars)
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.CARS_FETCHED || "Cars fetched successfully",
+            data: cars
+        });
+        // res.status(200).json({ success: true, data: owners });
+    } catch (error: any) {
+        // res.status(500).json({ success: false, message: error.message });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // async updateCustomerStatus(req: Request, res: Response):Promise<void> {
 //     try {
 //         const { customerId } = req.params;
@@ -211,7 +277,7 @@ async getAllOwners(req: Request, res: Response):Promise<void>{
 // }
 
 
-async updateCustomerStatus(req: Request, res: Response): Promise<void> {
+async updateCustomerBlockStatus(req: Request, res: Response): Promise<void> {
     // const { userId, newStatus } = req.body;
     try {
     console.log("hihihi")
@@ -219,7 +285,6 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
         const { status } = req.body;  
     console.log(userId, status)
         if (!userId || status === undefined) {
-            // res.status(400).json({ message: "Missing userId or status" });
             res.status(StatusCode.BAD_REQUEST).json({
                 success: false,
                 message: MESSAGES.ERROR.MISSING_FIELDS
@@ -230,14 +295,14 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
     console.log("hujuhuju,,,,....")
 
    
-      const updatedUser = await this._adminService.updateCustomerStatus(userId, status);
+      const updatedUser = await this._adminService.updateCustomerBlockStatus(userId, status);
 
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.STATUS_UPDATED || "Customer status updated successfully",
         user: updatedUser
     });
-    //   res.json({ message: "Status updated successfully", user: updatedUser });
+   
     } catch (error) {
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
@@ -247,7 +312,36 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
     }
   }
 
-  async updateOwnerStatus(req: Request, res: Response): Promise<void> {
+async updateVerifyStatus(req: Request, res: Response): Promise<void> {
+    try{
+    const { userId } = req.params;  
+    const { status, reason } = req.body;
+
+    console.log("reshhjbdh", status,reason)
+    if (!userId || status === undefined) {
+      res.status(400).json({ message: "Missing required fields" });
+      return 
+    }
+
+    const verifyDetails = status === -1 ? { verifyStatus:status, rejectionReason: reason } : { verifyStatus:status };
+    let updatedUser= await this._adminService.updateVerifyStatus(userId,verifyDetails);
+    res.status(StatusCode.OK).json({
+        success: true,
+        message: MESSAGES.SUCCESS.STATUS_UPDATED || "Owner status updated successfully",
+        user: updatedUser
+    });
+
+    }
+    catch(error){
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+
+    }
+}
+
+  async updateOwnerBlockStatus(req: Request, res: Response): Promise<void> {
     console.log("hihihi")
     const { userId } = req.params;  
         const { status } = req.body;  
@@ -262,7 +356,7 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
     console.log(userId)
     console.log("hujuhuju,,,,....")
     try {
-      const updatedUser = await this._adminService.updateOwnerStatus(userId, status);
+      const updatedUser = await this._adminService.updateOwnerBlockStatus(userId, status);
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.STATUS_UPDATED || "Owner status updated successfully",
@@ -277,6 +371,37 @@ async updateCustomerStatus(req: Request, res: Response): Promise<void> {
     });
     }
   }
+
+  async updateCarVerifyStatus(req: Request, res: Response): Promise<void> {
+    try{
+        console.log("&hsild")
+    const { carId } = req.params;  
+    const { status, reason } = req.body;
+
+    console.log("reshhjbdh", status,reason)
+    if (!carId || status === undefined) {
+      res.status(400).json({ message: "Missing required fields" });
+      return 
+    }
+
+    const verifyDetails = status === -1 ? { verifyStatus:status, rejectionReason: reason } : { verifyStatus:status };
+    let updatedCar= await this._adminService.updateCarVerifyStatus(carId,verifyDetails);
+    res.status(StatusCode.OK).json({
+        success: true,
+        message: MESSAGES.SUCCESS.STATUS_UPDATED || "Car status updated successfully",
+        car: updatedCar
+    });
+
+    }
+    catch(error){
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+
+    }
+}
+
 
 
 

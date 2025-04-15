@@ -3,6 +3,7 @@ import IAdminRepository from "../../interfaces/admin/IAdminRepository";
 import { BaseRepository } from "../../base/BaseRepository";
 import {Customer,ICustomer} from "../../../models/customer/customerModel"
 import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
+import { Car, ICar } from "../../../models/car/carModel";
 
 
 
@@ -54,6 +55,7 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
     }
     
     
+    
     async getAllOwners(): Promise<ICarOwner[]> {
         try {
             console.log("reached ,,,,6");
@@ -69,6 +71,47 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
             throw new Error("Database query failed");
         }
     }
+
+        
+    async getAllOwnerVerify(): Promise<ICarOwner[]> {
+        try {
+            console.log("reached ,,,,6");
+            const carowners = await CarOwner.find({processStatus:2,verifyStatus:0}, "-password -refreshToken");
+            console.log("Customers fetched:", carowners);
+            if (!carowners || !Array.isArray(carowners)) {  
+                console.error("No customers found or invalid format.");
+                return [];
+            }
+            return carowners;
+        } catch (error) {
+            console.error("Error in getAllOwners:", error);
+            throw new Error("Database query failed");
+        }
+    }
+
+
+
+
+
+
+
+
+    async getAllCarsVerify(): Promise<ICar[]> {
+        try {
+            console.log("reached ,,,,6");
+            const cars = await Car.find();
+            console.log("Customers fetched:", cars);
+            if (!cars || !Array.isArray(cars)) {  
+                console.error("No customers found or invalid format.");
+                return [];
+            }
+            return cars;
+        } catch (error) {
+            console.error("Error in getAllOwners:", error);
+            throw new Error("Database query failed");
+        }
+    }
+
 
     //   async getAllCustomers(): Promise<ICustomer[]> {
     //     console.log("reached ,,,,6")
@@ -137,5 +180,15 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
         return await CarOwner.findByIdAndUpdate(ownerId, updateData, { new: true });
     };
 
+
+    async updateCarStatus(carId:string, updateData: Partial<ICar>) :Promise<ICar| null> {
+        return await Car.findByIdAndUpdate(carId, updateData, { new: true });
+    };
+
+
+    async findCarById(carId: string): Promise<ICar | null> {
+        return Car.findById(carId);
+      }
+   
 }
 export default AdminRepository

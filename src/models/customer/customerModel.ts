@@ -18,6 +18,9 @@ interface ICustomer extends Document{
     password:string;
     isVerified:boolean;
     status:number;
+    processStatus:number;
+    verifyStatus:number;
+    blockStatus:number;
     previousStatus:number|null;
     otp?:string|null;
     otpExpires?:Date|null;
@@ -62,6 +65,21 @@ const CustomerSchema = new Schema<ICustomer>({
         type:String,
         enum:["customer"],
         default:"customer"
+    },
+    processStatus:{
+        type: Number,
+        enum: [0, 1, 2, 3], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
+    },
+    blockStatus:{
+        type: Number,
+        enum: [0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
+    },
+    verifyStatus:{
+        type: Number,
+        enum: [-1,0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+        default: 0,
     },
     status: {
         type: Number,

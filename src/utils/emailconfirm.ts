@@ -56,4 +56,19 @@ export const sendOTP = async (email: string, otp: string) => {
 }
 }
 
+export const sendEmail = async ({ to, subject, text }: { to: string; subject: string; text: string }) => {
+  try {
+    console.log("sending email")
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      text,
+    });
+    console.log(`Email sent to ${to}`);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
 

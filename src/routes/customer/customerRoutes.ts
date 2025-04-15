@@ -22,6 +22,9 @@ customerRouter.post("/resetpassword",(req,res)=>customerController.resetPassword
 
 customerRouter.post("/login",(req,res)=>customerController.login(req,res))
 
+customerRouter.post("/changepassword",authMiddleware,(req,res)=>customerController.changePassword(req,res))
+
+
 customerRouter.post('/logout',(req,res)=>customerController.logout(req,res))
 
 customerRouter.post('/googleSignIn',(req,res)=>customerController.googleSignIn(req,res))

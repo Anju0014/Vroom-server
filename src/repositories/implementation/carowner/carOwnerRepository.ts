@@ -36,11 +36,6 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
         return await CarOwner.findOne({_id:carOwnerId})
     }
 
-    async createCar(car:Partial<ICar>): Promise<ICar>{
-        return await Car.create(car)
-    }
-    async getCarsByOwner(ownerId: string): Promise<ICar[]> {
-        return await Car.find({ owner: ownerId });
-      }
+   
 }
 export default CarOwnerRepository

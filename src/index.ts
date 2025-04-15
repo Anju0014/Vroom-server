@@ -5,9 +5,10 @@ import http from 'http';
 import connectDB from './config/dbConfig';
 import cookieParser from 'cookie-parser';
 import customerRouter from './routes/customer/customerRoutes';
-import carOwnerRouter from './routes/carOwner/carOwner';
-import adminRouter from './routes/admin/admin';
+import carOwnerRouter from './routes/carOwner/carOwnerRoutes';
+import adminRouter from './routes/admin/adminRoutes';
 import s3Routes from './routes/s3Routes'
+import carRouter from './routes/car/carRoutes';
 
 dotenv.config();
 connectDB();
@@ -31,6 +32,7 @@ app.use(cors({
 
 app.use("/",customerRouter);
 app.use("/owner",carOwnerRouter);
+app.use("/car",carRouter)
 app.use("/admin",adminRouter);
 app.use("/api/s3", s3Routes);
 
