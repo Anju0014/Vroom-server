@@ -3,6 +3,7 @@ import {Car, ICar} from '../../../models/car/carModel'
 import { CustomRequest } from "../../../middlewares/authMiddleWare";
 import { MESSAGES } from "../../../constants/message";
 import { StatusCode } from "../../../constants/statusCode";
+// import {Booking} from '../../../models/booking'
 
 
 // import { IAdmin } from '../../../models/admin/adminModel';
@@ -218,7 +219,79 @@ class CarController implements ICarController{
         }
       }
       
+
+
+   async getNearbyCars (req: Request, res: Response): Promise<void>{
+  const { lat, lng, maxDistance = "50" } = req.query;
+console.log("didi i came")
+  console.log(lat,lng,maxDistance)
+  if (!lat || !lng) {
+    res.status(400).json({ error: 'Latitude and longitude are required' });
+    return;
+  }
+
+  try {
+    const cars = await Car.find({
+      verifyStatus: 1,
+      isDeleted: false,
+      available: true,
+      'location.coordinates': {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [
+              parseFloat(lng as string),
+              parseFloat(lat as string)
+            ]
+          },
+          $maxDistance: parseFloat(maxDistance as string) * 1000 // Convert km to meters
+        }
+      }
+    });
+   
+    console.log(cars)
+    res.json(cars);
+  } catch (err) {
+    console.error('Nearby cars error:', err);
+    res.status(500).json({ error: 'Server error while fetching nearby cars' });
+  }
+}
+async getFeaturedCars (req: Request, res: Response): Promise<void>{
+
+console.log("didi i came")
   
+ 
+  try {
+    const cars = await Car.find({
+      verifyStatus: 1,
+      isDeleted: false,
+      available: true,
+    }).limit(3);
+   
+    console.log(cars)
+    res.json(cars);
+  } catch (err) {
+    console.error('Nearby cars error:', err);
+    res.status(500).json({ error: 'Server error while fetching nearby cars' });
+  }
+  
+};
+
+
+
+
+async getCarDetail (req:Request, res:Response): Promise<void>  {
+console.log("melajd")
+  const  {carId}=req.params
+  // req.params;
+
+  const car = await Car.findById(carId);
+  res.status(201).json(car );
+}
+
+
+
+
 
 
   private handleError(res: Response, error: unknown, statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR): void {

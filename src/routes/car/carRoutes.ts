@@ -20,4 +20,15 @@ carRouter.delete("/deletecars/:id", authMiddleware, (req,res)=>carController.del
 carRouter.put("/updatecars/:id", authMiddleware, (req,res)=>carController.updateCar(req,res));
 
 
+carRouter.get('/nearby', (req,res)=>carController.getNearbyCars(req,res));
+
+carRouter.get('/featured',(req,res)=>carController.getFeaturedCars(req,res));
+
+
+// carRouter.get('/booked-dates/:carId',(req,res)=>carController.getbookedDatesCars(req,res));
+
+// carRouter.post('/bookings', async (req, res) => carController.createBooking(req,res));
+
+carRouter.get('/getCarDetails/:carId', (req,res)=>carController.getCarDetail(req,res));
+
 export default carRouter
