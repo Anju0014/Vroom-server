@@ -9,6 +9,7 @@ import { StatusCode } from "../../../constants/statusCode";
 // import { IAdmin } from '../../../models/admin/adminModel';
 import ICarController from '../../interfaces/car/ICarController';
 import { ICarService} from '../../../services/interfaces/car/ICarServices';
+import { Booking } from '../../../models/booking/bookingModel';
 // import { ICustomer } from '../../../models/customer/customerModel';
 // import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 
@@ -266,7 +267,7 @@ console.log("didi i came")
       verifyStatus: 1,
       isDeleted: false,
       available: true,
-    }).limit(3);
+    });
    
     console.log(cars)
     res.json(cars);
@@ -280,6 +281,7 @@ console.log("didi i came")
 
 
 
+
 async getCarDetail (req:Request, res:Response): Promise<void>  {
 console.log("melajd")
   const  {carId}=req.params
@@ -288,6 +290,41 @@ console.log("melajd")
   const car = await Car.findById(carId);
   res.status(201).json(car );
 }
+
+
+
+
+
+
+async getbookedDatesCars (req: Request, res: Response): Promise<void> {
+  const { carId } = req.params;
+  console.log("bookto")
+
+  if (!carId) {
+    res.status(400).json({ error: 'Missing carId parameter' });
+    return;
+  }
+
+  try {
+    const bookings = await Booking.find(
+      { carId, status: 'confirmed' },
+      'startDate endDate'
+    );
+
+    const bookedRanges = bookings.map(b => ({
+      start: b.startDate,
+      end: b.endDate
+    }));
+
+    res.json({ bookedRanges });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+
+
+
 
 
 

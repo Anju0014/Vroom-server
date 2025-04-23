@@ -7,9 +7,11 @@ interface IBooking extends Document {
   startDate: Date;
   endDate: Date;
   totalPrice: number;
-  status: 'confirmed' | 'pending' | 'cancelled';
+  status: 'confirmed' | 'pending' | 'cancelled'|' failed';
   createdAt?: Date;
   updatedAt?: Date;
+  paymentIntentId: string;
+  paymentMethod: 'stripe' |'wallet';  
 }
 
 const BookingSchema = new Schema<IBooking>(
@@ -21,11 +23,15 @@ const BookingSchema = new Schema<IBooking>(
     totalPrice: { type: Number, required: true },
     status: {
       type: String,
-      enum: ['confirmed', 'pending', 'cancelled'],
-      default: 'confirmed',
+      enum: ['confirmed', 'pending', 'cancelled','failed'],
+      default: 'pending',
     },
-  },
+    paymentIntentId: {type:String},
+    paymentMethod: {
+      type:String,
+  }},
   { timestamps: true }
+
 );
 
 const Booking = mongoose.models.Booking || mongoose.model<IBooking>('Booking', BookingSchema);

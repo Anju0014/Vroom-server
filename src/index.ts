@@ -7,8 +7,9 @@ import cookieParser from 'cookie-parser';
 import customerRouter from './routes/customer/customerRoutes';
 import carOwnerRouter from './routes/carOwner/carOwnerRoutes';
 import adminRouter from './routes/admin/adminRoutes';
-import s3Routes from './routes/s3Routes'
+import s3Routes from './routes/s3/s3Routes'
 import carRouter from './routes/car/carRoutes';
+import stripeRoutes from './routes/stripe/stripeRoutes';
 
 dotenv.config();
 connectDB();
@@ -35,6 +36,7 @@ app.use("/owner",carOwnerRouter);
 app.use("/car",carRouter)
 app.use("/admin",adminRouter);
 app.use("/api/s3", s3Routes);
+app.use("/api/stripe",stripeRoutes);
 
 server.listen(PORT,()=>{
     console.log(`Server Connected to ${PORT}`)

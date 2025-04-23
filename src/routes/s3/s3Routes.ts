@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from "express";
-import { generatePresignedUrl } from "../services/s3Service";
+import { generatePresignedUrl } from "../../services/s3Service";
 
 const router: Router = express.Router(); 
 

@@ -31,4 +31,6 @@ carRouter.get('/featured',(req,res)=>carController.getFeaturedCars(req,res));
 
 carRouter.get('/getCarDetails/:carId', (req,res)=>carController.getCarDetail(req,res));
 
+carRouter.get('/getBookingDetails/:carId',(req,res)=>carController.getbookedDatesCars(req,res));
+
 export default carRouter

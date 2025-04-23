@@ -2,7 +2,11 @@ import {Router} from "express";
 import  CustomerController from "../../controllers/implementation/customer/customerController"
 import CustomerService from "../../services/implementation/customer/customerService"
 import CustomerRepository from "../../repositories/implementation/customer/customerRepository";
+
+
 import authMiddleware from "../../middlewares/authMiddleWare";
+
+
 
 const customerRouter=Router();
 
