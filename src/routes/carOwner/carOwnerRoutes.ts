@@ -1,14 +1,25 @@
 import {Router} from "express";
-import  CarOwnerController from "../../controllers/implementation/carowner/carownerController"
-import CarOwnerService from "../../services/implementation/carOwner/carOwnerService"
-import CarOwnerRepository from "../../repositories/implementation/carowner/carOwnerRepository";
+import  CarOwnerController from "../../controllers/implementation/carOwner/carOwnerController"
+import CarOwnerService from "../../services/implementation/carOwner/carOwnerServices"
+import CarOwnerRepository from "../../repositories/implementation/carOwner/carOwnerRepository";
 import authMiddleware,{verifyRole} from "../../middlewares/authMiddleWare";
+
+import  CarOwnerCarsController from "../../controllers/implementation/carOwner/carOwnerCarsController"
+import CarOwnerCarsService from "../../services/implementation/carOwner/carOwnerCarsServices"
+import CarOwnerCarsRepository from "../../repositories/implementation/carOwner/carOwnerCarsRepository";
+
+
 
 const carOwnerRouter=Router();
 
 const carOwnerRepository= new CarOwnerRepository()
 const carOwnerService= new CarOwnerService(carOwnerRepository);
 const carOwnerController=new CarOwnerController(carOwnerService);
+
+const carOwnerCarsRepository= new CarOwnerCarsRepository()
+const carOwnerCarsService= new CarOwnerCarsService(carOwnerCarsRepository);
+const carOwnerCarsController=new CarOwnerCarsController(carOwnerCarsService);
+
 
 carOwnerRouter.post("/signup",(req,res)=>carOwnerController.registerBasicDetailsOwner(req,res))
 
@@ -46,6 +57,15 @@ carOwnerRouter.put("/updateProfile", authMiddleware,(req,res)=>carOwnerControlle
 
 // router.put('/car-owner/cars/:id', updateCar);
 // router.delete('/car-owner/cars/:id', deleteCar);
+
+
+carOwnerRouter.post("/carupload", authMiddleware, (req,res)=>carOwnerCarsController.uploadCar(req,res));
+
+carOwnerRouter.get("/getcars", authMiddleware, (req,res)=>carOwnerCarsController.getCarList(req,res));
+
+carOwnerRouter.delete("/deletecars/:id", authMiddleware, (req,res)=>carOwnerCarsController.deleteCar(req,res));
+
+carOwnerRouter.put("/updatecars/:id", authMiddleware, (req,res)=>carOwnerCarsController.updateCar(req,res));
 
 
 

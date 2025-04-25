@@ -1,18 +1,31 @@
 import {Router} from "express";
 import  CustomerController from "../../controllers/implementation/customer/customerController"
-import CustomerService from "../../services/implementation/customer/customerService"
+import CustomerService from "../../services/implementation/customer/customerServices"
 import CustomerRepository from "../../repositories/implementation/customer/customerRepository";
 
+import  CustomerCarAndBookingController from "../../controllers/implementation/customer/customerCarAndBookingController"
+import CustomerCarAndBookingService from "../../services/implementation/customer/customerCarAndBookingServices"
+import CustomerCarAndBookingRepository from "../../repositories/implementation/customer/customerCarAndBookingRepository";
+
+// import  CustomerDashBoardController from "../../controllers/implementation/customer/customerDashBoardController"
+// import CustomerDashBoardService from "../../services/implementation/customer/customerDashBoardServices"
+// import CustomerDashBoardRepository from "../../repositories/implementation/customer/customerDashBoardRepository";
 
 import authMiddleware from "../../middlewares/authMiddleWare";
-
-
-
 const customerRouter=Router();
+
+
+
+
 
 const customerRepository= new CustomerRepository()
 const customerService= new CustomerService(customerRepository);
 const customerController=new CustomerController(customerService);
+
+const customerCarAndBookingRepository= new CustomerCarAndBookingRepository()
+const customerCarAndBookingService= new CustomerCarAndBookingService(customerCarAndBookingRepository);
+const customerCarAndBookingController=new CustomerCarAndBookingController(customerCarAndBookingService);
+
 
 customerRouter.post("/signup",(req,res)=>customerController.registerBasicDetails(req,res))
 
@@ -24,10 +37,12 @@ customerRouter.post("/forgotpassword",(req,res)=>customerController.forgotPasswo
 
 customerRouter.post("/resetpassword",(req,res)=>customerController.resetPassword(req,res))
 
+
 customerRouter.post("/login",(req,res)=>customerController.login(req,res))
 
 customerRouter.post("/changepassword",authMiddleware,(req,res)=>customerController.changePassword(req,res))
 
+customerRouter.post("/refreshToken",(req,res)=>customerController.renewRefreshAccessToken(req,res))
 
 customerRouter.post('/logout',(req,res)=>customerController.logout(req,res))
 
@@ -43,5 +58,19 @@ customerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>customerCo
 
 
 
+
+customerRouter.get('/nearby', (req,res)=>customerCarAndBookingController.getNearbyCars(req,res));
+
+customerRouter.get('/featured',(req,res)=>customerCarAndBookingController.getFeaturedCars(req,res));
+
+customerRouter.get('/getCarDetails/:carId', (req,res)=>customerCarAndBookingController.getCarDetail(req,res));
+
+customerRouter.get('/getBookingDetails/:carId',(req,res)=>customerCarAndBookingController.getbookedDatesCars(req,res));
+
+
+customerRouter.post('/bookings/create', (req,res)=>customerCarAndBookingController.createPendingBooking(req,res));
+
+customerRouter.patch(`/bookings/:bookingId/confirm`, (req,res)=>customerCarAndBookingController.confirmBooking(req,res));
+customerRouter.patch(`/bookings/:bookingId/cancel`, (req,res)=>customerCarAndBookingController.cancelBooking(req,res));
 
 export default customerRouter

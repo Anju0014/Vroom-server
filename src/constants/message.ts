@@ -35,7 +35,13 @@ export const MESSAGES = {
       OTP_INVALID: "Invalid OTP",
       NO_REFRESH_TOKEN: "No refresh token found",
       INTERNAL_SERVER_ERROR: "Internal server error",
-    ADMIN_NOT_FOUND: "Admin not found"
+      ADMIN_NOT_FOUND: "Admin not found",
+      MISSING_COORDINATES: 'Latitude and longitude are required',
+      MISSING_CAR_ID: 'Car ID is required',
+      MISSING_PAYMENT_INTENT: 'Payment Intent ID is required',
+     
+
+
     },
   };
   

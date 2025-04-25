@@ -1,4 +1,4 @@
-import ICarOwnerRepository from "../../../repositories/interfaces/carowner/ICarOwnerRepository";
+import ICarOwnerRepository from "../../../repositories/interfaces/carOwner/ICarOwnerRepository";
 import { ICarOwnerService } from "../../interfaces/carOwner/ICarOwnerServices";
 import { sendOTP,sendResetEmail } from "../../../utils/emailconfirm";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";

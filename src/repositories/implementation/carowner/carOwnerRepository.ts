@@ -1,5 +1,5 @@
 import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
-import ICarOwnerRepository from "../../interfaces/carowner/ICarOwnerRepository";
+import ICarOwnerRepository from "../../interfaces/carOwner/ICarOwnerRepository";
 import { BaseRepository } from "../../base/BaseRepository";
 import { Car, ICar } from "../../../models/car/carModel";
 

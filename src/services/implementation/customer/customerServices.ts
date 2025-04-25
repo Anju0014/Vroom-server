@@ -163,12 +163,30 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
     
         const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
 
-        if (!decoded || typeof decoded === 'string' || !decoded.id) {
-            throw new Error("Invalid refresh token");
+        if (!decoded || typeof decoded === "string") {
+          console.log("Invalid or malformed refresh token");
+          throw new Error("Invalid refresh token");
+        }
+        if (decoded.message === "Token expired") {
+          console.log("Refresh token has expired");
+          throw new Error("Refresh token expired");
+        }
+        if (!decoded.id) {
+          console.log("No ID in refresh token payload");
+          throw new Error("Invalid refresh token");
         }
 
-        const customer = await this._customerRepository.findUserByEmail(decoded.id);
+        // if (!decoded || typeof decoded === 'string' || !decoded.id) {
+        //     throw new Error("Invalid refresh token");
+        // }
+
+        const customer = await this._customerRepository.findById(decoded.id);
+        console.log("Car owner:", customer);
+        console.log("Stored refresh token:", customer?.refreshToken);
+        console.log("Provided refresh token:", oldRefreshToken);
+      
         if (!customer || customer.refreshToken !== oldRefreshToken) {
+          console.log("Refresh token mismatch")
             throw new Error("Invalid refresh token")
         }
         const accessToken=JwtUtils.generateAccessToken({id:customer._id,email:customer.email});
