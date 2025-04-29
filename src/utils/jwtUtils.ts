@@ -11,7 +11,8 @@ const resetSecret = process.env.RESET_TOKEN_SECRET as string;
 
 class JwtUtils{
     static generateAccessToken(payload:object):string{
-        return jwt.sign(payload,accessSecret,{expiresIn:'2m'})
+        console.log("accesstoken generating point")
+        return jwt.sign(payload,accessSecret,{expiresIn:'1m'})
     }
 
     static generateRefreshToken(payload:object):string{

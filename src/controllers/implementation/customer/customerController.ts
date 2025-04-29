@@ -83,6 +83,12 @@ class CustomerContoller implements ICustomerController{
                 sameSite:"strict",
                 maxAge:7*24*60*60*1000
             })
+           res.cookie("customerAccessToken",customerAccessToken,{
+              httpOnly:true,
+              secure:process.env.NODE_ENV==="production",
+              sameSite:"strict",
+              maxAge:60*60*1000
+          })
             if(!customer){
                 res.status(400).json({error:"Customer not found"})
                 return
@@ -124,6 +130,12 @@ class CustomerContoller implements ICustomerController{
                 sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
+            res.cookie("customerAccessToken", accessToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
+              maxAge: 60 * 60 * 1000 // 7 days
+          })
             // res.status(200).json({ accessToken});
             res.status(StatusCode.OK).json({ success: true,accessToken });
         } catch (error) {
@@ -269,6 +281,13 @@ class CustomerContoller implements ICustomerController{
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000, 
           });
+
+          res.cookie("customerAccessToken", customerAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 60 * 60 * 1000, 
+          });
       
           if (!customer) {
             res.status(400).json({ error: "Customer not found" });
@@ -315,10 +334,52 @@ class CustomerContoller implements ICustomerController{
                   // res.status(401).json({ success: false, message: "Unauthorized" });
                   return;
                 }
-                const customerProfile = await this._customerService.getCustomerProfile(customerId);
-                console.log(customerProfile)
-                res.status(StatusCode.OK).json({
-                  success: true,customer: customerProfile });
+                // const customerProfile = await this._customerService.getCustomerProfile(customerId);
+                // console.log("checking",customerProfile)
+                // // const customerProfile = await this._customerService.getCustomerProfile(customerId);
+
+                // const mappedCustomer = {
+                //   id: customerProfile.customer._id,
+                //   fullName: customerProfile.customer.fullName,
+                //   email: customerProfile.customer.email,
+                //   phoneNumber: customerProfile.customer.phoneNumber,
+                //   isVerified: customerProfile.customer.isVerified,
+                //   role: customerProfile.customer.role,
+                //   processStatus: customerProfile.customer.processStatus,
+                //   blockStatus: customerProfile.customer.blockStatus,
+                //   verifyStatus: customerProfile.customer.verifyStatus,
+                //   status: customerProfile.customer.status,
+                //   idVerified: customerProfile.customer.idVerified,
+                //   idProof: customerProfile.customer.idProof,
+                //   createdAt: customerProfile.customer.createdAt,
+                //   updatedAt: customerProfile.customer.updatedAt,
+                // };
+            
+               
+                const { customer } = await this._customerService.getCustomerProfile(customerId);
+                const mappedCustomer = {
+                  id: customer._id,
+                  fullName: customer.fullName,
+                  email: customer.email,
+                  phoneNumber: customer.phoneNumber,
+                  isVerified: customer.isVerified,
+                  role: customer.role,
+                  processStatus: customer.processStatus,
+                  blockStatus: customer.blockStatus,
+                  verifyStatus: customer.verifyStatus,
+                  status: customer.status,
+                  idVerified: customer.idVerified,
+                  idProof: customer.idProof,
+                  createdAt: customer.createdAt,
+                  updatedAt: customer.updatedAt,
+                };
+                 res.status(StatusCode.OK).json({
+
+                  success: true,
+                  customer: mappedCustomer,
+                });
+                // res.status(StatusCode.OK).json({
+                //   success: true,customer: customerProfile });
               } catch (error) {
                 this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
               }

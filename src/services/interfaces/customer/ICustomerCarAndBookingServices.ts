@@ -12,5 +12,7 @@ export interface ICustomerCarAndBookingService{
 
         createPendingBooking(bookingdata: BookingData): Promise<string>;
         confirmBooking(bookingId: string, paymentIntentId: string): Promise<void>;
-        cancelBooking(bookingId: string): Promise<void>;
+        
+        failedBooking(bookingId: string): Promise<void>;
+
 }

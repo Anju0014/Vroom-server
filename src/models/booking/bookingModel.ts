@@ -43,6 +43,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 interface IBooking extends Document {
+  bookingId:string,
   carId: Types.ObjectId;
   userId: Types.ObjectId;
   carOwnerId: Types.ObjectId;
@@ -52,15 +53,19 @@ interface IBooking extends Document {
   status: 'confirmed' | 'pending' | 'cancelled' | 'failed';
   paymentIntentId?: string;
   paymentMethod?: 'stripe' | 'wallet';
+ cancellationFee :number
+  refundedAmount :number,
+ cancelledAt?:Date,
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 const BookingSchema = new Schema<IBooking>(
   {
+    bookingId: { type: String, unique: true },
     carId: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
-    userId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-    carOwnerId: { type: Schema.Types.ObjectId, ref: 'Owner', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'customer', required: true },
+    carOwnerId: { type: Schema.Types.ObjectId, ref: 'CarOwner', required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     totalPrice: { type: Number, required: true },
@@ -73,8 +78,10 @@ const BookingSchema = new Schema<IBooking>(
     paymentMethod: {
       type: String,
       enum: ['stripe', 'wallet'],
-      default: 'stripe',
     },
+    cancellationFee:{type: Number},
+    refundedAmount:{type: Number},
+    cancelledAt:{type: Date}
   },
   {
     timestamps: true,

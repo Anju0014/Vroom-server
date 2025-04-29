@@ -132,6 +132,6 @@ const CarOwnerSchema = new Schema<ICarOwner>({
 }, { timestamps: true })
 
 
-const CarOwner = mongoose.model<ICarOwner>("carowner", CarOwnerSchema)
+const CarOwner = mongoose.model<ICarOwner>("CarOwner", CarOwnerSchema)
 
 export { ICarOwner, CarOwner };

@@ -33,7 +33,7 @@ app.use(cors({
 
 app.use("/",customerRouter);
 app.use("/owner",carOwnerRouter);
-app.use("/car",carRouter)
+// app.use("/car",carRouter)
 app.use("/admin",adminRouter);
 app.use("/api/s3", s3Routes);
 app.use("/api/stripe",stripeRoutes);

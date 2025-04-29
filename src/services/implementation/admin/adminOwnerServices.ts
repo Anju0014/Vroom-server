@@ -5,6 +5,7 @@ import JwtUtils from "../../../utils/jwtUtils";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
 import { sendEmail } from "../../../utils/emailconfirm";
 import { ICar } from "../../../models/car/carModel";
+import { IBooking } from "../../../models/booking/bookingModel";
 
 
 class AdminOwnerService implements IAdminOwnerService {
@@ -35,6 +36,16 @@ async listAllCarsVerify(): Promise<ICar[]> {
     }
 }
 
+
+async listAllBookings(): Promise<IBooking[]> {
+  try {
+      console.log("reached222");
+      return await this._adminOwnerRepository.getAllBookings();
+  } catch (error) {
+      console.error("Error in listAllBookings:", error);
+      throw new Error("Failed to fetch bookings");
+  }
+}
 
     async updateOwnerVerifyStatus(ownerId:string, verifyDetails:Partial<ICarOwner>):Promise<ICarOwner|null>{
        

@@ -18,7 +18,6 @@ class CarOwnerController implements ICarOwnerController{
     async registerBasicDetailsOwner(req: Request, res: Response): Promise<void> {
         
         try {
-
             const { carOwner } = await this._carOwnerService.registerBasicDetails(req.body)
 
             res.status(StatusCode.CREATED).json({
@@ -93,6 +92,12 @@ class CarOwnerController implements ICarOwnerController{
                 sameSite:"strict",
                 maxAge:7*24*60*60*1000
             })
+            res.cookie("carOwnerAccessToken", ownerAccessToken,{
+              httpOnly:true,
+              secure:process.env.NODE_ENV==="production",
+              sameSite:"strict",
+              maxAge:60*60*1000
+          })
             if(!carOwner){
                 res.status(400).json({error:"carOwner not found"})
                 return
@@ -164,6 +169,12 @@ class CarOwnerController implements ICarOwnerController{
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
     
+        res.cookie("carOwnerAccessToken",accessToken,{
+          httpOnly:true,
+          secure:process.env.NODE_ENV==="production",
+          sameSite:"strict",
+          maxAge:60*60*1000
+      })
         res.status(StatusCode.OK).json({ success: true, accessToken });
       } catch (error) {
         if(error instanceof Error){

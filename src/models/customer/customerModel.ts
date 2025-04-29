@@ -81,11 +81,12 @@ const CustomerSchema = new Schema<ICustomer>({
         enum: [-1,0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
         default: 0,
     },
-    status: {
-        type: Number,
-        enum: [-2, -1, 0, 1, 2, 3 ], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified 
-        default: 0,
-      },
+    
+    // status: {
+    //     type: Number,
+    //     enum: [-2, -1, 0, 1, 2, 3 ], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified 
+    //     default: 0,
+    //   },
   
     
     previousStatus: { type: Number, enum: [-1, 0, 1, 2], default: 0 },

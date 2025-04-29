@@ -55,6 +55,28 @@ async getAllCarsforVerify(req: Request, res: Response):Promise<void>{
     }
 }
 
+async getAllBookings(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllBookings()...");
+        const bookings = await this._adminOwnerService.listAllBookings();
+        console.log("Finished calling listAllBookings()");
+        console.log(bookings)
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.CARS_FETCHED || "Bookings fetched successfully",
+            data: bookings
+        });
+ 
+    } catch (error: any) {
+   
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+    }
+}
+
 
 
 

@@ -135,6 +135,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
             location,
             images,
             videos,
+            available,
           } = req.body;
       
           if (!ownerId) {
@@ -171,6 +172,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
             fuelType,
             rcBookNo,
             expectedWage,
+            available,
             location: geoLocation,
             images: Array.isArray(images) ? images : [images],
             videos: videos && Array.isArray(videos) ? videos : [],

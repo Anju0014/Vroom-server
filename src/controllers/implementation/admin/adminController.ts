@@ -41,6 +41,14 @@ class AdminController implements IAdminController{
             sameSite:"strict",
             maxAge:7*24*60*60*1000
         })
+        res.cookie("adminAccessToken",adminAccessToken,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV==="production",
+            sameSite:"strict",
+            maxAge:60*60*1000
+        })
+        
+
         if(!admin){
             res.status(400).json({error:"admin not found"})
             return

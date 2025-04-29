@@ -22,6 +22,7 @@ interface ICustomerCarAndBookingRepository{
   deleteBooking(bookingId: string): Promise<void>;
   findConflictingBooking(carId: string,startDate: Date,endDate: Date): Promise<IBooking | null>;
   checkOldBooking(bookingData:BookingData): Promise<IBooking|null>
+  generateBookingId():Promise<string>
 }
 
 export default ICustomerCarAndBookingRepository

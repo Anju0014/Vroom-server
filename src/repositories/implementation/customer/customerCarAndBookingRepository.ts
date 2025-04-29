@@ -7,6 +7,7 @@ import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
 import { Car, ICar } from "../../../models/car/carModel";
 import { Booking,IBooking } from "../../../models/booking/bookingModel";
 import { BookingData } from "../../../types/bookingData";
+import { Counter } from '../../../models/counter/counterModel'; // wherever your model is
 
 
 
@@ -56,6 +57,39 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
           },
         });
       }
+      // async findNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
+      //   return Car.aggregate([
+      //     {
+      //       $geoNear: {
+      //         near: { type: 'Point', coordinates: [lng, lat] },
+      //         distanceField: 'distance',
+      //         spherical: true,
+      //         maxDistance: maxDistance * 1000, 
+      //         query: {
+      //           verifyStatus: 1,
+      //           isDeleted: false,
+      //           available: true,
+      //         },
+      //       },
+      //     },
+      //     {
+      //       $lookup: {
+      //         from: 'carowners', 
+      //         localField: 'owner',
+      //         foreignField: '_id',
+      //         as: 'ownerDetails',
+      //       },
+      //     },
+      //     { $unwind: '$ownerDetails' },
+      //     {
+      //       $match: {
+      //         'ownerDetails.verifyStatus': 1,
+      //         'ownerDetails.blockStatus': 0,
+      //       },
+      //     },
+      //   ]);
+      // }
+      
     
       async findFeaturedCars(): Promise<ICar[]> {
         return Car.find({
@@ -64,6 +98,34 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
           available: true,
         });
       }
+
+      // async findFeaturedCars(): Promise<ICar[]> {
+      //   return Car.aggregate([
+      //     {
+      //       $match: {
+      //         verifyStatus: 1,
+      //         isDeleted: false,
+      //         available: true,
+      //       },
+      //     },
+      //     {
+      //       $lookup: {
+      //         from: 'owners', 
+      //         localField: 'owner',
+      //         foreignField: '_id',
+      //         as: 'ownerDetails',
+      //       },
+      //     },
+      //     { $unwind: '$ownerDetails' },
+      //     {
+      //       $match: {
+      //         'ownerDetails.verifyStatus': 1,
+      //         'ownerDetails.blockStatus': 0,
+      //       },
+      //     },
+      //   ]);
+      // }
+      
     
       async findCarById(carId: string): Promise<ICar | null> {
         return Car.findById(carId);
@@ -99,7 +161,7 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
       async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
         return Booking.findOne({
           carId,
-          status: { $in: ['pending', 'confirmed'] },
+          status: { $in: ['confirmed'] },
           $or: [
             { startDate: { $lte: endDate, $gte: startDate } },
             { endDate: { $lte: endDate, $gte: startDate } },
@@ -115,8 +177,17 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
             status: 'pending',
             })
       }
-
-
+    async generateBookingId():Promise<string> {
+        const counter = await Counter.findOneAndUpdate(
+          { id: 'bookingId' },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+      
+        const paddedSeq = counter.seq.toString().padStart(4, '0'); // 0001, 0023, etc
+        return `VROOM-RIDE-${paddedSeq}`;
+      }
+    
 
 
 

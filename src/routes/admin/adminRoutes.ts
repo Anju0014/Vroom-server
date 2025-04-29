@@ -39,6 +39,8 @@ adminRouter.get('/owners',(req,res)=>adminController.getAllOwners(req,res));
 
 adminRouter.get('/cars',(req,res)=>adminOwnerController.getAllCarsforVerify(req,res));
 
+adminRouter.get('/bookings',(req,res)=>adminOwnerController.getAllBookings(req,res));
+
 adminRouter.get('/ownerpending',(req,res)=>adminOwnerController.getAllOwnersforVerify(req,res));
 
 adminRouter.patch('/customers/updateblockstatus/:userId', (req,res)=>adminController.updateCustomerBlockStatus(req,res));

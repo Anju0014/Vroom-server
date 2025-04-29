@@ -8,7 +8,9 @@ import  CarOwnerCarsController from "../../controllers/implementation/carOwner/c
 import CarOwnerCarsService from "../../services/implementation/carOwner/carOwnerCarsServices"
 import CarOwnerCarsRepository from "../../repositories/implementation/carOwner/carOwnerCarsRepository";
 
-
+import CarOwnerBookingRepository from "../../repositories/implementation/carOwner/carOwnerBookingRepository";
+import CarOwnerBookingService from "../../services/implementation/carOwner/carOwnerBookingServices";
+import CarOwnerBookingController from "../../controllers/implementation/carOwner/carOwnerBookingController";
 
 const carOwnerRouter=Router();
 
@@ -19,6 +21,10 @@ const carOwnerController=new CarOwnerController(carOwnerService);
 const carOwnerCarsRepository= new CarOwnerCarsRepository()
 const carOwnerCarsService= new CarOwnerCarsService(carOwnerCarsRepository);
 const carOwnerCarsController=new CarOwnerCarsController(carOwnerCarsService);
+
+const carOwnerBookingRepository= new CarOwnerBookingRepository()
+const carOwnerBookingService= new CarOwnerBookingService(carOwnerBookingRepository);
+const carOwnerBookingController=new CarOwnerBookingController(carOwnerBookingService);
 
 
 carOwnerRouter.post("/signup",(req,res)=>carOwnerController.registerBasicDetailsOwner(req,res))
@@ -68,5 +74,6 @@ carOwnerRouter.delete("/deletecars/:id", authMiddleware, (req,res)=>carOwnerCars
 carOwnerRouter.put("/updatecars/:id", authMiddleware, (req,res)=>carOwnerCarsController.updateCar(req,res));
 
 
+carOwnerRouter.get("/bookings", authMiddleware, (req,res)=>carOwnerBookingController.getCarOwnerBookings(req,res));
 
 export default carOwnerRouter

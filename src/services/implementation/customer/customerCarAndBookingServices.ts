@@ -57,13 +57,17 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 
   console.log("conflict",conflict)
 
-  const existingBooking = await  this._customerCarRepository.checkOldBooking(bookingData)
+//   const existingBooking = await  this._customerCarRepository.checkOldBooking(bookingData)
 
 
-  if (existingBooking &&  existingBooking._id) {
-    console.log("existingone")
-    return  existingBooking._id.toString() ;
-  }
+//   if (existingBooking &&  existingBooking._id) {
+//     console.log("existingone")
+//     return  existingBooking._id.toString() ;
+//   }
+
+console.log("create pending booking phase1")
+
+
   const booking = await this._customerCarRepository.createBooking({
     ...bookingData,
     startDate: new Date(startDate),
@@ -77,6 +81,8 @@ console.log("booking new pending",booking);
   return booking._id.toString();
 }
 
+
+
 async confirmBooking(bookingId: string, paymentIntentId: string): Promise<void> {
   const booking = await this._customerCarRepository.findBookingById(bookingId);
   console.log("booking-old-confirm",booking)
@@ -86,25 +92,33 @@ async confirmBooking(bookingId: string, paymentIntentId: string): Promise<void> 
 
   booking.status = 'confirmed';
   booking.paymentIntentId = paymentIntentId;
+  const newBookingId = await this._customerCarRepository.generateBookingId();
+  booking.bookingId=newBookingId,
+
   console.log("old -confirm???",booking);
  const newbooking= await this._customerCarRepository.saveBooking(booking);
  console.log("newbooking-confirm", newbooking)
 
 }
 
-async cancelBooking(bookingId: string): Promise<void> {
-  const booking = await this._customerCarRepository.findBookingById(bookingId);
-  if (!booking || booking.status !== 'pending') {
-    throw new Error('Invalid or non-pending booking');
+
+async failedBooking(bookingId: string): Promise<void> {
+    const booking = await this._customerCarRepository.findBookingById(bookingId);
+    if (!booking || booking.status !== 'pending') {
+      throw new Error('Invalid or non-pending booking');
+    }
+  
+  
+    // Option 1: update status
+    booking.status = 'failed';
+    await this._customerCarRepository.saveBooking(booking);
+  
+    
   }
+  
 
 
-  // Option 1: update status
-  booking.status = 'failed';
-  await this._customerCarRepository.saveBooking(booking);
 
-  // Option 2 (alternative): await this._customerCarRepository.deleteBooking(bookingId);
-}
 
     
           
