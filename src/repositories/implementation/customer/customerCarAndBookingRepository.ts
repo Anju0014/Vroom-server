@@ -16,31 +16,6 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
         super(Car);
      }
 
-    //  async createCar(car:Partial<ICar>): Promise<ICar>{
-    //     return await Car.create(car)
-    // }
-    // async getCarsByOwner(ownerId: string): Promise<ICar[]> {
-    //     return await Car.find({ owner: ownerId,isDeleted:false });
-    //   }
-
-
-    //   async deleteCarById(carId: string): Promise<ICar | null> {
-    //     return await Car.findByIdAndUpdate(
-    //       carId,
-    //       { isDeleted: true },
-    //       { new: true }
-    //     );
-    //   }
-
-    //   async updateCarById(carId: string, updatedData: Partial<ICar>): Promise<ICar | null> {
-    //     return await Car.findByIdAndUpdate(carId, updatedData, { new: true });
-    //   }
-      
-    //   async findCarById(carId:string): Promise<ICar|null>{
-    //     return await Car.findOne({_id:carId})
-
-    //   }
-
       async findNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
         return Car.find({
           verifyStatus: 1,
@@ -57,39 +32,6 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
           },
         });
       }
-      // async findNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
-      //   return Car.aggregate([
-      //     {
-      //       $geoNear: {
-      //         near: { type: 'Point', coordinates: [lng, lat] },
-      //         distanceField: 'distance',
-      //         spherical: true,
-      //         maxDistance: maxDistance * 1000, 
-      //         query: {
-      //           verifyStatus: 1,
-      //           isDeleted: false,
-      //           available: true,
-      //         },
-      //       },
-      //     },
-      //     {
-      //       $lookup: {
-      //         from: 'carowners', 
-      //         localField: 'owner',
-      //         foreignField: '_id',
-      //         as: 'ownerDetails',
-      //       },
-      //     },
-      //     { $unwind: '$ownerDetails' },
-      //     {
-      //       $match: {
-      //         'ownerDetails.verifyStatus': 1,
-      //         'ownerDetails.blockStatus': 0,
-      //       },
-      //     },
-      //   ]);
-      // }
-      
     
       async findFeaturedCars(): Promise<ICar[]> {
         return Car.find({
@@ -99,34 +41,73 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
         });
       }
 
-      // async findFeaturedCars(): Promise<ICar[]> {
-      //   return Car.aggregate([
-      //     {
-      //       $match: {
-      //         verifyStatus: 1,
-      //         isDeleted: false,
-      //         available: true,
-      //       },
-      //     },
-      //     {
-      //       $lookup: {
-      //         from: 'owners', 
-      //         localField: 'owner',
-      //         foreignField: '_id',
-      //         as: 'ownerDetails',
-      //       },
-      //     },
-      //     { $unwind: '$ownerDetails' },
-      //     {
-      //       $match: {
-      //         'ownerDetails.verifyStatus': 1,
-      //         'ownerDetails.blockStatus': 0,
-      //       },
-      //     },
-      //   ]);
-      // }
-      
-    
+
+  async getAllCars(page: number, limit: number, filters: {
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    latitude?: number;
+    longitude?: number;
+  }) :Promise<ICar[]>{
+    const query: any = { isDeleted: false, verifyStatus: 1 };
+    if (filters.search) {
+      query.carName = { $regex: filters.search, $options: 'i' };
+    }
+    if (filters.minPrice) {
+      query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+    }
+    if (filters.maxPrice !== Infinity) {
+      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+    }
+    if (filters.latitude && filters.longitude) {
+      query['location.coordinates'] = {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [filters.longitude, filters.latitude] },
+          $maxDistance: 10000, // 10km radius
+        },
+      };
+    }
+
+    console.log('Query:', query);
+    const cars = await Car.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+    console.log('Found cars:', cars);
+    return cars;
+  }
+
+  async getCarsCount(filters: {
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    latitude?: number;
+    longitude?: number;
+  }):Promise<number> {
+    const query: any = { isDeleted: false, verifyStatus: 1 };
+    if (filters.search) {
+      query.carName = { $regex: filters.search, $options: 'i' };
+    }
+    if (filters.minPrice) {
+      query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+    }
+    if (filters.maxPrice !== Infinity) {
+      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+    }
+    if (filters.latitude && filters.longitude) {
+      query['location.coordinates'] = {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [filters.longitude, filters.latitude] },
+          $maxDistance: 10000,
+        },
+      };
+    }
+
+    const count = await Car.countDocuments(query).exec();
+    console.log('Total cars count:', count);
+    return count;
+  }
+
       async findCarById(carId: string): Promise<ICar | null> {
         return Car.findById(carId);
       }

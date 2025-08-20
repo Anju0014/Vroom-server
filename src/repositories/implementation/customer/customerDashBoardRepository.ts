@@ -16,76 +16,8 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
      }
 
 
-    //  async findBookingsByUserId (userId: string):Promise<any>{
-    //     return await Booking.aggregate([
-    //       {
-    //         $match: {
-    //           userId: new mongoose.Types.ObjectId(userId),
-    //         },
-    //       },
-    //       {
-    //         $lookup: {
-    //           from: "cars",
-    //           localField: "carId",
-    //           foreignField: "_id",
-    //           as: "carData",
-    //         },
-    //       },
-    //       { $unwind: "$carData" },
-    //       {
-    //         $lookup: {
-    //           from: "users",
-    //           localField: "carOwnerId",
-    //           foreignField: "_id",
-    //           as: "ownerData",
-    //         },
-    //       },
-    //       { $unwind: "$ownerData" },
-    //       {
-    //         $project: {
-    //           _id: 1,
-    //           carId: 1,
-    //           userId: 1,
-    //           carOwnerId: 1,
-    //           startDate: 1,
-    //           endDate: 1,
-    //           totalPrice: 1,
-    //           status: 1,
-    //           createdAt: 1,
-    //           carName: "$carData.carName",
-    //           brand: "$carData.brand",
-    //           pickupLocation: "$carData.location.address",
-    //           carNumber: "$carData.rcBookNo",
-    //           ownerName: "$ownerData.name",
-    //           ownerContact: "$ownerData.phone",
-    //         },
-    //       },
-    //     ]);
-    //   };
-      
-
-    // async findBookingsByUserId(userId: string):Promise<any> {
-    //     const bookings = await Booking.find({ userId })
-    //       .populate({
-    //         path: 'carId',
-    //         select: 'carName brand rcBookNo location',
-    //       })
-    //       .populate({
-    //         path: 'carOwnerId',
-    //         select: 'name phone',
-    //       });
-      
-    //     return bookings;
-    //   }
-
-    //     async findBookingsByUserId(userId: string):Promise<any> {
-    //     const bookings = await Booking.find({ userId })
-          
-
-    //     return bookings;
-
-    //   }
-    async findBookingsByUserId(userId: string): Promise<any[]> {
+    
+    async findBookingsByUserId(userId: string,page:number,limit:number): Promise<any[]> {
         const bookings = await Booking.find({ userId })
           .populate({
             path: "carId",
@@ -94,7 +26,8 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
           .populate({
             path: "carOwnerId",
             select: "fullName phone", 
-          })
+          }). skip((page - 1) * limit)
+        .limit(limit)
           .lean(); // makes it a plain JS object
       
         return bookings.map(booking => ({
@@ -118,7 +51,11 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
       }
       
 
-      
+   async bookingsByUserCount(userId: string): Promise<number> {
+    const count = await Booking.countDocuments({ userId }).exec();
+    console.log('Total bookings count:', count);
+    return count;
+  }
             async findBookingById(bookingId: string): Promise<IBooking | null> {
               return Booking.findById(bookingId);
             }

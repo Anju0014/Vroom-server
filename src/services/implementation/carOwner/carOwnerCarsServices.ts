@@ -2,6 +2,7 @@
 import ICarOwnerCarsRepository from "../../../repositories/interfaces/carOwner/ICarOwnerCarsRepository";
 import { ICarOwnerCarsService} from "../../interfaces/carOwner/ICarOwnerCarsServices";
 import { ICar } from "../../../models/car/carModel";
+import { IBooking} from "../../../models/booking/bookingModel"
 import mongoose from "mongoose";
 
 class CarOwnerCarsService implements ICarOwnerCarsService {
@@ -25,10 +26,27 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
         
           return await this._ownersCarRepository.createCar(carData);
     }
-        async getCarsByOwner(ownerId: string): Promise<ICar[]> {
-          return await this._ownersCarRepository.getCarsByOwner(ownerId);
+        async getCarsByOwner(ownerId: string, page: number, limit: number): Promise<ICar[]> {
+          return await this._ownersCarRepository.getCarsByOwner(ownerId,page,limit);
         }
 
+        async getCarsCount(ownerId: string): Promise<number> {
+    return this._ownersCarRepository.getCarsCount(ownerId);
+  }
+
+   
+  async updateCarAvailability(carId: string, ownerId: string, unavailableDates: string[]): Promise<ICar> {
+    const car = await this._ownersCarRepository.updateAvailability(carId, ownerId, unavailableDates);
+    if (!car) {
+      throw new Error(`Car with ID ${carId} not found or not owned by user`);
+    }
+    return car;
+  }
+
+  async getBookingsByCarId(carId: string, ownerId: string): Promise<IBooking[]> {
+    console.log("whre are u")
+    return await this._ownersCarRepository.findByCarId(carId, ownerId);
+  }
 
         async deleteCar(carId: string): Promise<ICar> {
             const deletedCar = await this._ownersCarRepository.deleteCarById(carId);

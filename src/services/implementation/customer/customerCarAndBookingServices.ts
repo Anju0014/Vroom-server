@@ -29,7 +29,28 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
       }
 
 
-   
+
+
+  async getAllCars(page: number, limit: number, filters: {
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    latitude?: number;
+    longitude?: number;
+  }):Promise<ICar[]>  {
+    return this._customerCarRepository.getAllCars(page, limit, filters);
+  }
+
+  async getCarsCount(filters: {
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    latitude?: number;
+    longitude?: number;
+  }):Promise<number>  {
+    return this._customerCarRepository.getCarsCount(filters);
+  }
+
       async createPendingBooking(bookingData: BookingData): Promise<string> {
   const { carId, startDate, endDate } = bookingData;
   

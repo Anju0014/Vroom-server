@@ -6,7 +6,8 @@ import { BookingUserData } from '../../../types/bookingData';
 
 interface ICustomerDashBoardRepository{
     
-    findBookingsByUserId (userId: string):Promise<any>
+    findBookingsByUserId (userId: string,page:number,limit:number):Promise<any>
+    bookingsByUserCount(userId:string): Promise<number>
     findBookingById(bookingId: string): Promise<IBooking | null>;
   saveBooking(bookingData:IBooking): Promise<IBooking>;
  logWalletTransaction(

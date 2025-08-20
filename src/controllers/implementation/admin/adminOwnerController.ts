@@ -105,7 +105,6 @@ async updateOwnerVerifyStatus(req: Request, res: Response): Promise<void> {
             success: false,
             message: MESSAGES.ERROR.SERVER_ERROR
         });
-
     }
 }
 

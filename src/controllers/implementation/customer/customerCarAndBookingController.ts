@@ -53,6 +53,46 @@ async getNearbyCars(req: Request, res: Response): Promise<void> {
     }
   }
   
+  async getAllCars(req: CustomRequest, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 9;
+      const search = req.query.search as string;
+      const minPrice = parseFloat(req.query.minPrice as string) || 0;
+      const maxPrice = parseFloat(req.query.maxPrice as string) || Infinity;
+      // const latitude = parseFloat(req.query.latitude as string);
+      // const longitude = parseFloat(req.query.longitude as string);
+
+      if (page < 1 || limit < 1 || limit > 100) {
+        res.status(StatusCode.BAD_REQUEST).json({
+          success: false,
+          message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+        });
+        return;
+      }
+
+      const cars = await this._customerCarService.getAllCars(page, limit, {
+        search,
+        minPrice,
+        maxPrice,
+        // latitude,
+        // longitude,
+      });
+      const total = await this._customerCarService.getCarsCount({ search, minPrice, maxPrice });
+      console.log('Cars:', cars, 'Total:', total);
+
+      res.status(StatusCode.OK).json({ data: cars, total });
+    } catch (error) {
+      console.error('Failed to fetch cars:', error);
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+
+
   async getCarDetail(req: Request, res: Response): Promise<void> {
     const { carId } = req.params;
   console.log("car details")

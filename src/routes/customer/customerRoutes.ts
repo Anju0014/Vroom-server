@@ -69,6 +69,8 @@ customerRouter.get('/car/nearby', (req,res)=>customerCarAndBookingController.get
 
 customerRouter.get('/car/featured',(req,res)=>customerCarAndBookingController.getFeaturedCars(req,res));
 
+customerRouter.get('/car/getAllCars',(req,res)=>customerCarAndBookingController.getAllCars(req,res));
+
 customerRouter.get('/car/getCarDetails/:carId', (req,res)=>customerCarAndBookingController.getCarDetail(req,res));
 
 customerRouter.get('/car/getBookingDetails/:carId',(req,res)=>customerCarAndBookingController.getbookedDatesCars(req,res));

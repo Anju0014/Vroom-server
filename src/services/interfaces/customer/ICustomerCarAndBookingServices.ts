@@ -15,4 +15,6 @@ export interface ICustomerCarAndBookingService{
         
         failedBooking(bookingId: string): Promise<void>;
 
+        getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}) : Promise<number>
+       getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}): Promise<ICar[]>
 }

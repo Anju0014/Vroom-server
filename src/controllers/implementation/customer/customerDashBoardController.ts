@@ -24,8 +24,18 @@ class CustomerDashBoardController implements ICustomerDashBoardController{
             res.status(404).json({message:'User Id not found'})
             return
           }
-          const bookings = await this._customerDashService.getCustomerBookings(userId);
-          res.status(200).json(bookings);
+           const page = parseInt(req.query.page as string) || 1;
+                  const limit = parseInt(req.query.limit as string) || 9;
+                  if (page < 1 || limit < 1 || limit > 100) {
+                       res.status(StatusCode.BAD_REQUEST).json({
+                        success: false,
+                         message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+                     });
+                     return;
+                   }
+          const bookings = await this._customerDashService.getCustomerBookings(userId,page,limit);
+          const total = await this._customerDashService.getCustomerBookingCount(userId);
+          res.status(200).json({bookings,total});
           return
         } catch (error) {
           console.error("Failed to fetch bookings:", error);

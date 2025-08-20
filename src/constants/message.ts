@@ -39,7 +39,7 @@ export const MESSAGES = {
       MISSING_COORDINATES: 'Latitude and longitude are required',
       MISSING_CAR_ID: 'Car ID is required',
       MISSING_PAYMENT_INTENT: 'Payment Intent ID is required',
-     
+      INVALID_PAGE_OR_LIMIT: 'Invalid page or limit'
 
 
     },

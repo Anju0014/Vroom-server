@@ -73,6 +73,8 @@ carOwnerRouter.delete("/deletecars/:id", authMiddleware, (req,res)=>carOwnerCars
 
 carOwnerRouter.put("/updatecars/:id", authMiddleware, (req,res)=>carOwnerCarsController.updateCar(req,res));
 
+carOwnerRouter.get('/cars/:id/bookings', authMiddleware,(req, res) => carOwnerCarsController.getBookingsByCarId(req, res));
+carOwnerRouter.patch('/cars/:id/availability', authMiddleware,(req, res) => carOwnerCarsController.updateCarAvailability(req, res));
 
 carOwnerRouter.get("/bookings", authMiddleware, (req,res)=>carOwnerBookingController.getCarOwnerBookings(req,res));
 

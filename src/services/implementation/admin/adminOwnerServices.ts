@@ -70,8 +70,14 @@ async listAllBookings(): Promise<IBooking[]> {
               subject: "Verification Rejected",
               text: `Dear ${updatedUser.fullName},\n\nYour verification has been rejected due to the following reason:\n${rejectionReason}\n\nPlease address the issue and  reapply.\n\nBest regards,\nVroom Support Team`
             });
+          }else if(verifyStatus===1){
+            await sendEmail({
+              to:updatedUser.email,
+              subject:"Verification Approved",
+              text: `Dear ${updatedUser.fullName},\n\nYour Vroom  verification has been Approved. You can login to your account and add the car listings. \n\nBest regards,\nVroom Support Team`
+            })
+            
           }
-        
           console.log("message")
           return updatedUser 
 

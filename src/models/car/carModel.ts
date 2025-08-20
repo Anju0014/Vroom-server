@@ -9,6 +9,8 @@ interface ICar extends Document {
   fuelType?: "Petrol" | "Diesel" | "Electric" | "Hybrid";
   rcBookNo?: string;
   expectedWage: string;
+  rcBookProof:string;
+  insuranceProof:string;
   location: {
     address: string;
     landmark: string;
@@ -39,6 +41,8 @@ const CarSchema = new Schema<ICar>(
     },
     rcBookNo: { type: String, unique: true },
     expectedWage: { type: String, required: true },
+    rcBookProof:{type:String},
+    insuranceProof:{type:String},
     location: {
       address: { type: String, required: true },
       landmark: { type: String, required: true },
