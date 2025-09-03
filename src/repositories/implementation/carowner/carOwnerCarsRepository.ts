@@ -6,7 +6,7 @@ import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
 import { Car, ICar } from "../../../models/car/carModel";
 import { Booking,IBooking } from "../../../models/booking/bookingModel";
 import { Types } from 'mongoose';
-
+import { startOfDay, endOfDay } from "date-fns";
 
 class CarOwnerCarsRepository extends BaseRepository<ICar> implements ICarOwnerCarsRepository {
     constructor(){
@@ -67,6 +67,22 @@ async findByCarId(carId: string, ownerId: string): Promise<IBooking[]> {
         return await Car.findOne({_id:carId})
 
       }
+
+
+    async findActiveBookingByCarId(carId: string): Promise<IBooking | null> {
+      const today = new Date();
+const start = startOfDay(today);
+const end = endOfDay(today);
+
+const activeBookings = await Booking.findOne({
+  carId,
+  status: "confirmed",
+  startDate: { $lte: end },
+  endDate: { $gte: start }
+});
+        console.log("active booking?:",activeBookings)
+        return activeBookings
+  }
 
 
 }

@@ -12,7 +12,7 @@ interface ICarRepository{
     updateCarById(carId: string, updatedData: Partial<ICar>): Promise<ICar | null>
     updateAvailability(carId: string, ownerId: string, unavailableDates: string[]): Promise<ICar | null>
     findByCarId(carId: string, ownerId: string): Promise<IBooking[]>
-
+    findActiveBookingByCarId(carId: string): Promise<IBooking | null>
 }
 
 export default ICarRepository

@@ -11,5 +11,5 @@ export interface ICarOwnerCarsService{
 
       updateCarAvailability(carId: string, ownerId: string, unavailableDates: string[]): Promise<ICar>
       getBookingsByCarId(carId: string, ownerId: string): Promise<IBooking[]>
-
+      getActiveBookingForCar(carId: string):Promise<IBooking|null>
 }

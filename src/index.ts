@@ -10,6 +10,8 @@ import adminRouter from './routes/admin/adminRoutes';
 import s3Routes from './routes/s3/s3Routes'
 import carRouter from './routes/car/carRoutes';
 import stripeRoutes from './routes/stripe/stripeRoutes';
+import { initSockets } from './sockets/socket';
+import './jobs/bookingTrackingJob';
 
 dotenv.config();
 connectDB();
@@ -37,6 +39,9 @@ app.use("/owner",carOwnerRouter);
 app.use("/admin",adminRouter);
 app.use("/api/s3", s3Routes);
 app.use("/api/stripe",stripeRoutes);
+
+
+initSockets(server);
 
 server.listen(PORT,()=>{
     console.log(`Server Connected to ${PORT}`)

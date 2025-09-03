@@ -21,7 +21,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
         try {
           console.log("DID I REACH HERE")
           console.log(req.body)
-          const {carName,brand,year,fuelType,rcBookNo,expectedWage,location,images,videos,rcBookProof, insuranceProof} = req.body;
+          const {carName,brand,year,fuelType,carType,rcBookNo,expectedWage,location,images,videos,rcBookProof, insuranceProof} = req.body;
     
           const ownerId = req.userId; 
           console.log(req.userId)
@@ -61,6 +61,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
             brand,
             year,
             fuelType,
+            carType,
             rcBookNo,
             expectedWage,
             rcBookProof,
@@ -219,6 +220,9 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
             images,
             videos,
             available,
+            carType,
+            rcBookProof,
+            insuranceProof,
           } = req.body;
       
           if (!ownerId) {
@@ -256,6 +260,9 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
             rcBookNo,
             expectedWage,
             available,
+            rcBookProof,
+            insuranceProof,
+            carType,
             location: geoLocation,
             images: Array.isArray(images) ? images : [images],
             videos: videos && Array.isArray(videos) ? videos : [],
@@ -275,6 +282,19 @@ class CarOwnerCarsController implements ICarOwnerCarsController{
       }
 
 
+      async getActiveBooking(req: Request, res: Response): Promise<void> {
+    try {
+      const { carId } = req.params;
+      console.log("active")
+      const booking = await this._ownerscarService.getActiveBookingForCar(carId);
+      console.log("booking/ ",booking)
+      res.status(StatusCode.OK).json({ success: true, booking });
+    } catch (error: any) {
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
+    }
+  }
+
+  
 
       
 

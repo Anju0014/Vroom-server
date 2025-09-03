@@ -1,7 +1,7 @@
 import { IBooking } from "../../../models/booking/bookingModel";
 import { ICar } from "../../../models/car/carModel";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
-import { BookingData } from "../../../types/bookingData";
+import { BookingData,UpdateTrackingProps } from "../../../types/bookingData";
 
 export interface ICustomerCarAndBookingService{
    
@@ -15,6 +15,9 @@ export interface ICustomerCarAndBookingService{
         
         failedBooking(bookingId: string): Promise<void>;
 
-        getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}) : Promise<number>
-       getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}): Promise<ICar[]>
+        getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string, location?:string; latitude?: number;longitude?: number;}) : Promise<number>
+       getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string; location?:string;latitude?: number;longitude?: number;}): Promise<ICar[]>
+
+       updateTrackingLocation(updateTrackingProps:{bookingId: string,token: string,lat: number,lng: number}):Promise<void>
+
 }

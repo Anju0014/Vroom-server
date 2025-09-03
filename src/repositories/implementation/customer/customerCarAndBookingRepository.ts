@@ -46,8 +46,10 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
     search?: string;
     minPrice?: number;
     maxPrice?: number;
-    latitude?: number;
-    longitude?: number;
+    carType?:string;
+    location?:string;
+    // latitude?: number;
+    // longitude?: number;
   }) :Promise<ICar[]>{
     const query: any = { isDeleted: false, verifyStatus: 1 };
     if (filters.search) {
@@ -59,14 +61,16 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
     if (filters.maxPrice !== Infinity) {
       query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
     }
-    if (filters.latitude && filters.longitude) {
-      query['location.coordinates'] = {
-        $near: {
-          $geometry: { type: 'Point', coordinates: [filters.longitude, filters.latitude] },
-          $maxDistance: 10000, // 10km radius
-        },
-      };
+    if(filters.carType){
+      query.carType=filters.carType
     }
+    if (filters.location) {
+    query.$or = [
+      { "location.address": { $regex: filters.location, $options: "i" } },
+      { "location.landmark": { $regex: filters.location, $options: "i" } },
+    ];
+  }
+    
 
     console.log('Query:', query);
     const cars = await Car.find(query)
@@ -81,8 +85,11 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
     search?: string;
     minPrice?: number;
     maxPrice?: number;
-    latitude?: number;
-    longitude?: number;
+    carType?: string;
+    location?:string;
+
+    // latitude?: number;
+    // longitude?: number;
   }):Promise<number> {
     const query: any = { isDeleted: false, verifyStatus: 1 };
     if (filters.search) {
@@ -94,14 +101,17 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
     if (filters.maxPrice !== Infinity) {
       query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
     }
-    if (filters.latitude && filters.longitude) {
-      query['location.coordinates'] = {
-        $near: {
-          $geometry: { type: 'Point', coordinates: [filters.longitude, filters.latitude] },
-          $maxDistance: 10000,
-        },
-      };
+      if(filters.carType){
+      query.carType=filters.carType
     }
+    if (filters.location) {
+    query.$or = [
+      { "location.address": { $regex: filters.location, $options: "i" } },
+      { "location.landmark": { $regex: filters.location, $options: "i" } },
+    ];
+  }
+    
+    
 
     const count = await Car.countDocuments(query).exec();
     console.log('Total cars count:', count);
@@ -169,8 +179,13 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
         return `VROOM-RIDE-${paddedSeq}`;
       }
     
-
-
+    async updateBookingLocation(bookingId: string, location: { lat: number; lng: number }) {
+        return Booking.findByIdAndUpdate(
+          bookingId,
+          { $set: { currentLocation: location } },
+          { new: true }
+     );
+     }
 
 }
 export default CustomerCarAndBookingRepository

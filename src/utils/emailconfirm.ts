@@ -72,3 +72,19 @@ export const sendEmail = async ({ to, subject, text }: { to: string; subject: st
 };
 
 
+export const  sendTrackingEmail=async(to:string,trackingUrl:string)=>{
+  try{
+    await transporter.sendMail({
+      from:process.env.EMAIL_USER,
+      to,
+      subject:"Your Ride Starts Tomorrow",
+      text:`Hi Rider, Your Ride wil start soon. Please Share your live location: ${trackingUrl}`
+    })
+    console.log(`email send for trackingid ${to}`)
+  }
+  catch(error){
+    console.log("error sending trackingid:",error)
+  }
+}
+
+

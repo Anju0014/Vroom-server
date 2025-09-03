@@ -21,12 +21,14 @@ interface ICar extends Document {
   };
   make?: string;
   carModel?: string;
+  carType?:string;
   verifyStatus?: number;
   images: string[];
   videos?: string[];
   owner: mongoose.Types.ObjectId;
   available?: boolean;
   isDeleted?: boolean;
+  unavailableDates: Date[];
   rejectionReason:string;
 }
 
@@ -38,6 +40,10 @@ const CarSchema = new Schema<ICar>(
     fuelType: {
       type: String,
       enum: ["Petrol", "Diesel", "Electric", "Hybrid"]
+    },
+    carType:{
+      type: String,
+      enum:["Sedan","SUV","Hatchback","VAN/MPV"]
     },
     rcBookNo: { type: String, unique: true },
     expectedWage: { type: String, required: true },
@@ -66,6 +72,7 @@ const CarSchema = new Schema<ICar>(
     owner: { type: Schema.Types.ObjectId, ref: "CarOwner", required: true },
     available: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
+    unavailableDates: { type: [Date], default: [] },
     rejectionReason :{type:String}
   },
   { timestamps: true }

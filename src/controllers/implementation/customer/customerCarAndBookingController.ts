@@ -60,9 +60,12 @@ async getNearbyCars(req: Request, res: Response): Promise<void> {
       const search = req.query.search as string;
       const minPrice = parseFloat(req.query.minPrice as string) || 0;
       const maxPrice = parseFloat(req.query.maxPrice as string) || Infinity;
-      // const latitude = parseFloat(req.query.latitude as string);
-      // const longitude = parseFloat(req.query.longitude as string);
+      const latitude = parseFloat(req.query.latitude as string);
+      const longitude = parseFloat(req.query.longitude as string);
+      const carType= req.query.carType as string;
+      const location=req.query.location as string;
 
+      console.log("reached at controller", search, minPrice,maxPrice,carType,location)
       if (page < 1 || limit < 1 || limit > 100) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -75,10 +78,14 @@ async getNearbyCars(req: Request, res: Response): Promise<void> {
         search,
         minPrice,
         maxPrice,
+        carType,
+        location,
         // latitude,
         // longitude,
       });
-      const total = await this._customerCarService.getCarsCount({ search, minPrice, maxPrice });
+      const total = await this._customerCarService.getCarsCount({ search, minPrice, maxPrice,carType,location
+        // latitude,longitude 
+        });
       console.log('Cars:', cars, 'Total:', total);
 
       res.status(StatusCode.OK).json({ data: cars, total });
@@ -176,7 +183,24 @@ async getNearbyCars(req: Request, res: Response): Promise<void> {
     }
   }
   
+async updateCarTracking(req: Request, res: Response): Promise<void> {
+  try {
+    console.log("here i am");
+    console.log(req.body)
+    const { bookingId, token, lat, lng } = req.body;
 
+    await this._customerCarService.updateTrackingLocation({
+      bookingId,
+      token,
+      lat,
+      lng,
+    });
+
+    res.status(StatusCode.OK).json({ success: true });
+  } catch (err: any) {
+    this.handleError(res, err, StatusCode.BAD_REQUEST);
+  }
+}
 
 
 

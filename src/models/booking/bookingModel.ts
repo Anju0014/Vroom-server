@@ -1,6 +1,10 @@
 
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
+interface ILocation {
+  lat: number;
+  lng: number;
+}
 interface IBooking extends Document {
   bookingId:string,
   carId: Types.ObjectId;
@@ -17,6 +21,9 @@ interface IBooking extends Document {
  cancelledAt?:Date,
   createdAt?: Date;
   updatedAt?: Date;
+  trackingToken: String,      
+  trackingUrl: String, 
+  currentLocation?: ILocation;
 }
 
 const BookingSchema = new Schema<IBooking>(
@@ -40,7 +47,13 @@ const BookingSchema = new Schema<IBooking>(
     },
     cancellationFee:{type: Number},
     refundedAmount:{type: Number},
-    cancelledAt:{type: Date}
+    cancelledAt:{type: Date},
+    trackingToken: {type:String},      
+    trackingUrl: {type:String}, 
+    currentLocation: {
+      lat: { type: Number },
+      lng: { type: Number },
+    },
   },
   {
     timestamps: true,

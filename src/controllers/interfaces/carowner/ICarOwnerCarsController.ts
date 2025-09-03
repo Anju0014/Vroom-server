@@ -5,7 +5,7 @@ interface ICarController{
   getCarList(req: Request, res: Response): Promise<void>
   deleteCar (req: Request, res: Response): Promise<void>
   updateCar (req: Request, res: Response): Promise<void>
-
+  getActiveBooking(req: Request, res: Response): Promise<void>
 
 }
 

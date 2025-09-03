@@ -23,8 +23,12 @@ interface ICustomerCarAndBookingRepository{
   findConflictingBooking(carId: string,startDate: Date,endDate: Date): Promise<IBooking | null>;
   checkOldBooking(bookingData:BookingData): Promise<IBooking|null>
   generateBookingId():Promise<string>
-  getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}):Promise<ICar[]>
-  getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number;latitude?: number;longitude?: number;}):Promise<number> 
+  getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number; maxPrice?: number; carType?:string;
+    location?:string;latitude?: number;longitude?: number;}):Promise<ICar[]>
+  getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string;
+    location?:string;latitude?: number;longitude?: number;}):Promise<number> 
+
+  updateBookingLocation(bookingId: string, location: { lat: number; lng: number }):Promise<void>
 
 }
 

@@ -28,3 +28,10 @@ export interface BookingData {
     carNumber: string;
 
   }
+
+  export interface UpdateTrackingProps {
+  bookingId: string;
+  token: string;
+  lat: number;
+  lng: number;
+}

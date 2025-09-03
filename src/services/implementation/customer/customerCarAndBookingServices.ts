@@ -1,8 +1,11 @@
 import ICustomerCarAndBookingRepository from "../../../repositories/interfaces/customer/ICustomerCarAndBookingRepository";
 import { ICustomerCarAndBookingService } from "../../interfaces/customer/ICustomerCarAndBookingServices";
 import { ICar } from "../../../models/car/carModel";
-import { BookingData } from "../../../types/bookingData";
+import { BookingData,UpdateTrackingProps } from "../../../types/bookingData";
 import mongoose from "mongoose";
+import generateTrackingToken from "../../../utils/trackingIDGenerator";
+import { getIO } from "../../../sockets/socket";
+import { endOfDay } from "date-fns";
 
 class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 
@@ -35,8 +38,10 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     search?: string;
     minPrice?: number;
     maxPrice?: number;
-    latitude?: number;
-    longitude?: number;
+    carType?:string;
+    location?: string;
+    // latitude?: number;
+    // longitude?: number;
   }):Promise<ICar[]>  {
     return this._customerCarRepository.getAllCars(page, limit, filters);
   }
@@ -45,8 +50,10 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     search?: string;
     minPrice?: number;
     maxPrice?: number;
-    latitude?: number;
-    longitude?: number;
+    carType?:string;
+    location?:string;
+    // latitude?: number;
+    // longitude?: number;
   }):Promise<number>  {
     return this._customerCarRepository.getCarsCount(filters);
   }
@@ -65,7 +72,7 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
   }
 
   const start = new Date(startDate);
-  const end = new Date(endDate);
+  const end = endOfDay(new Date(endDate)); 
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new Error('Invalid date format');
@@ -91,8 +98,8 @@ console.log("create pending booking phase1")
 
   const booking = await this._customerCarRepository.createBooking({
     ...bookingData,
-    startDate: new Date(startDate),
-    endDate: new Date(endDate),
+    startDate: start,
+    endDate: end,
     status: 'pending',
   });
 console.log("booking new pending",booking);
@@ -117,8 +124,15 @@ async confirmBooking(bookingId: string, paymentIntentId: string): Promise<void> 
   booking.bookingId=newBookingId,
 
   console.log("old -confirm???",booking);
- const newbooking= await this._customerCarRepository.saveBooking(booking);
- console.log("newbooking-confirm", newbooking)
+  const newbooking= await this._customerCarRepository.saveBooking(booking);
+  console.log("newbooking-confirm", newbooking)
+  const token = generateTrackingToken();
+  const frontendUrl = process.env.FRONTEND_URL;
+  const trackingUrl = `${frontendUrl}/customer/tracking/${bookingId}?token=${token}`;
+  booking.trackingToken=token;
+  booking.trackingUrl=trackingUrl;
+  await this._customerCarRepository.saveBooking(booking);
+  
 
 }
 
@@ -138,6 +152,40 @@ async failedBooking(bookingId: string): Promise<void> {
   }
   
 
+// async updateTrackingLocation({bookingId,token,lat,lng,}: UpdateTrackingProps): Promise<void> {
+//   const booking = await this._customerCarRepository.findBookingById(bookingId);
+//   console.log(booking)
+  
+//   if (!booking || booking.trackingToken !== token) {
+//     throw new Error("Unauthorized tracking link");
+//   }
+
+  
+//   await this._customerCarRepository.updateBookingLocation(bookingId, { lat, lng });
+
+
+//   const io = getIO();
+//   console.log(`Emitting location to booking_${bookingId}:`, { lat, lng });
+//   io.to(`booking_${bookingId}`).emit("location:update", { lat, lng });
+// }
+
+async updateTrackingLocation({ bookingId, token, lat, lng }: UpdateTrackingProps): Promise<void> {
+  console.log("Updating location for booking:", bookingId, { lat, lng });
+  const booking = await this._customerCarRepository.findBookingById(bookingId);
+  console.log("Booking found:", booking);
+
+  if (!booking || booking.trackingToken !== token) {
+    console.error("Unauthorized tracking link for booking:", bookingId);
+    throw new Error("Unauthorized tracking link");
+  }
+
+  await this._customerCarRepository.updateBookingLocation(bookingId, { lat, lng });
+  console.log("Location updated in DB for booking:", bookingId);
+
+  const io = getIO();
+  console.log(`Emitting location to booking_${bookingId}:`, { lat, lng });
+  io.to(`booking_${bookingId}`).emit("location:update", { lat, lng });
+}
 
 
 

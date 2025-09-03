@@ -84,4 +84,7 @@ customerRouter.patch(`/bookings/:bookingId/fail`, (req,res)=>customerCarAndBooki
 customerRouter.get('/getCustomerBookingDetails',authMiddleware,(req,res)=>customerDashBoardController.getCustomerBookingDetails(req,res))
 customerRouter.patch(`/bookings/:bookingId/cancel`,(req,res)=>customerDashBoardController.cancelBooking(req,res));
 
+
+customerRouter.post(`/tracking/update`,(req,res)=>customerCarAndBookingController.updateCarTracking(req,res));
+
 export default customerRouter

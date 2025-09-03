@@ -116,6 +116,7 @@ class CarOwnerController implements ICarOwnerController{
             });
 
         }catch(error){
+          console.log(error)
           this.handleError(res, error, StatusCode.BAD_REQUEST);
             // console.log("LoginError:" ,error)
 
@@ -153,89 +154,96 @@ class CarOwnerController implements ICarOwnerController{
 
 
 
-    // async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
-    //   try {
-    //     console.log("Reached renewRefreshAccessTokenOwner");
-    //     const oldRefreshToken = req.cookies.carOwnerRefreshToken;
-    //     if (!oldRefreshToken) {
-    //       res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
-    //       return;
-    //     }
-    
-    //     const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken);
-    
-    //     res.cookie("carOwnerRefreshToken", refreshToken, {
-    //       httpOnly: true,
-    //       secure: process.env.NODE_ENV === "production",
-    //       sameSite: "strict",
-    //       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    //     });
-    
-    //     res.cookie("carOwnerAccessToken",accessToken,{
-    //       httpOnly:true,
-    //       secure:process.env.NODE_ENV==="production",
-    //       sameSite:"strict",
-    //       maxAge:60*60*1000
-    //   })
-    //     res.status(StatusCode.OK).json({ success: true, accessToken });
-    //   } catch (error) {
-    //     if(error instanceof Error){
-    //     console.error("Error renewing token:", error.message);
-    //     if (error.message === "Refresh token expired" || error.message === "Invalid refresh token") {
-    //       res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: "Invalid or expired refresh token" });
-    //     } else {
-    //       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-    //     }}
-    //   }
-    // }
-
-
 
 
     async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
-  try {
-    console.log("Reached renewRefreshAccessTokenOwner");
-    const oldRefreshToken = req.cookies.carOwnerRefreshToken;
-    if (!oldRefreshToken) {
-      res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
-      return;
-    }
-
-    const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken);
-
-    res.cookie("carOwnerRefreshToken", refreshToken, {
-      httpOnly: process.env.COOKIE_HTTP_ONLY === "true",
-      secure: process.env.COOKIE_SECURE === "true",
-      sameSite: process.env.COOKIE_SAME_SITE as "strict" | "lax" | "none",
-      maxAge: Number(process.env.COOKIE_REFRESH_MAX_AGE),
-    });
-
-    res.cookie("carOwnerAccessToken", accessToken, {
-      httpOnly: process.env.COOKIE_HTTP_ONLY === "true",
-      secure: process.env.COOKIE_SECURE === "true",
-      sameSite: process.env.COOKIE_SAME_SITE as "strict" | "lax" | "none",
-      maxAge: Number(process.env.COOKIE_ACCESS_MAX_AGE),
-    });
-
-    res.status(StatusCode.OK).json({ success: true, accessToken });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error renewing token:", error.message);
-      if (error.message === "Refresh token expired" || error.message === "Invalid refresh token") {
-        res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: "Invalid or expired refresh token" });
-      } else {
-        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      try {
+        console.log("Reached renewRefreshAccessTokenOwner");
+        const oldRefreshToken = req.cookies.carOwnerRefreshToken;
+        if (!oldRefreshToken) {
+          res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
+          return;
+        }
+    
+        const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken);
+    
+        res.cookie("carOwnerRefreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+    
+        res.cookie("carOwnerAccessToken",accessToken,{
+          httpOnly:true,
+          secure:process.env.NODE_ENV==="production",
+          sameSite:"strict",
+          maxAge:60*60*1000
+      })
+        res.status(StatusCode.OK).json({ success: true, accessToken });
+      } catch (error) {
+        if(error instanceof Error){
+        console.error("Error renewing token:", error.message);
+        if (error.message === "Refresh token expired" || error.message === "Invalid refresh token") {
+          res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: "Invalid or expired refresh token" });
+        } else {
+          this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+        }}
       }
     }
-  }
-}
+
+
+
+
+//     async renewRefreshAccessTokenOwner(req: Request, res: Response): Promise<void> {
+//   try {
+//     console.log("Reached renewRefreshAccessTokenOwner");
+//     const oldRefreshToken = req.cookies.carOwnerRefreshToken;
+//     if (!oldRefreshToken) {
+//       res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: MESSAGES.ERROR.UNAUTHORIZED });
+//       return;
+//     }
+
+//     const { accessToken, refreshToken } = await this._carOwnerService.renewAuthToken(oldRefreshToken);
+
+//     res.cookie("carOwnerRefreshToken", refreshToken, {
+//       httpOnly: process.env.COOKIE_HTTP_ONLY === "true",
+//       secure: process.env.COOKIE_SECURE === "true",
+//       sameSite: process.env.COOKIE_SAME_SITE as "strict" | "lax" | "none",
+//       maxAge: Number(process.env.COOKIE_REFRESH_MAX_AGE),
+//     });
+
+//     res.cookie("carOwnerAccessToken", accessToken, {
+//       httpOnly: process.env.COOKIE_HTTP_ONLY === "true",
+//       secure: process.env.COOKIE_SECURE === "true",
+//       sameSite: process.env.COOKIE_SAME_SITE as "strict" | "lax" | "none",
+//       maxAge: Number(process.env.COOKIE_ACCESS_MAX_AGE),
+//     });
+
+//     res.status(StatusCode.OK).json({ success: true, accessToken });
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       console.error("Error renewing token:", error.message);
+//       if (error.message === "Refresh token expired" || error.message === "Invalid refresh token") {
+//         res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: "Invalid or expired refresh token" });
+//       } else {
+//         this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+//       }
+//     }
+//   }
+// }
 
 
     async completeRegistration(req: CustomRequest, res: Response): Promise<void> {
     // async completeRegistration(req:CustomRequest,res:Request): Promise<void>{
       try{
+
         console.log("reached at new Registratipo")
+
+
+        console.log("show what error",req.body)
         const carOwnerId = req.userId;
+          console.log("id?",carOwnerId)
           console.log("data from frontend",req.body)
           console.log(carOwnerId)
           if(!carOwnerId){
@@ -565,10 +573,6 @@ class CarOwnerController implements ICarOwnerController{
             message: errorMessage,
         });
     }
-
-
     }
     
-
-
     export default CarOwnerController

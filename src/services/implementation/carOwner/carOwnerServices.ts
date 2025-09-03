@@ -147,7 +147,7 @@ async loginCarOwner(email:string, password:string): Promise<{ownerAccessToken:st
         console.log("not correct")
         throw new Error("Invalid Credentials")
     }
-    const ownerAccessToken=JwtUtils.generateAccessToken({id:carOwner._id, email:carOwner.email,role:'owner'});
+    const ownerAccessToken=JwtUtils.generateAccessToken({id:carOwner._id, email:carOwner.email,role:'carOwner'});
     const newRefreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
 
     this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), newRefreshToken);
@@ -211,7 +211,7 @@ async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, re
     throw new Error("Invalid refresh token");
   }
 
-  const accessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email, role: "owner" });
+  const accessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email, role: "carOwner" });
   const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
   await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
 
@@ -333,7 +333,7 @@ async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, re
         }
       
     
-        const ownerAccessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email,role:'owner' });
+        const ownerAccessToken = JwtUtils.generateAccessToken({ id: carOwner._id, email: carOwner.email,role:'carOwner' });
         const refreshToken = JwtUtils.generateRefreshToken({ id: carOwner._id });
       
         await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);

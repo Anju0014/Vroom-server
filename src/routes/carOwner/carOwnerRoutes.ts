@@ -78,4 +78,6 @@ carOwnerRouter.patch('/cars/:id/availability', authMiddleware,(req, res) => carO
 
 carOwnerRouter.get("/bookings", authMiddleware, (req,res)=>carOwnerBookingController.getCarOwnerBookings(req,res));
 
+carOwnerRouter.get("/activebooking/:carId", authMiddleware, (req,res)=>carOwnerCarsController.getActiveBooking(req,res));
+
 export default carOwnerRouter

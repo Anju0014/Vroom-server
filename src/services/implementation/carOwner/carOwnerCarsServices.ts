@@ -71,6 +71,12 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
             return updatedCar;
           }
           
+
+          async getActiveBookingForCar(carId: string) {
+            console.log(carId)
+            const booking = await this._ownersCarRepository.findActiveBookingByCarId(carId);
+            return booking;
+            }
           
     
           
