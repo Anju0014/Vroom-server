@@ -3,10 +3,14 @@ import IAdminRepository from "../../interfaces/admin/IAdminRepository";
 import { BaseRepository } from "../../base/BaseRepository";
 import {Customer,ICustomer} from "../../../models/customer/customerModel"
 import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
+import { buildSearchQuery } from "../../../utils/queryUtils";
 import { Car, ICar } from "../../../models/car/carModel";
 
 
-
+interface PaginationResult<T> {
+  data: T[];
+  total: number;
+}
 class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository {
 
      constructor(){
@@ -41,37 +45,79 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
         await Admin.updateOne({ _id: adminId }, { $set: { refreshToken: null } });
       }
 
-      async getAllCustomers(): Promise<ICustomer[]> {
-        try {
-            console.log("reached ,,,,6");
-            const customers = await Customer.find({}, "-password -refreshToken",);
-            console.log("Customers fetched:", customers);
-            if (!customers || !Array.isArray(customers)) {  
-                console.error(" No customers found or invalid format.");
-                return [];
-            }
-            return customers;
-        } catch (error) {
-            console.error("Error in getAllCustomers:", error);
-            throw new Error("Database query failed");
-        }
-    }
+    //   async getAllCustomers(page: number,limit: number,search: string):Promise<{ customers: ICustomer[]; total: number }>{
+    //     try {
+    //         console.log("reached ,,,,6");
+    //         const customers = await Customer.find({}, "-password -refreshToken",);
+    //         console.log("Customers fetched:", customers);
+    //         if (!customers || !Array.isArray(customers)) {  
+    //             console.error(" No customers found or invalid format.");
+    //             return [];
+    //         }
+    //         return customers;
+    //     } catch (error) {
+    //         console.error("Error in getAllCustomers:", error);
+    //         throw new Error("Database query failed");
+    //     }
+    // }
     
-    async getAllOwners(): Promise<ICarOwner[]> {
-        try {
-            console.log("reached ,,,,6");
-            const carowners = await CarOwner.find({}, "-password -refreshToken");
-            console.log("Customers fetched:", carowners);
-            if (!carowners || !Array.isArray(carowners)) {  
-                console.error("No customers found or invalid format.");
-                return [];
-            }
-            return carowners;
-        } catch (error) {
-            console.error("Error in getAllOwners:", error);
-            throw new Error("Database query failed");
-        }
-    }
+    // async getAllOwners(page: number,limit: number,search: string):Promise<{ carOwners: ICarOwner[]; total: number }>{
+    //     try {
+    //         console.log("reached ,,,,6");
+    //         const carowners = await CarOwner.find({}, "-password -refreshToken");
+    //         console.log("Customers fetched:", carowners);
+    //         if (!carowners || !Array.isArray(carowners)) {  
+    //             console.error("No customers found or invalid format.");
+    //             return [];
+    //         }
+    //         return carowners;
+    //     } catch (error) {
+    //         console.error("Error in getAllOwners:", error);
+    //         throw new Error("Database query failed");
+    //     }
+    // }
+    async getAllCustomers(
+  page: number,
+  limit: number,
+  search: string
+): Promise<{ customers: ICustomer[]; total: number }> {
+  try {
+    const filter ={ processStatus:2, verifyStatus: 1, ... buildSearchQuery(search, ["fullName", "email", "phoneNumber"])};
+
+    const customers = await Customer.find(filter, "-password -refreshToken")
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Customer.countDocuments(filter);
+
+    return { customers, total };
+  } catch (error) {
+    console.error("Error in getAllCustomers:", error);
+    throw new Error("Database query failed");
+  }
+}
+
+async getAllOwners(
+  page: number,
+  limit: number,
+  search: string
+): Promise<{ carOwners: ICarOwner[]; total: number }> {
+  try {
+    const filter = {processStatus:2, verifyStatus:1,...buildSearchQuery(search, ["fullName", "email", "phoneNumber"])};
+
+    const carOwners = await CarOwner.find(filter, "-password -refreshToken")
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await CarOwner.countDocuments(filter);
+
+    return { carOwners, total };
+  } catch (error) {
+    console.error("Error in getAllOwners:", error);
+    throw new Error("Database query failed");
+  }
+}
+
 
    
     async findCustomerById (customerId:string): Promise<ICustomer | null>{

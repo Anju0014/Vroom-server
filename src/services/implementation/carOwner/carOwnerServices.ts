@@ -1,12 +1,12 @@
 import ICarOwnerRepository from "../../../repositories/interfaces/carOwner/ICarOwnerRepository";
 import { ICarOwnerService } from "../../interfaces/carOwner/ICarOwnerServices";
-import { sendOTP,sendResetEmail } from "../../../utils/emailconfirm";
+import { sendEmail,sendResetEmail } from "../../../utils/emailconfirm";
 import { ICarOwner } from "../../../models/carowner/carOwnerModel";
 import PasswordUtils from "../../../utils/passwordUtils";
 import JwtUtils from "../../../utils/jwtUtils";
 import { ICar } from "../../../models/car/carModel";
 import mongoose from "mongoose";
-
+import { otpTemplate, passwordResetTemplate } from "../../../templates/emailTemplates";
 
 class CarOwnerService implements ICarOwnerService {
 
@@ -55,7 +55,9 @@ async registerBasicDetails(carOwnerDetails: Partial<ICarOwner>): Promise<{ carOw
         processStatus: 0
     })
 
-    await sendOTP(email, otp)
+    const otpContent = otpTemplate(otp);
+        await sendEmail({ to: email, ...otpContent });
+    // await sendOTP(email, otp)
     console.log("create new carOwner: ", carOwner);
     return { carOwner }
 }
@@ -120,7 +122,10 @@ async resendOtp(email:string): Promise<{message:string}>{
     carOwner.otpExpires=otpExpires;
 
     await this._carOwnerRepository.updateCarOwner(carOwner._id.toString(),carOwner);
-    await sendOTP(carOwner.email,newOtp);
+
+    const otpContent = otpTemplate(newOtp);
+    await sendEmail({ to: carOwner.email, ...otpContent });
+    // await sendOTP(carOwner.email,newOtp);
     console.log("New OTP sent Successfully");
     return {message:"OTP resend successfully"}
 }
@@ -258,7 +263,9 @@ async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, re
           throw new Error('User not found');
         }
         const resetToken = JwtUtils.generateResetToken({ userId: carOwner._id });
-        await sendResetEmail(email, resetToken, 'carOwner');
+
+        await sendResetEmail(carOwner.email, carOwner.fullName, resetToken, 'carOwner');
+        // await sendResetEmail(email, resetToken, 'carOwner');
       }
 
     async resetPassword  (token: string, newPassword: string, role: "customer" | "carOwner"):Promise<string>{

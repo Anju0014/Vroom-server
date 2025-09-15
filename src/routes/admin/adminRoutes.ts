@@ -37,7 +37,9 @@ adminRouter.get('/customers', (req,res)=>adminController.getAllCustomers(req,res
 
 adminRouter.get('/owners',(req,res)=>adminController.getAllOwners(req,res));
 
-adminRouter.get('/cars',(req,res)=>adminOwnerController.getAllCarsforVerify(req,res));
+adminRouter.get('/pendingcars',(req,res)=>adminOwnerController.getAllCarsforVerify(req,res));
+
+adminRouter.get('/verifiedcars',(req,res)=>adminOwnerController.getAllVerifiedCars(req,res));
 
 adminRouter.get('/bookings',(req,res)=>adminOwnerController.getAllBookings(req,res));
 

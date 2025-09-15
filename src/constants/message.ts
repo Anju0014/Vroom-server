@@ -11,6 +11,7 @@ export const MESSAGES = {
       PROFILE_UPDATED: "Profile updated successfully",
       CAR_UPLOADED: "Car uploaded successfully",
       CARS_FETCHED: "Cars fetched successfully",
+      BOOKINGS_FETCHED: "Bookings fetched successfully",
       PROFILE_FETCHED: "Profile fetched successfully",
       ID_PROOF_UPDATED: "ID Proof updated successfully",
       STATUS_UPDATED: "Status updated successfully",    

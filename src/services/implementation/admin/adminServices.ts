@@ -54,19 +54,19 @@ async logoutAdmin(refreshToken: string): Promise<void> {
 }
 
 
-async listAllCustomers(): Promise<ICustomer[]> {
+async listAllCustomers(page: number,limit: number,search: string,): Promise<{customers:ICustomer[], total: number}>{
     try {
         console.log("reached222");
-        return await this._adminRepository.getAllCustomers();
+        return await this._adminRepository.getAllCustomers(page,limit,search);
     } catch (error) {
         console.error("Error in listAllCustomers:", error);
         throw new Error("Failed to fetch customers");
     }
 }
-async listAllCarOwners(): Promise<ICarOwner[]> {
+async listAllCarOwners(page: number,limit: number,search: string,): Promise<{carOwners:ICarOwner[], total: number}> {
     try {
         console.log("reached222");
-        return await this._adminRepository.getAllOwners();
+        return await this._adminRepository.getAllOwners(page,limit,search);
     } catch (error) {
         console.error("Error in listAllCustomers:", error);
         throw new Error("Failed to fetch customers");

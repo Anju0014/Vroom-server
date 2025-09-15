@@ -16,13 +16,18 @@ async getAllOwnersforVerify(req: Request, res: Response):Promise<void>{
     try {
         console.log("reached.......5")
         console.log("Calling this._adminService.listAllCustomers()...");
-        const owners = await this._adminOwnerService.listAllOwnerVerify();
-        console.log("Finished calling listAllCustomers()");
-        console.log(owners)
+         const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+        const {carOwners, total } = await this._adminOwnerService.listAllOwnerforVerify(page,limit,search);
+         
+        console.log("Finished calling listAllOwnersfor Verify()");
+        console.log(carOwners)
         res.status(StatusCode.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.OWNERS_FETCHED || "Car owners fetched successfully",
-            data: owners
+            data: carOwners,
+            total
         });
     } catch (error: any) {
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
@@ -36,14 +41,18 @@ async getAllOwnersforVerify(req: Request, res: Response):Promise<void>{
 async getAllCarsforVerify(req: Request, res: Response):Promise<void>{
     try {
         console.log("reached.......5")
-        console.log("Calling this._adminService.listAllCustomers()...");
-        const cars = await this._adminOwnerService.listAllCarsVerify();
+        console.log("Calling this._adminService.listAllCars()...");
+          const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+        const {cars, total } = await this._adminOwnerService.listAllCarsforVerify(page,limit,search);
         console.log("Finished calling listAllCustomers()");
-        console.log(cars)
+        console.log("cars",cars)
         res.status(StatusCode.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.CARS_FETCHED || "Cars fetched successfully",
-            data: cars
+            data: cars,
+            total
         });
  
     } catch (error: any) {
@@ -55,17 +64,48 @@ async getAllCarsforVerify(req: Request, res: Response):Promise<void>{
     }
 }
 
+async getAllVerifiedCars(req: Request, res: Response):Promise<void>{
+    try {
+        console.log("reached.......5")
+        console.log("Calling this._adminService.listAllCustomers()...");
+          const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+        const {cars, total } = await this._adminOwnerService.listAllVerifiedCars(page,limit,search);
+        console.log("Finished calling listAllCustomers()");
+        console.log(cars)
+        res.status(StatusCode.OK).json({
+            success: true,
+            message: MESSAGES.SUCCESS.CARS_FETCHED || "Cars fetched successfully",
+            data: cars,
+            total
+        });
+ 
+    } catch (error: any) {
+   
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.ERROR.SERVER_ERROR
+        });
+    }
+}
 async getAllBookings(req: Request, res: Response):Promise<void>{
     try {
         console.log("reached.......5")
         console.log("Calling this._adminService.listAllBookings()...");
-        const bookings = await this._adminOwnerService.listAllBookings();
+        const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+
+        // const bookings = await this._adminOwnerService.listAllBookings();
+         const { bookings, total } = await this._adminOwnerService.listAllBookings(page,limit,search);
         console.log("Finished calling listAllBookings()");
         console.log(bookings)
         res.status(StatusCode.OK).json({
             success: true,
-            message: MESSAGES.SUCCESS.CARS_FETCHED || "Bookings fetched successfully",
-            data: bookings
+            message: MESSAGES.SUCCESS.BOOKINGS_FETCHED || "Bookings fetched successfully",
+            data: bookings,
+            total
         });
  
     } catch (error: any) {

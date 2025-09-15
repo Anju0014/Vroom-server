@@ -12,8 +12,8 @@ interface IAdminRepository{
     updateRefreshToken(carOwnerId:string,refreshToken:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<IAdmin | null> 
     clearRefreshToken(carOwnerId: string): Promise<void> 
-    getAllCustomers(): Promise<ICustomer[]>
-    getAllOwners(): Promise<ICarOwner[]>
+    getAllCustomers(page: number,limit: number,search: string):Promise<{ customers: ICustomer[]; total: number }>
+    getAllOwners(page: number,limit: number,search: string):Promise<{ carOwners: ICarOwner[]; total: number }>
     findCustomerById (customerId:string): Promise<ICustomer | null>
     updateCustomerStatus(customerId:string, updateData: Partial<ICustomer>) :Promise<ICustomer | null> 
 

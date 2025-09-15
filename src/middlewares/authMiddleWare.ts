@@ -40,6 +40,8 @@
 
 import { Request, Response, NextFunction } from "express";
 import JwtUtils from "../utils/jwtUtils";
+import {Customer} from "../models/customer/customerModel"
+import {CarOwner} from "../models/carowner/carOwnerModel"
 
 export interface CustomRequest extends Request {
   userId?: string;
@@ -88,6 +90,39 @@ export const verifyRole = (allowedRoles: ("carOwner" | "customer" | "admin")[]) 
     }
     next();
   };
+};
+
+export const checkBlocked = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId, role } = req;
+
+    if (!userId || !role) {
+      return res.status(401).json({ message: "Unauthorized: Missing user data." });
+    }
+
+    let user: any;
+    if (role === "customer") {
+      user = await Customer.findById(userId);
+    } else if (role === "carOwner") {
+      user = await CarOwner.findById(userId);
+    } else {
+      // Admins aren't blocked
+      return next();
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (user.blockStatus === 1) { // assuming 1 = blocked, 0 = active
+      return res.status(403).json({ message: "Your account is blocked. Contact support." });
+    }
+
+    next();
+  } catch (err) {
+    console.error("Block check error:", err);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 
 export default authMiddleware;

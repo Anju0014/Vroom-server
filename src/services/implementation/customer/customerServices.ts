@@ -1,9 +1,10 @@
 import ICustomerRepository from "../../../repositories/interfaces/customer/ICustomerRepository";
 import { ICustomerService } from "../../interfaces/customer/ICustomerServices";
-import { sendOTP,sendResetEmail } from "../../../utils/emailconfirm";
+import { sendEmail, sendResetEmail } from "../../../utils/emailconfirm";
 import { ICustomer } from "../../../models/customer/customerModel";
 import PasswordUtils from "../../../utils/passwordUtils";
 import JwtUtils from "../../../utils/jwtUtils";
+import { otpTemplate, passwordResetTemplate } from "../../../templates/emailTemplates";
 
 
 class CustomerService implements ICustomerService {
@@ -51,8 +52,11 @@ async registerBasicDetails(customerDetails: Partial<ICustomer>): Promise<{ custo
         otpExpires,
         processStatus: 0
     })
+     
+    const otpContent = otpTemplate(otp);
+    await sendEmail({ to: email, ...otpContent });
 
-    await sendOTP(email, otp)
+    // await sendOTP(email, otp)
     console.log("create new customer: ", customer);
 
 
@@ -121,7 +125,11 @@ async resendOtp(email:string): Promise<{message:string}>{
     customer.otpExpires=otpExpires;
 
     await this._customerRepository.updateCustomer(customer._id.toString(),customer);
-    await sendOTP(customer.email,newOtp);
+
+    const otpContent = otpTemplate(newOtp);
+    await sendEmail({ to: customer.email, ...otpContent });
+
+    // await sendOTP(customer.email,newOtp);
     console.log("New OTP sent Successfully");
     return {message:"OTP resend successfully"}
 }
@@ -202,7 +210,8 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
           throw new Error('User not found');
         }
         const resetToken = JwtUtils.generateResetToken({ userId: customer._id });
-        await sendResetEmail(email, resetToken, 'customer');
+       await sendResetEmail(customer.email, customer.fullName, resetToken, "customer");
+        // await sendResetEmail(email, resetToken, 'customer');
       }
     async resetPassword  (token: string, newPassword: string, role: "customer" | "carOwner"):Promise<string>{
         console.log("reached pt 2")

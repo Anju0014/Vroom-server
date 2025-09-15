@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { Booking } from "../models/booking/bookingModel";
-import { sendTrackingEmail} from "../utils/emailconfirm"
+import { sendEmail} from "../utils/emailconfirm"
+import { trackingEmailTemplate } from "../templates/emailTemplates";
 
 
 cron.schedule("0 0 * * *", async () => {
@@ -18,6 +19,8 @@ cron.schedule("0 0 * * *", async () => {
   }).populate("userId", "name email");
 
   for (const booking of bookings) {
-    await sendTrackingEmail(booking.userId.email, booking.trackingUrl);
+    const trackingContent = trackingEmailTemplate(booking.trackingUrl);
+    await sendEmail({ to: booking.userId.email, ...trackingContent });
+    // await sendTrackingEmail(booking.userId.email, booking.trackingUrl);
   }
 });

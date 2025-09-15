@@ -109,13 +109,17 @@ async getAllCustomers(req: Request, res: Response):Promise<void>{
     try {
         console.log("reached.......5")
         console.log("Calling this._adminService.listAllCustomers()...");
-        const customers = await this._adminService.listAllCustomers();
+          const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+        const {customers, total } = await this._adminService.listAllCustomers(page,limit,search);
         console.log("Finished calling listAllCustomers()");
         console.log(customers)
         res.status(StatusCode.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.CUSTOMERS_FETCHED || "Customers fetched successfully",
-            data: customers
+            data: customers,
+            total
         });
 
     } catch (error: any) {
@@ -132,13 +136,17 @@ async getAllOwners(req: Request, res: Response):Promise<void>{
     try {
         console.log("reached.......5")
         console.log("Calling this._adminService.listAllCustomers()...");
-        const owners = await this._adminService.listAllCarOwners();
+          const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+        const {carOwners, total } = await this._adminService.listAllCarOwners(page,limit,search);
         console.log("Finished calling listAllCustomers()");
-        console.log(owners)
+        console.log(carOwners)
         res.status(StatusCode.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.OWNERS_FETCHED || "Car owners fetched successfully",
-            data: owners
+            data: carOwners,
+            total
         });
    
     } catch (error: any) {
