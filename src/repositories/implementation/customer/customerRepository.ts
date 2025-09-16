@@ -29,8 +29,13 @@ class CustomerRepository extends BaseRepository<ICustomer> implements ICustomerR
     async clearRefreshToken(customerId: string): Promise<void> {
         await Customer.updateOne({ _id: customerId }, { $set: { refreshToken: null } });
       }
-      async findById(customerId:string): Promise<ICustomer |null>{
+    async findById(customerId:string): Promise<ICustomer |null>{
         return await Customer.findOne({_id:customerId})
+    }
+     async getBlockStatusByUserId(userId: string): Promise<number> {
+       const customer=await Customer.findById(userId).select('blockStatus');
+       if(!customer) throw new Error('Owner not found');
+           return customer.blockStatus
     }
 }
 export default CustomerRepository

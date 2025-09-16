@@ -554,7 +554,19 @@ class CarOwnerController implements ICarOwnerController{
       // }
 
 
-
+    async getBlockStatus(req: Request, res: Response): Promise<void> {
+                 try {
+                  console.log("block status checking..................")
+                 const { userId } = req.params;
+                  const status = await this._carOwnerService.checkBlockStatus(userId);
+    
+                  res.status(StatusCode.OK).json({ blockStatus: status });
+                 } catch (error) {
+                    this.handleError(res, error, StatusCode.BAD_REQUEST);
+                  }
+                }
+    
+    
       
 
       

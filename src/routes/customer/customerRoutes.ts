@@ -62,6 +62,7 @@ customerRouter.put("/updateProfile", authMiddleware,(req,res)=>customerControlle
 
 customerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>customerController.updateProfileCustomerIdProof(req,res));
 
+customerRouter.get("/checkblockstatus/:userId", authMiddleware,(req,res)=>customerController.getBlockStatus(req,res));
 
 
 

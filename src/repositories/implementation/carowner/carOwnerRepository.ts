@@ -36,6 +36,12 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
         return await CarOwner.findOne({_id:carOwnerId})
     }
 
+       async getBlockStatusByUserId(userId: string): Promise<number> {
+           const owner=await CarOwner.findById(userId).select('blockStatus');
+            if(!owner) throw new Error('Owner not found');
+            return owner.blockStatus
+       }
+
    
 }
 export default CarOwnerRepository

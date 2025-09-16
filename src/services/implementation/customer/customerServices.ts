@@ -5,6 +5,7 @@ import { ICustomer } from "../../../models/customer/customerModel";
 import PasswordUtils from "../../../utils/passwordUtils";
 import JwtUtils from "../../../utils/jwtUtils";
 import { otpTemplate, passwordResetTemplate } from "../../../templates/emailTemplates";
+import CustomerRepository from "../../../repositories/implementation/customer/customerRepository";
 
 
 class CustomerService implements ICustomerService {
@@ -355,6 +356,11 @@ async loginCustomerGoogle(fullName: string, email: string, profileImage: string,
         }
         return updatedcustomer;
       }
+
+
+      async checkBlockStatus(userId: string): Promise<number> {
+       return await this._customerRepository.getBlockStatusByUserId(userId);
+    }
 
 
 }

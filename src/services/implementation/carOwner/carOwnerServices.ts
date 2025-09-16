@@ -380,7 +380,11 @@ async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, re
     
         return updatedOwner;
       }
+     
 
+       async checkBlockStatus(userId: string): Promise<number> {
+       return await this._carOwnerRepository.getBlockStatusByUserId(userId);
+    }
 
 
       // async updateCarOwnerProfileId(carOwnerId: string,updatedData: Partial<ICarOwner>): Promise<ICarOwner> {

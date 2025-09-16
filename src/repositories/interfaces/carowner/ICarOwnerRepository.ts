@@ -13,6 +13,7 @@ interface ICarOwnerRepository{
     clearRefreshToken(ownerId:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICarOwner | null>
     findById(ownerId:string): Promise<ICarOwner |null>
+    getBlockStatusByUserId(userId:string):Promise<number>
    
 }
 

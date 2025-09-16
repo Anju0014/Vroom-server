@@ -15,6 +15,7 @@ export interface ICustomerService{
     getCustomerProfile(customerId: string):Promise<{customer:ICustomer}>
     updateCustomerProfile(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer>
     updateCustomerProfileId(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> 
+    checkBlockStatus(userId: string): Promise<number> 
 }
 
 

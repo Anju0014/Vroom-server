@@ -447,6 +447,18 @@ class CustomerContoller implements ICustomerController{
               }
             }
 
+             async getBlockStatus(req: Request, res: Response): Promise<void> {
+             try {
+              console.log("block status checking..................")
+             const { userId } = req.params;
+              const status = await this._customerService.checkBlockStatus(userId);
+
+              res.status(StatusCode.OK).json({ blockStatus: status });
+             } catch (error) {
+                this.handleError(res, error, StatusCode.BAD_REQUEST);
+              }
+            }
+
 
 
             private handleError(res: Response, error: unknown, statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR): void {

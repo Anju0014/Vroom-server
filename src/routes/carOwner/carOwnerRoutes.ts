@@ -54,6 +54,9 @@ carOwnerRouter.get("/getOwnerProfile",authMiddleware,(req,res)=>carOwnerControll
 
 carOwnerRouter.put("/updateProfile", authMiddleware,(req,res)=>carOwnerController.updateProfileOwner(req,res));
 
+
+carOwnerRouter.get("/checkblockstatus/:userId", authMiddleware,(req,res)=>carOwnerController.getBlockStatus(req,res));
+
 // carOwnerRouter.put("/updateProfileIdProof", authMiddleware,(req,res)=>carOwnerController.updateProfileOwnerIdProof(req,res));
 
 // carOwnerRouter.post("/carupload", authMiddleware, (req,res)=>carOwnerController.uploadCar(req,res));

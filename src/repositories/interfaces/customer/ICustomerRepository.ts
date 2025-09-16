@@ -11,6 +11,8 @@ interface ICustomerRepository{
     clearRefreshToken(id:string): Promise<void>
     findUserByRefreshToken(refreshToken: string): Promise<ICustomer | null>
     findById(id:string): Promise<ICustomer |null>
+    getBlockStatusByUserId(userId:string):Promise<number>
+   
 }
 
 

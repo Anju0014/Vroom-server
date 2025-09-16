@@ -18,5 +18,6 @@ export interface ICarOwnerService{
    
     completeRegister(ownerId:string,ownerDetails:Partial<ICarOwner>):Promise<ICarOwner>
     // changePassword(ownerId:string)
+    checkBlockStatus(userId: string): Promise<number> 
 
 }
