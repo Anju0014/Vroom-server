@@ -16,9 +16,9 @@ class CarOwnerBookingService implements ICarOwnerBookingService {
         this._ownersBookingRepository=ownerBookingRepository
     }
 
-    async getBookingsForCarOwner(carOwnerId: string): Promise<IBooking[]> {
-        const bookings = await this._ownersBookingRepository.getBookingsForCarOwner(carOwnerId)
-        return bookings;
+    async getBookingsForCarOwner(carOwnerId: string, page: number, limit: number): Promise<{bookings:IBooking[],total:number}> {
+        const {bookings,total} = await this._ownersBookingRepository.getBookingsForCarOwner(carOwnerId,page,limit)
+        return {bookings,total};
       }
 }
 export default CarOwnerBookingService

@@ -161,31 +161,6 @@ async loginCarOwner(email:string, password:string): Promise<{ownerAccessToken:st
     return {ownerAccessToken,refreshToken:newRefreshToken,carOwner}
 }
 
-// async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
-    
-//         const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
-    
-//         console.log("did reach")
-//         if (!decoded || typeof decoded === 'string' || !decoded.id) {
-//             console.log("error heree")
-//             throw new Error("Invalid refresh token");
-//         }
-
-//         const carOwner = await this._carOwnerRepository.findById(decoded.id);
-//         console.log(carOwner)
-//         console.log(carOwner?.refreshToken)
-//         console.log(oldRefreshToken)
-//         if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
-            
-//             console.log("error here77e")
-//             throw new Error("Invalid refresh token")
-//         }
-//         const accessToken=JwtUtils.generateAccessToken({id:carOwner._id,email:carOwner.email, role:'owner'});
-//         const refreshToken=JwtUtils.generateRefreshToken({id:carOwner._id});
-//         await this._carOwnerRepository.updateRefreshToken(carOwner._id.toString(), refreshToken);
-         
-//         return {accessToken,refreshToken}
-//     }
 
 async renewAuthToken(oldRefreshToken: string): Promise<{ accessToken: string, refreshToken: string }> {
   const decoded = JwtUtils.verifyToken(oldRefreshToken, true);

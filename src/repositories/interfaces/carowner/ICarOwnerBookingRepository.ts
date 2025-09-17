@@ -5,7 +5,7 @@ import { Booking,IBooking } from "../../../models/booking/bookingModel";
 import { BookingData } from "../../../types/bookingData";
 
 interface ICarOwnerBookingRepository{
-    getBookingsForCarOwner(carOwnerId: string): Promise<IBooking[]>
+    getBookingsForCarOwner(carOwnerId: string,page:number,limit:number): Promise<{bookings:IBooking[],total:number}>
 
 
 

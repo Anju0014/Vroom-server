@@ -1,5 +1,5 @@
 import {Router} from "express";
-import  CarOwnerController from "../../controllers/implementation/carOwner/carOwnerController"
+import  CarOwnerController from "../../controllers/implementation/carOwner/carownerController"
 import CarOwnerService from "../../services/implementation/carOwner/carOwnerServices"
 import CarOwnerRepository from "../../repositories/implementation/carOwner/carOwnerRepository";
 import authMiddleware,{verifyRole} from "../../middlewares/authMiddleWare";

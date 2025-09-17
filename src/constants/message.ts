@@ -16,7 +16,8 @@ export const MESSAGES = {
       ID_PROOF_UPDATED: "ID Proof updated successfully",
       STATUS_UPDATED: "Status updated successfully",    
       OWNERS_FETCHED: "Car owners fetched successfully",  
-      CAR_UPDATED:"Car Detail Update d Successfully",
+      CAR_UPDATED:"Car Detail Updated Successfully",
+      CAR_DELETED:"Car Deleted Successfully",
       CUSTOMERS_FETCHED: "Customers fetched successfully",
       COMPLETED_REGISTRATION_FORM:"Completed Registration Form"
     },

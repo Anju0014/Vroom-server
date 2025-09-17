@@ -198,7 +198,7 @@ async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refresh
           console.log("Refresh token mismatch")
             throw new Error("Invalid refresh token")
         }
-        const accessToken=JwtUtils.generateAccessToken({id:customer._id,email:customer.email});
+        const accessToken=JwtUtils.generateAccessToken({id:customer._id,email:customer.email,role:'customer'});
         const refreshToken=JwtUtils.generateRefreshToken({id:customer._id});
         await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
          

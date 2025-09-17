@@ -1,12 +1,10 @@
 import { Response,Request} from 'express';
-import {Car, ICar} from '../../../models/car/carModel'
 import { CustomRequest } from "../../../middlewares/authMiddleWare";
 import { MESSAGES } from "../../../constants/message";
 import { StatusCode } from "../../../constants/statusCode";
 
 import ICustomerDashBoardController from '../../interfaces/customer/ICustomerDashBoardController';
 import {ICustomerDashBoardService} from '../../../services/interfaces/customer/ICustomerDashBoardServices'
-import { Booking } from '../../../models/booking/bookingModel';
 
 class CustomerDashBoardController implements ICustomerDashBoardController{
 
@@ -25,14 +23,14 @@ class CustomerDashBoardController implements ICustomerDashBoardController{
             return
           }
            const page = parseInt(req.query.page as string) || 1;
-                  const limit = parseInt(req.query.limit as string) || 9;
-                  if (page < 1 || limit < 1 || limit > 100) {
-                       res.status(StatusCode.BAD_REQUEST).json({
-                        success: false,
-                         message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
-                     });
-                     return;
-                   }
+          const limit = parseInt(req.query.limit as string) || 9;
+          if (page < 1 || limit < 1 || limit > 100) {
+              res.status(StatusCode.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+            });
+            return;
+          }
           const bookings = await this._customerDashService.getCustomerBookings(userId,page,limit);
           const total = await this._customerDashService.getCustomerBookingCount(userId);
           res.status(200).json({bookings,total});
@@ -42,20 +40,19 @@ class CustomerDashBoardController implements ICustomerDashBoardController{
           res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
           return
         }
-      };
+    };
       
 
       async cancelBooking(req: Request, res: Response): Promise<void> {
         console.log("**************booking cancel controller*******************************")
         const { bookingId } = req.params;
-      
         try {
          let booking= await this._customerDashService.cancelBooking(bookingId);
          console.log(booking)
           res.status(StatusCode.OK).json({ success: true });
         } catch (err) {
           res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
-        //   this.handleError(res, err, StatusCode.BAD_REQUEST);
+       
         }
       }
 }

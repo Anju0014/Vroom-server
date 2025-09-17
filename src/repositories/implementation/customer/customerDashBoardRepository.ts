@@ -26,8 +26,10 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
           .populate({
             path: "carOwnerId",
             select: "fullName phone", 
-          }). skip((page - 1) * limit)
-        .limit(limit)
+          })
+          .sort({createdAt:-1})
+          . skip((page - 1) * limit)
+          .limit(limit)
           .lean(); // makes it a plain JS object
       
         return bookings.map(booking => ({
