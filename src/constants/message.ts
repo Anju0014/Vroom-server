@@ -27,6 +27,7 @@ export const MESSAGES = {
       INVALID_CREDENTIALS: "Invalid email or password",
       UNAUTHORIZED: "Unauthorized access",
       CUSTOMER_NOT_FOUND: "Customer not found",
+      ADMIN_NOT_FOUND:"Admin not found",
       FORBIDDEN: "Access forbidden",
       PROFILE_NOT_FOUND: "Owner profile not found",
       NO_OWNER_ID_FOUND: "Forbidden: No car owner ID found",
@@ -41,8 +42,8 @@ export const MESSAGES = {
       MISSING_COORDINATES: 'Latitude and longitude are required',
       MISSING_CAR_ID: 'Car ID is required',
       MISSING_PAYMENT_INTENT: 'Payment Intent ID is required',
-      INVALID_PAGE_OR_LIMIT: 'Invalid page or limit'
-
+      INVALID_PAGE_OR_LIMIT: 'Invalid page or limit',
+      INVALID_TOKEN:'Invalid Token'
 
     },
   };

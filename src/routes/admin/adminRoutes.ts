@@ -71,3 +71,70 @@ export default adminRouter
 // adminRouter.patch('/owners/verifydocument/:ownerId', adminController.verifyOwner);
 
 // adminRouter.patch('/owners/verifyowner/:ownerId',adminController.verifyOwner)
+
+
+
+
+
+
+// import { Router } from 'express';
+// import { AdminAuthController } from '../../features/auth/controllers/implementation/AdminAuthController';
+// import { AdminUserController } from '../../features/user/controllers/implementation/AdminUserController';
+// import { AdminCarController } from '../../features/car/controllers/implementation/AdminCarController';
+// import { AdminBookingController } from '../../features/booking/controllers/implementation/AdminBookingController';
+// import { container } from '../../di/container';
+// import { authMiddleware } from '../../middleware/auth'; // Assume middleware for admin auth
+
+// const router = Router();
+// const authController = container.get<AdminAuthController>('AdminAuthController');
+// const userController = container.get<AdminUserController>('AdminUserController');
+// const carController = container.get<AdminCarController>('AdminCarController');
+// const bookingController = container.get<AdminBookingController>('AdminBookingController');
+
+// // Apply admin auth middleware to protected routes
+// router.use(authMiddleware('admin'));
+
+// // Auth routes
+// router.route('/auth/login')
+//   .post(authController.loginAdmin.bind(authController));
+
+// router.route('/auth/logout')
+//   .post(authController.logoutAdmin.bind(authController));
+
+// // User routes (customers and car owners)
+// router.route('/users/customers')
+//   .get(userController.getAllCustomers.bind(userController));
+
+// router.route('/users/customers/:customerId/block')
+//   .patch(userController.updateCustomerBlockStatus.bind(userController));
+
+// router.route('/users/customers/:customerId/verify')
+//   .patch(userController.verifyCustomer.bind(userController));
+
+// router.route('/users/car-owners')
+//   .get(userController.getAllCarOwners.bind(userController));
+
+// router.route('/users/car-owners/pending')
+//   .get(userController.getAllCarOwnersForVerify.bind(userController));
+
+// router.route('/users/car-owners/:userId/block')
+//   .patch(userController.updateOwnerBlockStatus.bind(userController));
+
+// router.route('/users/car-owners/:userId/verify')
+//   .patch(userController.updateOwnerVerifyStatus.bind(userController));
+
+// // Car routes
+// router.route('/cars/pending')
+//   .get(carController.getAllCarsForVerify.bind(carController));
+
+// router.route('/cars/verified')
+//   .get(carController.getAllVerifiedCars.bind(carController));
+
+// router.route('/cars/:carId/verify')
+//   .patch(carController.updateCarVerifyStatus.bind(carController));
+
+// // Booking routes
+// router.route('/bookings')
+//   .get(bookingController.getAllBookings.bind(bookingController));
+
+// export default router;

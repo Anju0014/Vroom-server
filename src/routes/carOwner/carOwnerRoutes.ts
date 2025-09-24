@@ -84,3 +84,27 @@ carOwnerRouter.get("/bookings", authMiddleware, (req,res)=>carOwnerBookingContro
 carOwnerRouter.get("/activebooking/:carId", authMiddleware, (req,res)=>carOwnerCarsController.getActiveBooking(req,res));
 
 export default carOwnerRouter
+
+
+
+// import { Router } from 'express';
+// import container from '../../di/container';
+// import { ICarOwnerAuthController } from '../../features/auth/controllers/interfaces/ICarOwnerAuthController';
+// import { authMiddleware } from '../../middlewares/authMiddleware';
+
+// const router = Router();
+// const carOwnerAuthController = container.get<ICarOwnerAuthController>('CarOwnerAuthController');
+
+// router.route('/auth/register').post(carOwnerAuthController.registerBasicDetailsOwner.bind(carOwnerAuthController));
+// router.route('/auth/verify-otp').post(carOwnerAuthController.verifyOtpOwner.bind(carOwnerAuthController));
+// router.route('/auth/resend-otp').post(carOwnerAuthController.resendOtpOwner.bind(carOwnerAuthController));
+// router.route('/auth/login').post(carOwnerAuthController.loginOwner.bind(carOwnerAuthController));
+// router.route('/auth/refresh-token').post(carOwnerAuthController.renewRefreshAccessTokenOwner.bind(carOwnerAuthController));
+// router.route('/auth/complete-registration').post(authMiddleware, carOwnerAuthController.completeRegistration.bind(carOwnerAuthController));
+// router.route('/auth/forgot-password').post(carOwnerAuthController.forgotPasswordOwner.bind(carOwnerAuthController));
+// router.route('/auth/reset-password').post(carOwnerAuthController.resetPasswordOwner.bind(carOwnerAuthController));
+// router.route('/auth/change-password').post(authMiddleware, carOwnerAuthController.changePasswordOwner.bind(carOwnerAuthController));
+// router.route('/auth/logout').post(authMiddleware, carOwnerAuthController.logout.bind(carOwnerAuthController));
+// router.route('/auth/google-signin').post(carOwnerAuthController.googleSignIn.bind(carOwnerAuthController));
+
+// export default router;

@@ -89,3 +89,27 @@ customerRouter.patch(`/bookings/:bookingId/cancel`,(req,res)=>customerDashBoardC
 customerRouter.post(`/tracking/update`,(req,res)=>customerCarAndBookingController.updateCarTracking(req,res));
 
 export default customerRouter
+
+
+
+// import { Router } from 'express';
+// import container from '../../di/container';
+// import { ICustomerAuthController } from '../../features/auth/controllers/interfaces/ICustomerAuthController';
+// import { authMiddleware } from '../../middlewares/authMiddleware';
+
+// const router = Router();
+// const customerAuthController = container.get<ICustomerAuthController>('CustomerAuthController');
+
+// router.route('/auth/register').post(customerAuthController.registerBasicDetailsCustomer.bind(customerAuthController));
+// router.route('/auth/verify-otp').post(customerAuthController.verifyOtpCustomer.bind(customerAuthController));
+// router.route('/auth/resend-otp').post(customerAuthController.resendOtpCustomer.bind(customerAuthController));
+// router.route('/auth/login').post(customerAuthController.loginCustomer.bind(customerAuthController));
+// router.route('/auth/refresh-token').post(customerAuthController.renewRefreshAccessTokenCustomer.bind(customerAuthController));
+// router.route('/auth/complete-registration').post(authMiddleware, customerAuthController.completeRegistration.bind(customerAuthController));
+// router.route('/auth/forgot-password').post(customerAuthController.forgotPasswordCustomer.bind(customerAuthController));
+// router.route('/auth/reset-password').post(customerAuthController.resetPasswordCustomer.bind(customerAuthController));
+// router.route('/auth/change-password').post(authMiddleware, customerAuthController.changePasswordCustomer.bind(customerAuthController));
+// router.route('/auth/logout').post(authMiddleware, customerAuthController.logout.bind(customerAuthController));
+// router.route('/auth/google-signin').post(customerAuthController.googleSignIn.bind(customerAuthController));
+
+// export default router;
