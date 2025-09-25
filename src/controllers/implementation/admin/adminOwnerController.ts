@@ -175,6 +175,37 @@ class AdminOwnerController implements IAdminOwnerController{
         }
     }
 
+     async updateCarBlockStatus(req: Request, res: Response): Promise<void> {
+        try {
+
+            console.log("show the details of block")
+            const { carId } = req.params;  
+            const { status } = req.body;  
+            if (!carId || status === undefined) {
+                res.status(StatusCode.BAD_REQUEST).json({
+                    success: false,
+                    message: MESSAGES.ERROR.MISSING_FIELDS
+                });
+                return;
+            }
+    
+    
+            const updatedCar = await this._adminOwnerService.updateCarBlockStatus(carId, status);
+            res.status(StatusCode.OK).json({
+                success: true,
+                message: MESSAGES.SUCCESS.STATUS_UPDATED || "Car status updated successfully",
+                car: updatedCar
+            });
+
+        } catch (error:any) {
+            res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: MESSAGES.ERROR.SERVER_ERROR
+            });
+        }
+    }
+
+
     async updateCarVerifyStatus(req: Request, res: Response): Promise<void> {
 
         try{

@@ -111,6 +111,13 @@ async updateOwnerBlockStatus(ownerId: string, newStatus: number): Promise<ICarOw
     return await this._adminOwnerRepository.updateOwnerStatus(ownerId, updateData);
 }
 
+async updateCarBlockStatus(carId: string, newStatus: number): Promise<ICar | null> {
+    console.log("Processing status update:", carId, newStatus)
+    const car= await this._adminOwnerRepository.findCarById(carId);
+    if (!car) throw new Error("Car not found");
+    let updateData: Partial<ICar> = { blockStatus: newStatus };
+    return await this._adminOwnerRepository.updateCarStatus(carId, updateData);
+}
 
 async updateCarVerifyStatus(carId: string, verifyDetails: Partial<ICar>): Promise<ICar | null> {
     const { verifyStatus, rejectionReason } = verifyDetails;

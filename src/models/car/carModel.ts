@@ -23,6 +23,7 @@ interface ICar extends Document {
   carModel?: string;
   carType?:string;
   verifyStatus?: number;
+  blockStatus?:number;
   images: string[];
   videos?: string[];
   owner: mongoose.Types.ObjectId;
@@ -44,6 +45,11 @@ const CarSchema = new Schema<ICar>(
     carType:{
       type: String,
       enum:["Sedan","SUV","Hatchback","VAN/MPV"]
+    },
+    blockStatus:{
+        type: Number,
+        enum: [0,1], 
+        default: 0,
     },
     rcBookNo: { type: String, unique: true },
     expectedWage: { type: String, required: true },

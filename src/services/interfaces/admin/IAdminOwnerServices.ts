@@ -10,6 +10,7 @@ export interface IAdminOwnerService{
 
     updateOwnerVerifyStatus(ownerId:string, verifyDetails:Partial<ICarOwner>):Promise<ICarOwner|null>
     updateOwnerBlockStatus(ownerId: string, newStatus: number): Promise<ICarOwner|null> 
+    updateCarBlockStatus(carId: string, newStatus: number): Promise<ICar|null> 
     updateCarVerifyStatus(carId:string, verifyDetails:Partial<ICar>):Promise<ICar|null>
     
 }

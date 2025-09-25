@@ -6,6 +6,7 @@ interface IAdminOwnerController{
     updateOwnerBlockStatus(req: Request, res: Response): Promise<void>
     updateCarVerifyStatus(req: Request, res: Response): Promise<void>
     getAllBookings(req: Request, res: Response):Promise<void>
+     updateCarBlockStatus(req: Request, res: Response): Promise<void>
 
    
 }

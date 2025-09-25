@@ -52,6 +52,7 @@ adminRouter.patch('/owners/updateblockstatus/:userId', (req,res)=>adminOwnerCont
 
 adminRouter.patch('/owners/updateverifystatus/:userId', (req,res)=>adminOwnerController.updateOwnerVerifyStatus(req,res));
 
+adminRouter.patch('/cars/updateblockstatus/:carId', (req,res)=>adminOwnerController.updateCarBlockStatus(req,res));
 
 adminRouter.patch('/cars/updateverifystatus/:carId', (req,res)=>adminOwnerController.updateCarVerifyStatus(req,res));
 
