@@ -40,6 +40,8 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     maxPrice?: number;
     carType?:string;
     location?: string;
+    startDate:string, 
+    endDate:string
     // latitude?: number;
     // longitude?: number;
   }):Promise<ICar[]>  {
@@ -52,6 +54,8 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     maxPrice?: number;
     carType?:string;
     location?:string;
+    startDate:string,
+     endDate:string
     // latitude?: number;
     // longitude?: number;
   }):Promise<number>  {

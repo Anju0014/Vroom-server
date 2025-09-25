@@ -41,82 +41,107 @@ class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements IC
         });
       }
 
+async getAllCars(page: number, limit: number, filters: {
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  carType?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+}): Promise<ICar[]> {
+  const query: any = { isDeleted: false, verifyStatus: 1 };
 
-  async getAllCars(page: number, limit: number, filters: {
-    search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    carType?:string;
-    location?:string;
-    // latitude?: number;
-    // longitude?: number;
-  }) :Promise<ICar[]>{
-    const query: any = { isDeleted: false, verifyStatus: 1 };
-    if (filters.search) {
-      query.carName = { $regex: filters.search, $options: 'i' };
-    }
-    if (filters.minPrice) {
-      query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
-    }
-    if (filters.maxPrice !== Infinity) {
-      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
-    }
-    if(filters.carType){
-      query.carType=filters.carType
-    }
-    if (filters.location) {
+  if (filters.search) {
+    query.carName = { $regex: filters.search, $options: 'i' };
+  }
+
+  if (filters.minPrice) {
+    query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+  }
+
+  if (filters.maxPrice !== Infinity) {
+    query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+  }
+
+  if (filters.carType) {
+    query.carType = filters.carType;
+  }
+
+  if (filters.location) {
     query.$or = [
       { "location.address": { $regex: filters.location, $options: "i" } },
       { "location.landmark": { $regex: filters.location, $options: "i" } },
     ];
   }
-    
 
-    console.log('Query:', query);
-    const cars = await Car.find(query)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
-    console.log('Found cars:', cars);
-    return cars;
+  // 🆕 Handle availability between startDate and endDate
+  if (filters.startDate && filters.endDate) {
+    const start = new Date(filters.startDate);
+    const end = new Date(filters.endDate);
+
+    // Find bookings that overlap with the requested date range
+    const overlappingBookings = await Booking.find({
+      status: { $in: ['confirmed', 'pending'] },
+      startDate: { $lt: end },
+      endDate: { $gt: start },
+    }).select("carId");
+
+    const bookedCarIds = overlappingBookings.map(b => b.carId);
+
+    if (bookedCarIds.length > 0) {
+      query._id = { $nin: bookedCarIds };
+    }
   }
 
-  async getCarsCount(filters: {
-    search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    carType?: string;
-    location?:string;
+  const cars = await Car.find(query)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
 
-    // latitude?: number;
-    // longitude?: number;
-  }):Promise<number> {
-    const query: any = { isDeleted: false, verifyStatus: 1 };
-    if (filters.search) {
-      query.carName = { $regex: filters.search, $options: 'i' };
-    }
-    if (filters.minPrice) {
-      query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
-    }
-    if (filters.maxPrice !== Infinity) {
-      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
-    }
-      if(filters.carType){
-      query.carType=filters.carType
-    }
-    if (filters.location) {
+  return cars;
+}
+
+
+async getCarsCount(filters: {
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  carType?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+}): Promise<number> {
+  const query: any = { isDeleted: false, verifyStatus: 1 };
+
+  if (filters.search) query.carName = { $regex: filters.search, $options: 'i' };
+  if (filters.minPrice) query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+  if (filters.maxPrice !== Infinity) query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+  if (filters.carType) query.carType = filters.carType;
+  if (filters.location) {
     query.$or = [
       { "location.address": { $regex: filters.location, $options: "i" } },
       { "location.landmark": { $regex: filters.location, $options: "i" } },
     ];
   }
-    
-    
 
-    const count = await Car.countDocuments(query).exec();
-    console.log('Total cars count:', count);
-    return count;
+  if (filters.startDate && filters.endDate) {
+    const start = new Date(filters.startDate);
+    const end = new Date(filters.endDate);
+
+    const overlappingBookings = await Booking.find({
+      status: { $in: ['confirmed', 'pending'] },
+      startDate: { $lt: end },
+      endDate: { $gt: start },
+    }).select("carId");
+
+    const bookedCarIds = overlappingBookings.map(b => b.carId);
+    if (bookedCarIds.length > 0) query._id = { $nin: bookedCarIds };
   }
+
+  return Car.countDocuments(query).exec();
+}
+
 
       async findCarById(carId: string): Promise<ICar | null> {
         return Car.findById(carId);

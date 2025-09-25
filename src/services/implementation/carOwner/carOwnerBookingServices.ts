@@ -20,5 +20,8 @@ class CarOwnerBookingService implements ICarOwnerBookingService {
         const {bookings,total} = await this._ownersBookingRepository.getBookingsForCarOwner(carOwnerId,page,limit)
         return {bookings,total};
       }
+
+
+    
 }
 export default CarOwnerBookingService

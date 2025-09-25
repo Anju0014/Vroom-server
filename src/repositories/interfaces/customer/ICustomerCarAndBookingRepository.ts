@@ -24,9 +24,9 @@ interface ICustomerCarAndBookingRepository{
   checkOldBooking(bookingData:BookingData): Promise<IBooking|null>
   generateBookingId():Promise<string>
   getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number; maxPrice?: number; carType?:string;
-    location?:string;latitude?: number;longitude?: number;}):Promise<ICar[]>
+    location?:string;latitude?: number;longitude?: number; startDate:string, endDate:string}):Promise<ICar[]>
   getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string;
-    location?:string;latitude?: number;longitude?: number;}):Promise<number> 
+    location?:string;latitude?: number;longitude?: number;startDate:string, endDate:string}):Promise<number> 
 
   updateBookingLocation(bookingId: string, location: { lat: number; lng: number }):Promise<void>
 

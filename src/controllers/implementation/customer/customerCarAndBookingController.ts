@@ -62,6 +62,8 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
         const longitude = parseFloat(req.query.longitude as string);
         const carType= req.query.carType as string;
         const location=req.query.location as string;
+        const startDate=req.query.startDate as string;
+        const endDate= req.query.endDate as string;
 
         console.log("reached at controller", search, minPrice,maxPrice,carType,location)
         if (page < 1 || limit < 1 || limit > 100) {
@@ -78,8 +80,10 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
           maxPrice,
           carType,
           location,
+          startDate,
+          endDate,
         });
-        const total = await this._customerCarService.getCarsCount({ search, minPrice, maxPrice,carType,location});
+        const total = await this._customerCarService.getCarsCount({ search, minPrice, maxPrice,carType,location,startDate,endDate});
         console.log('Cars:', cars, 'Total:', total);
 
         res.status(StatusCode.OK).json({ data: cars, total });
