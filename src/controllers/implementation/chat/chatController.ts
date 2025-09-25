@@ -32,8 +32,10 @@ async getOwnerChats (req: CustomRequest, res: Response) {
     console.log("missing")
     return 
   }
+  
   try {
     const chats = await this._chatService.fetchOwnerChats(ownerId);
+    console.log("ChatService",chats)
     res.status(200).json(chats);
   } catch {
     res.status(500).json({ message: "Failed to fetch owner chats" });

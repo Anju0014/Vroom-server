@@ -2,6 +2,7 @@ import ChatMessage,{IChatMessage} from "../../../models/chatMessage/chatMessageM
 
 import IChatRepository from "../../interfaces/chat/IChatRepository";
 import { BaseRepository } from "../../base/BaseRepository";
+import { Booking } from "../../../models/booking/bookingModel";
 
 
 class ChatRepository extends BaseRepository<IChatMessage> implements IChatRepository {
@@ -22,12 +23,16 @@ async getMessagesByRoom (roomId: string): Promise<IChatMessage[]> {
 };
 
   async getActiveChatsByOwner(ownerId: string):Promise<IChatMessage[]> {
-  
-  return await ChatMessage.aggregate([
-    { $match: { senderId: ownerId } },
-    { $group: { _id: "$roomId", lastMessage: { $last: "$message" }, timestamp: { $last: "$timestamp" } } },
-    { $sort: { timestamp: -1 } }
-  ]);
+const bookings = await Booking.find({ carOwnerId: ownerId }).select("bookingId");
+console.log(bookings)
+  const bookingIds = bookings.map(b => b.bookingId);
+
+ const chats = await ChatMessage.find({ roomId: { $in: bookingIds } })
+    .sort({ timestamp: 1 });
+
+  console.log("chats",chats)
+  return chats;
+
 }
 }
 export default ChatRepository

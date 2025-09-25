@@ -3,6 +3,7 @@ import IChatRepository from "../../../repositories/interfaces/chat/IChatReposito
 import { IChatService } from "../../interfaces/chat/IChatServices";
 import { getIO } from "../../../sockets/socket";
 import { IChatMessage } from "../../../models/chatMessage/chatMessageModel";
+import { OwnerChat } from "../../../types/chatData";
 
 
 class ChatService implements IChatService {

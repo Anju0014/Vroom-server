@@ -1,5 +1,5 @@
 import { IChatMessage } from "../../../models/chatMessage/chatMessageModel"
-
+import { OwnerChat } from "../../../types/chatData"
 
 interface IChatRepository{
 
