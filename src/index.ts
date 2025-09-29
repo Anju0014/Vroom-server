@@ -8,7 +8,7 @@ import customerRouter from './routes/customer/customerRoutes';
 import carOwnerRouter from './routes/carOwner/carOwnerRoutes';
 import adminRouter from './routes/admin/adminRoutes';
 import s3Routes from './routes/s3/s3Routes'
-import carRouter from './routes/car/carRoutes';
+import chatRouter from './routes/chat/chatRoutes';
 import stripeRoutes from './routes/stripe/stripeRoutes';
 import { initSockets } from './sockets/socket';
 import './jobs/bookingTrackingJob';
@@ -39,6 +39,7 @@ app.use("/owner",carOwnerRouter);
 app.use("/admin",adminRouter);
 app.use("/api/s3", s3Routes);
 app.use("/api/stripe",stripeRoutes);
+app.use("/chats",chatRouter)
 
 
 initSockets(server);

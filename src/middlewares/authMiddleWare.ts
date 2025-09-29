@@ -52,6 +52,7 @@ export interface CustomRequest extends Request {
 
 const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
   try {
+    console.log("checking auth")
     const token = req.header("Authorization")?.replace("Bearer ", "").trim();
     if (!token) {
       res.status(401).json({ message: "Unauthorized. No token provided." });
