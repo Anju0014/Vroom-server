@@ -18,6 +18,7 @@ async getChatHistory (req: Request, res: Response): Promise<void> {
   try {
     console.log("showw")
     const { roomId } = req.params;
+    console.log(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",roomId)
     const messages = await this._chatService.fetchMessages(roomId);
     res.status(StatusCode.OK).json(messages);
   } catch (err) {
