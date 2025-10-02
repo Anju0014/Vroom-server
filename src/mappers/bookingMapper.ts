@@ -1,4 +1,3 @@
-
 import { IBooking } from '../models/booking/bookingModel';
 import mongoose from 'mongoose';
 
@@ -112,3 +111,4 @@ export const bookingMapper = {
     };
   },
 };
+

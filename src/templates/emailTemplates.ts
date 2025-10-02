@@ -150,6 +150,27 @@ Vroom Support Team 🚗`,
   `
 });
 
+export const carVerificationApprovedTemplate = (userName: string, carName: string) => ({
+  subject: "✅ Vroom Car Verification Approved",
+  text: `Dear ${userName},
+
+Your car "${carName}" verification has been approved. So you can start using this car to travel with us.
+
+Congratulations and Welcome Board.
+
+Best regards,
+Vroom Support Team 🚗`,
+  html: `
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2 style="color: #d9534f;">✅ Car Verification Approved</h2>
+    <p>Dear ${userName},</p>
+    <p>Your car "<strong>${carName}</strong>" verification has been approved</p>
+    
+    <p>Congratulations and Welcome Aboard.</p>
+    <p style="margin-top:30px;">Best regards,<br/><strong>Vroom Support Team 🚗</strong></p>
+  </div>
+  `
+});
 
 
 export const passwordResetTemplate = (name: string, resetLink: string) => ({
