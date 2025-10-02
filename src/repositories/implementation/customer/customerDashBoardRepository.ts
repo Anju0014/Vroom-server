@@ -18,7 +18,7 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
 
     
     async findBookingsByUserId(userId: string,page:number,limit:number): Promise<any[]> {
-        const bookings = await Booking.find({ userId })
+        const bookings = await Booking.find({ userId, status: { $ne: "pending" }, })
           .populate({
             path: "carId",
             select: "carName brand location.address rcBookNo", 
