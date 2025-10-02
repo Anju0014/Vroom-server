@@ -11,7 +11,7 @@ export interface ICustomerCarAndBookingService{
         getBookedDateRanges(carId: string): Promise<{ start: Date; end: Date }[]>;
 
         createPendingBooking(bookingdata: BookingData): Promise<string>;
-        confirmBooking(bookingId: string, paymentIntentId: string): Promise<void>;
+        confirmBooking(bookingId: string, paymentIntentId: string): Promise<IBooking>;
         
         failedBooking(bookingId: string): Promise<void>;
 
@@ -19,5 +19,6 @@ export interface ICustomerCarAndBookingService{
        getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string; location?:string;latitude?: number;longitude?: number; startDate:string, endDate:string}): Promise<ICar[]>
 
        updateTrackingLocation(updateTrackingProps:{bookingId: string,token: string,lat: number,lng: number}):Promise<void>
+//        generateAndUploadReceipt(bookingId: string):Promise<string>
 
 }

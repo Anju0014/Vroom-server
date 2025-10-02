@@ -4,6 +4,7 @@ import { ICar } from "../../../models/car/carModel";
 import { BookingData, BookingUserData } from "../../../types/bookingData";
 import mongoose from "mongoose";
 import {stripe}  from '../../../config/stripeConfig'; 
+import { IBooking } from "../../../models/booking/bookingModel";
 
 class CustomerDashBoardService implements ICustomerDashBoardService {
 
@@ -24,7 +25,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     return this._customerDashRepository.bookingsByUserCount(userId);
   }
     
-    async cancelBooking(bookingId: string): Promise<void> {
+    async cancelBooking(bookingId: string): Promise<IBooking> {
         // Check if the booking exists and its status
         const booking = await this._customerDashRepository.findBookingById(bookingId);
       
@@ -57,7 +58,10 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
           console.log('Wallet not found. Creating a new wallet...');
           wallet = await this._customerDashRepository.createWallet(booking.userId.toString());
         }
-      if(wallet){
+        
+      if (!wallet) {
+            throw new Error('Failed to create wallet');
+      }
        
         wallet.balance += refundAmount;
         await this._customerDashRepository.saveWallet(wallet);
@@ -71,9 +75,13 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
         booking.cancellationFee = cancellationFee;
         booking.refundedAmount = refundAmount;
         booking.cancelledAt = new Date();
-        await this._customerDashRepository.saveBooking(booking);
+        // await this._customerDashRepository.saveBooking(booking);
+        
+        const updatedBooking = await this._customerDashRepository.saveBooking(booking);
+        console.log('Booking cancelled and saved successfully.');
+        return updatedBooking;
       
-        console.log('Booking cancelled and saved successfully.');}
+        
       }
       
 }

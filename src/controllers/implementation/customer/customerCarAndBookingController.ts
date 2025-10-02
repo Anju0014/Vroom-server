@@ -5,6 +5,7 @@ import { StatusCode } from "../../../constants/statusCode";
 
 import ICustomerCarAndBookingController from '../../interfaces/customer/ICustomerCarAndBookingController';
 import { ICustomerCarAndBookingService } from '../../../services/interfaces/customer/ICustomerCarAndBookingServices';
+import { generateAndUploadReceipt } from '../../../services/receiptService';
 
 
 
@@ -160,8 +161,9 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       return
     }
     try {
-      await this._customerCarService.confirmBooking(bookingId, paymentIntentId);
-      res.status(StatusCode.OK).json({ success: true, bookingId });
+     const booking = await this._customerCarService.confirmBooking(bookingId, paymentIntentId);
+    const receiptUrl = await generateAndUploadReceipt(bookingId);
+      res.status(StatusCode.OK).json({ success: true, bookingId,receiptUrl });
     } catch (err) {
       this.handleError(res, err, StatusCode.BAD_REQUEST);
     }
