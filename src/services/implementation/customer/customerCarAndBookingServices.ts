@@ -6,6 +6,10 @@ import mongoose from "mongoose";
 import generateTrackingToken from "../../../utils/trackingIDGenerator";
 import { getIO } from "../../../sockets/socket";
 import { endOfDay } from "date-fns";
+import PDFDocument from "pdfkit";
+import stream from "stream";
+import { S3 } from "../../../config/s3Config";
+import { Booking } from "../../../models/booking/bookingModel";
 
 class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 
@@ -192,6 +196,48 @@ async updateTrackingLocation({ bookingId, token, lat, lng }: UpdateTrackingProps
 }
 
 
+// src/services/bookingService.ts
+
+
+export const generateAndUploadReceipt = async (booking: any) => {
+  const doc = new PDFDocument();
+  const bufferStream = new stream.PassThrough();
+  doc.pipe(bufferStream);
+
+  // Header
+  doc.fontSize(20).text("Booking Receipt", { align: "center" });
+  doc.moveDown();
+
+  // Booking details
+  doc.fontSize(12).text(`Booking ID: ${booking.bookingId}`);
+  doc.text(`Customer Name: ${booking.customerName}`);
+  doc.text(`Car: ${booking.carName} (${booking.brand})`);
+  doc.text(
+    `Booking Dates: ${new Date(booking.startDate).toLocaleDateString()} - ${new Date(booking.endDate).toLocaleDateString()}`
+  );
+  doc.text(`Total Paid: ₹${booking.totalPrice}`);
+  doc.text(`Pickup Location: ${booking.pickupLocation}`);
+  doc.text(`Owner: ${booking.ownerName}`);
+  doc.text(`Status: ${booking.status}`); // Confirmed / Cancelled
+
+  doc.end();
+
+  // Upload to S3
+  const uploadParams = {
+    Bucket: process.env.AWS_BUCKET_NAME!,
+    Key: `receipts/booking-${booking.bookingId}${
+      booking.status === "cancelled" ? "-cancelled" : ""
+    }.pdf`,
+    Body: bufferStream,
+    ContentType: "application/pdf",
+  };
+
+  const result = await s3.upload(uploadParams).promise();
+  booking.receiptUrl = result.Location;
+  await booking.save();
+
+  return result.Location;
+};
 
     
           
