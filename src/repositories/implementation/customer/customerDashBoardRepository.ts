@@ -49,6 +49,7 @@ class CustomerDashBoardRepository extends BaseRepository<ICustomer> implements I
           carNumber: booking.carId.rcBookNo,
           ownerName: booking.carOwnerId.fullName,
           ownerContact: booking.carOwnerId.phone,
+          receiptUrl:booking.receiptUrl,
         }));
       }
       

@@ -5,6 +5,7 @@ import { StatusCode } from "../../../constants/statusCode";
 
 import ICustomerDashBoardController from '../../interfaces/customer/ICustomerDashBoardController';
 import {ICustomerDashBoardService} from '../../../services/interfaces/customer/ICustomerDashBoardServices'
+import { generateAndUploadReceipt } from '../../../services/receiptService';
 
 class CustomerDashBoardController implements ICustomerDashBoardController{
 
@@ -48,6 +49,7 @@ class CustomerDashBoardController implements ICustomerDashBoardController{
         const { bookingId } = req.params;
         try {
          let booking= await this._customerDashService.cancelBooking(bookingId);
+         const receiptUrl = await generateAndUploadReceipt(bookingId);
          console.log(booking)
           res.status(StatusCode.OK).json({ success: true });
         } catch (err) {
