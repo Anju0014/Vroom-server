@@ -4,6 +4,7 @@ import { IChatService } from "../../interfaces/chat/IChatServices";
 import { getIO } from "../../../sockets/socket";
 import { IChatMessage } from "../../../models/chatMessage/chatMessageModel";
 import { OwnerChat } from "../../../types/chatData";
+import logger from "../../../utils/logger";
 
 
 class ChatService implements IChatService {
@@ -24,6 +25,10 @@ async fetchMessages (roomId: string): Promise<IChatMessage[]> {
 };
 
  async fetchOwnerChats (ownerId: string):Promise<IChatMessage[]>{
+  if (!ownerId) {
+      logger.warn("saveMessage: owner not found, ownerId=%s", ownerId);
+      throw new Error("Sender not found");
+    }
   return await this._chatRepository.getActiveChatsByOwner(ownerId);
 };
 }
