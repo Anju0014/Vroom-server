@@ -1,114 +1,216 @@
+// import { ICar } from '../models/car/carModel';
+// import mongoose from 'mongoose';
+// import { UserDTO } from './userMapper';
 
-import { IBooking } from '../models/booking/bookingModel';
+// export interface CarDTO {
+//   id: string;
+//   carName: string;
+//   brand: string;
+//   year?: number; 
+//   fuelType?: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
+//   carType?: 'Sedan' | 'SUV' | 'Hatchback' | 'VAN/MPV';
+//   rcBookNo?: string;
+//   expectedWage: number; 
+//   rcBookProof?: string;
+//   insuranceProof?: string;
+//   location: {
+//     address: string;
+//     landmark: string;
+//     coordinates: {
+//       lat: number;
+//       lng: number;
+//     };
+//   };
+//   make?: string;
+//   carModel?: string;
+//   verifyStatus?: number;
+//   blockStatus?: boolean; 
+//   images: string[];
+//   videos?: string[];
+//   available?: boolean;
+//   unavailableDates?: string[]; 
+//   rejectionReason?: string;
+//   ownerDetails?: {
+//     id: string;
+//     fullName: string;
+//     email: string;
+//     phoneNumber: string;
+//   }; 
+// }
+
+// export const carMapper = {
+//   toDTO(car: ICar & { _id: mongoose.Types.ObjectId }): CarDTO {
+   
+//     const validCarType = car.carType && ['Sedan', 'SUV', 'Hatchback', 'VAN/MPV'].includes(car.carType)
+//       ? car.carType as 'Sedan' | 'SUV' | 'Hatchback' | 'VAN/MPV'
+//       : undefined;
+
+//     return {
+//       id: car._id.toString(),
+//       carName: String(car.carName), 
+//       brand: String(car.brand), 
+//       year: car.year ? parseInt(car.year, 10) : undefined, 
+//       fuelType: car.fuelType,
+//       carType: validCarType, 
+//       rcBookNo: car.rcBookNo ? String(car.rcBookNo) : undefined, 
+//       expectedWage: parseFloat(car.expectedWage), 
+//       rcBookProof: car.rcBookProof ? String(car.rcBookProof) : undefined, 
+//       insuranceProof: car.insuranceProof ? String(car.insuranceProof) : undefined, 
+//       location: {
+//         address: String(car.location.address), 
+//         landmark: String(car.location.landmark), 
+//         coordinates: car.location.coordinates?.coordinates
+//           ? {
+//               lat: car.location.coordinates.coordinates[1], // GeoJSON: [lng, lat]
+//               lng: car.location.coordinates.coordinates[0],
+//             }
+//           : { lat: 0, lng: 0 }, 
+//       },
+//       make: car.make ? String(car.make) : undefined, 
+//       carModel: car.carModel ? String(car.carModel) : undefined, 
+//       verifyStatus: car.verifyStatus,
+//       blockStatus: car.blockStatus === 1, 
+//       images: car.images.map(String), 
+//       videos: car.videos?.map(String) || [], 
+//       available: car.available ?? true,
+//       unavailableDates: car.unavailableDates?.map((date) => date.toISOString()) || [],
+//       rejectionReason: car.rejectionReason ? String(car.rejectionReason) : undefined, 
+//       ownerDetails: car.owner && typeof car.owner === 'object' && 'fullName' in car.owner
+//         ? {
+//             id: (car.owner as any)._id.toString(),
+//             fullName: String((car.owner as any).fullName),
+//             email: String((car.owner as any).email),
+//             phoneNumber: String((car.owner as any).phoneNumber),
+//           }
+//         : undefined, // Compatible with UserDTO
+//     };
+//   },
+
+// }
+
+import { ICar } from '../models/car/carModel';
 import mongoose from 'mongoose';
+import { UserDTO } from './userMapper';
 
-export interface BookingDTO {
+export interface CarDTO {
   id: string;
-  bookingId?: string;
-  carId: string;
-  customerId: string;
-  carOwnerId: string;
-  startDate: string;
-  endDate: string;
-  status: 'confirmed' | 'pending' | 'cancelled' | 'failed';
-  totalAmount: number;
-  paymentIntentId?: string;
-  paymentMethod?: 'stripe' | 'wallet';
-  trackingToken?: string;
-  trackingUrl?: string;
-  cancellationFee?: number;
-  refundedAmount?: number;
-  cancelledAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  tracking?: {
-    lat: number;
-    lng: number;
+  carName: string;
+  brand: string;
+  year?: number; // Convert string to number for API
+  fuelType?: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
+  carType?: 'Sedan' | 'SUV' | 'Hatchback' | 'VAN/MPV';
+  rcBookNo?: string;
+  expectedWage: number; // Convert string to number for API
+  rcBookProof?: string;
+  insuranceProof?: string;
+  location: {
+    address: string;
+    landmark: string;
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
   };
-  carDetails?: {
-    carName: string;
-    brand: string;
-    pickupLocation: string;
-    carNumber: string;
-  };
+  make?: string;
+  carModel?: string;
+  verifyStatus?: number;
+  blockStatus?: boolean; // Convert number (0/1) to boolean
+  images: string[];
+  videos?: string[];
+  available?: boolean;
+  unavailableDates?: string[]; // ISO strings
+  rejectionReason?: string;
   ownerDetails?: {
+    id: string;
     fullName: string;
-    phone: string;
-    email?: string;
-  };
+    email: string;
+    phoneNumber: string;
+  }; // Subset of UserDTO
 }
 
-export const bookingMapper = {
-  toDTO(booking: IBooking & { _id: mongoose.Types.ObjectId }): BookingDTO {
+export const carMapper = {
+  toDTO(car: ICar): CarDTO {
+    // Cast _id to mongoose.Types.ObjectId
+    const id = (car._id as mongoose.Types.ObjectId).toString();
+
+    // Validate and cast carType to match CarDTO
+    const validCarType = car.carType && ['Sedan', 'SUV', 'Hatchback', 'VAN/MPV'].includes(car.carType)
+      ? car.carType as 'Sedan' | 'SUV' | 'Hatchback' | 'VAN/MPV'
+      : undefined;
+
     return {
-      id: booking._id.toString(),
-      bookingId: booking.bookingId,
-      carId: booking.carId.toString(),
-      customerId: booking.userId.toString(),
-      carOwnerId: booking.carOwnerId.toString(),
-      startDate: booking.startDate.toISOString(),
-      endDate: booking.endDate.toISOString(),
-      status: booking.status,
-      totalAmount: booking.totalPrice,
-      paymentIntentId: booking.paymentIntentId,
-      paymentMethod: booking.paymentMethod,
-      trackingToken: booking.trackingToken ? String(booking.trackingToken) : undefined,
-      trackingUrl: booking.trackingUrl ? String(booking.trackingUrl) : undefined,
-      cancellationFee: booking.cancellationFee,
-      refundedAmount: booking.refundedAmount,
-      cancelledAt: booking.cancelledAt ? booking.cancelledAt.toISOString() : undefined,
-      createdAt: booking.createdAt ? booking.createdAt.toISOString() : undefined,
-      updatedAt: booking.updatedAt ? booking.updatedAt.toISOString() : undefined,
-      tracking: booking.currentLocation
+      id,
+      carName: String(car.carName), // Cast String to string
+      brand: String(car.brand), // Cast String to string
+      year: car.year ? parseInt(car.year, 10) : undefined, // Convert to number
+      fuelType: car.fuelType,
+      carType: validCarType,
+      rcBookNo: car.rcBookNo ? String(car.rcBookNo) : undefined, // Cast String to string
+      expectedWage: parseFloat(car.expectedWage), // Convert to number
+      rcBookProof: car.rcBookProof ? String(car.rcBookProof) : undefined, // Cast String to string
+      insuranceProof: car.insuranceProof ? String(car.insuranceProof) : undefined, // Cast String to string
+      location: {
+        address: String(car.location.address), // Cast String to string
+        landmark: String(car.location.landmark), // Cast String to string
+        coordinates: car.location.coordinates?.coordinates
+          ? {
+              lat: car.location.coordinates.coordinates[1], // GeoJSON: [lng, lat]
+              lng: car.location.coordinates.coordinates[0],
+            }
+          : { lat: 0, lng: 0 }, // Fallback for missing coordinates
+      },
+      make: car.make ? String(car.make) : undefined, // Cast String to string
+      carModel: car.carModel ? String(car.carModel) : undefined, // Cast String to string
+      verifyStatus: car.verifyStatus,
+      blockStatus: car.blockStatus === 1, // Convert number to boolean
+      images: car.images.map(String), // Ensure string array
+      videos: car.videos?.map(String) || [], // Ensure string array
+      available: car.available ?? true,
+      unavailableDates: car.unavailableDates?.map((date) => date.toISOString()) || [],
+      rejectionReason: car.rejectionReason ? String(car.rejectionReason) : undefined, // Cast String to string
+      ownerDetails: car.owner && typeof car.owner === 'object' && 'fullName' in car.owner
         ? {
-            lat: booking.currentLocation.lat,
-            lng: booking.currentLocation.lng,
+            id: (car.owner as any)._id.toString(),
+            fullName: String((car.owner as any).fullName),
+            email: String((car.owner as any).email),
+            phoneNumber: String((car.owner as any).phoneNumber),
           }
-        : undefined,
-      carDetails: booking.carId && typeof booking.carId === 'object' && 'carName' in booking.carId
-        ? {
-            carName: (booking.carId as any).carName,
-            brand: (booking.carId as any).brand,
-            pickupLocation: (booking.carId as any).location?.address || '',
-            carNumber: (booking.carId as any).rcBookNo || '',
-          }
-        : undefined,
-      ownerDetails: booking.carOwnerId && typeof booking.carOwnerId === 'object' && 'fullName' in booking.carOwnerId
-        ? {
-            fullName: (booking.carOwnerId as any).fullName,
-            phone: (booking.carOwnerId as any).phone,
-            email: (booking.carOwnerId as any).email,
-          }
-        : undefined,
+        : undefined, // Compatible with UserDTO
     };
   },
 
-  toEntity(dto: Partial<BookingDTO>): Partial<IBooking> {
+  toEntity(dto: Partial<CarDTO>): Partial<ICar> {
     return {
       _id: dto.id ? new mongoose.Types.ObjectId(dto.id) : undefined,
-      bookingId: dto.bookingId,
-      carId: dto.carId ? new mongoose.Types.ObjectId(dto.carId) : undefined,
-      userId: dto.customerId ? new mongoose.Types.ObjectId(dto.customerId) : undefined,
-      carOwnerId: dto.carOwnerId ? new mongoose.Types.ObjectId(dto.carOwnerId) : undefined,
-      startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-      endDate: dto.endDate ? new Date(dto.endDate) : undefined,
-      status: dto.status,
-      totalPrice: dto.totalAmount,
-      paymentIntentId: dto.paymentIntentId,
-      paymentMethod: dto.paymentMethod,
-      trackingToken: dto.trackingToken,
-      trackingUrl: dto.trackingUrl,
-      cancellationFee: dto.cancellationFee,
-      refundedAmount: dto.refundedAmount,
-      cancelledAt: dto.cancelledAt ? new Date(dto.cancelledAt) : undefined,
-      createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
-      updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
-      currentLocation: dto.tracking
+      carName: dto.carName,
+      brand: dto.brand,
+      year: dto.year ? String(dto.year) : undefined, // Convert number to string
+      fuelType: dto.fuelType,
+      carType: dto.carType,
+      rcBookNo: dto.rcBookNo,
+      expectedWage: dto.expectedWage ? String(dto.expectedWage) : undefined, // Convert number to string
+      rcBookProof: dto.rcBookProof,
+      insuranceProof: dto.insuranceProof,
+      location: dto.location
         ? {
-            lat: dto.tracking.lat,
-            lng: dto.tracking.lng,
+            address: dto.location.address,
+            landmark: dto.location.landmark,
+            coordinates: {
+              type: 'Point',
+              coordinates: [dto.location.coordinates.lng, dto.location.coordinates.lat], // [lng, lat]
+            },
           }
         : undefined,
+      make: dto.make,
+      carModel: dto.carModel,
+      verifyStatus: dto.verifyStatus,
+      blockStatus: dto.blockStatus ? 1 : 0, // Convert boolean to number
+      images: dto.images,
+      videos: dto.videos,
+      available: dto.available,
+      unavailableDates: dto.unavailableDates?.map((date) => new Date(date)) || [],
+      rejectionReason: dto.rejectionReason,
+      owner: dto.ownerDetails?.id ? new mongoose.Types.ObjectId(dto.ownerDetails.id) : undefined,
     };
   },
 };

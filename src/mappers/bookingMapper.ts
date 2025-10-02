@@ -80,35 +80,6 @@ export const bookingMapper = {
           }
         : undefined,
     };
-  },
+  }
 
-  toEntity(dto: Partial<BookingDTO>): Partial<IBooking> {
-    return {
-      _id: dto.id ? new mongoose.Types.ObjectId(dto.id) : undefined,
-      bookingId: dto.bookingId,
-      carId: dto.carId ? new mongoose.Types.ObjectId(dto.carId) : undefined,
-      userId: dto.customerId ? new mongoose.Types.ObjectId(dto.customerId) : undefined,
-      carOwnerId: dto.carOwnerId ? new mongoose.Types.ObjectId(dto.carOwnerId) : undefined,
-      startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-      endDate: dto.endDate ? new Date(dto.endDate) : undefined,
-      status: dto.status,
-      totalPrice: dto.totalAmount,
-      paymentIntentId: dto.paymentIntentId,
-      paymentMethod: dto.paymentMethod,
-      trackingToken: dto.trackingToken,
-      trackingUrl: dto.trackingUrl,
-      cancellationFee: dto.cancellationFee,
-      refundedAmount: dto.refundedAmount,
-      cancelledAt: dto.cancelledAt ? new Date(dto.cancelledAt) : undefined,
-      createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
-      updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
-      currentLocation: dto.tracking
-        ? {
-            lat: dto.tracking.lat,
-            lng: dto.tracking.lng,
-          }
-        : undefined,
-    };
-  },
-};
-
+} 
