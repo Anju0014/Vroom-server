@@ -174,16 +174,43 @@ async getCarsCount(filters: {
         await Booking.deleteOne({ _id: bookingId });
       }
     
-      async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
-        return Booking.findOne({
-          carId,
-          status: { $in: ['confirmed'] },
-          $or: [
-            { startDate: { $lte: endDate, $gte: startDate } },
-            { endDate: { $lte: endDate, $gte: startDate } },
-          ],
-        });
+      // async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
+      //   return Booking.findOne({
+      //     carId,
+      //     status: { $in: ['confirmed'] },
+      //     $or: [
+      //       { startDate: { $lte: endDate, $gte: startDate } },
+      //       { endDate: { $lte: endDate, $gte: startDate } },
+      //     ],
+      //   });
+      // }
+      async findConflictingBooking(
+  carId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<IBooking | null> {
+  const now = new Date();
+
+  return Booking.findOne({
+    carId,
+    $and: [
+      {
+        $or: [
+          { status: 'confirmed' },
+          { status: 'pending', lockedUntil: { $gt: now } }
+        ]
+      },
+      {
+        $or: [
+          { startDate: { $lte: endDate, $gte: startDate } },
+          { endDate: { $lte: endDate, $gte: startDate } },
+          { startDate: { $lte: startDate }, endDate: { $gte: endDate } } // fully overlapping
+        ]
       }
+    ]
+  });
+}
+
       async checkOldBooking(bookingData:BookingData): Promise<IBooking|null>{
             return Booking.findOne({
               carId:bookingData.carId,

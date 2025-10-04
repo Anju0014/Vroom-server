@@ -101,14 +101,18 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 //   }
 
 console.log("create pending booking phase1")
-
-
+const now = new Date();
+const lockDuration = 10 * 60 * 1000; // 10 minutes
   const booking = await this._customerCarRepository.createBooking({
     ...bookingData,
     startDate: start,
     endDate: end,
     status: 'pending',
+    lockedUntil: new Date(now.getTime() + lockDuration),
+
   });
+
+  
 console.log("booking new pending",booking);
   if(!booking || !booking._id){
     throw new Error(' Error in Creating the Booking')

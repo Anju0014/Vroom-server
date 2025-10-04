@@ -6,6 +6,7 @@ import { StatusCode } from "../../../constants/statusCode";
 import ICustomerCarAndBookingController from '../../interfaces/customer/ICustomerCarAndBookingController';
 import { ICustomerCarAndBookingService } from '../../../services/interfaces/customer/ICustomerCarAndBookingServices';
 import { generateAndUploadReceipt } from '../../../services/receiptService';
+import { Booking } from '../../../models/booking/bookingModel';
 
 
 
@@ -138,6 +139,45 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       this.handleError(res, err);
     }
   }
+  // controller
+async  checkBookingAvailability (req: Request, res: Response):Promise<void>  {
+  console.log("reached availability point")
+  try {
+    const { carId, startDate, endDate } = req.query; // or req.body
+
+   const bookings = await Booking.find({
+  carId,
+  $or: [
+    // confirmed overlapping
+    {
+      status: 'confirmed',
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate }
+    },
+    // pending overlapping
+    {
+      status: 'pending',
+      lockedUntil: { $gte: new Date() },
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate }
+    }
+  ]
+});
+
+    if (bookings.length > 0) {
+      console.log(false)
+      res.json({ available: false });
+      return
+    }
+console.log(true)
+     res.json({ available: true });
+     return
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
   async createPendingBooking(req: Request, res: Response): Promise<void> {
     try {

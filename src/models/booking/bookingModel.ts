@@ -25,6 +25,7 @@ interface IBooking extends Document {
   trackingUrl: String, 
   currentLocation?: ILocation;
   receiptUrl?:String,
+  lockedUntil?:Date
 }
 
 const BookingSchema = new Schema<IBooking>(
@@ -56,6 +57,7 @@ const BookingSchema = new Schema<IBooking>(
       lat: { type: Number },
       lng: { type: Number },
     },
+    lockedUntil:{type:Date},
   },
   {
     timestamps: true,

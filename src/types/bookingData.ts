@@ -9,6 +9,7 @@ export interface BookingData {
     status: 'confirmed' | 'pending' | 'cancelled'|' failed';
     paymentIntentId?: string;
     paymentMethod?: 'stripe' | 'wallet';
+    lockedUntil?:Date
   }
   export interface BookingUserData{
     id: string;
@@ -26,6 +27,7 @@ export interface BookingData {
     createdAt: string;
     pickupLocation: string;
     carNumber: string;
+    lockedUntil?:Date
 
   }
 
