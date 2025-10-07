@@ -65,13 +65,12 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     return this._customerCarRepository.getCarsCount(filters);
   }
 
-      async createPendingBooking(bookingData: BookingData): Promise<string> {
-  const { carId, startDate, endDate } = bookingData;
-  
+  async createPendingBooking(bookingData: BookingData): Promise<string> {
+  const { carId, startDate, endDate, userId } = bookingData;
+
   if (!startDate || !endDate) {
     throw new Error('Start date and end date are required');
   }
-
 
   const car = await this._customerCarRepository.findCarById(carId);
   if (!car) {
@@ -79,53 +78,118 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
   }
 
   const start = new Date(startDate);
-  const end = endOfDay(new Date(endDate)); 
+  const end = endOfDay(new Date(endDate));
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new Error('Invalid date format');
   }
 
-  const conflict = await this._customerCarRepository.findConflictingBooking(carId,start,end);
-  if (conflict) {
+  const conflict = await this._customerCarRepository.findConflictingBooking(
+    carId,
+    start,
+    end
+  );
+  if (conflict && conflict.userId.toString() !== userId) {
     throw new Error('Car is not available for the selected dates');
   }
 
-  console.log("conflict",conflict)
+  const existingBooking = await this._customerCarRepository.checkOldBooking({
+    carId,
+    userId,
+    startDate: start,
+    endDate: end,
+  });
 
-//   const existingBooking = await  this._customerCarRepository.checkOldBooking(bookingData)
+  const now = new Date();
+  const lockDuration = 10 * 60 * 1000; 
 
+  if (existingBooking && existingBooking.lockedUntil && existingBooking?.lockedUntil > now) {
+  
+    existingBooking.lockedUntil = new Date(now.getTime() + lockDuration);
+    await existingBooking.save();
+    if(!existingBooking._id){
+    throw new Error(' Error in retreiving the old Booking')
+  }
+    return existingBooking._id.toString();
+  }
 
-//   if (existingBooking &&  existingBooking._id) {
-//     console.log("existingone")
-//     return  existingBooking._id.toString() ;
-//   }
-
-console.log("create pending booking phase1")
-const now = new Date();
-const lockDuration = 10 * 60 * 1000; // 10 minutes
   const booking = await this._customerCarRepository.createBooking({
     ...bookingData,
     startDate: start,
     endDate: end,
     status: 'pending',
     lockedUntil: new Date(now.getTime() + lockDuration),
-
   });
 
-  
-console.log("booking new pending",booking);
-  if(!booking || !booking._id){
-    throw new Error(' Error in Creating the Booking')
+  if (!booking || !booking._id) {
+    throw new Error('Error creating the booking');
   }
   return booking._id.toString();
 }
 
 
 
+//       async createPendingBooking(bookingData: BookingData): Promise<string> {
+//   const { carId, startDate, endDate } = bookingData;
+  
+//   if (!startDate || !endDate) {
+//     throw new Error('Start date and end date are required');
+//   }
+
+
+//   const car = await this._customerCarRepository.findCarById(carId);
+//   if (!car) {
+//     throw new Error('Car not found');
+//   }
+
+//   const start = new Date(startDate);
+//   const end = endOfDay(new Date(endDate)); 
+
+//   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+//     throw new Error('Invalid date format');
+//   }
+
+//   const conflict = await this._customerCarRepository.findConflictingBooking(carId,start,end);
+//   if (conflict) {
+//     throw new Error('Car is not available for the selected dates');
+//   }
+
+//   console.log("conflict",conflict)
+
+// //   const existingBooking = await  this._customerCarRepository.checkOldBooking(bookingData)
+
+
+// //   if (existingBooking &&  existingBooking._id) {
+// //     console.log("existingone")
+// //     return  existingBooking._id.toString() ;
+// //   }
+
+// console.log("create pending booking phase1")
+// const now = new Date();
+// const lockDuration = 10 * 60 * 1000; // 10 minutes
+//   const booking = await this._customerCarRepository.createBooking({
+//     ...bookingData,
+//     startDate: start,
+//     endDate: end,
+//     status: 'pending',
+//     lockedUntil: new Date(now.getTime() + lockDuration),
+
+//   });
+
+  
+// console.log("booking new pending",booking);
+//   if(!booking || !booking._id){
+//     throw new Error(' Error in Creating the Booking')
+//   }
+//   return booking._id.toString();
+// }
+
+
+
 async confirmBooking(bookingId: string, paymentIntentId: string): Promise<IBooking> {
   const booking = await this._customerCarRepository.findBookingById(bookingId);
   console.log("booking-old-confirm",booking)
-  if (!booking || booking.status !== 'pending') {
+  if (!booking || booking.status !== 'agreementAccepted') {
     throw new Error('Invalid or non-pending booking');
   }
 

@@ -86,7 +86,7 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
   try {
     // Validate booking
     const booking = await Booking.findById(bookingId);
-    if (!booking || booking.status !== 'pending') {
+    if (!booking || booking.status !== 'agreementAccepted') {
       console.log('Invalid or non-pending booking:', bookingId);
       res.status(400).json({ error: 'Invalid or non-pending booking' });
       return;

@@ -13,7 +13,7 @@ interface IBooking extends Document {
   startDate: Date;
   endDate: Date;
   totalPrice: number;
-  status: 'confirmed' | 'pending' | 'cancelled' | 'failed';
+  status: 'confirmed' | 'pending' | 'cancelled' | 'failed'| 'agreementAccepted';
   paymentIntentId?: string;
   paymentMethod?: 'stripe' | 'wallet';
  cancellationFee :number
@@ -39,7 +39,7 @@ const BookingSchema = new Schema<IBooking>(
     totalPrice: { type: Number, required: true },
     status: {
       type: String,
-      enum: ['confirmed', 'pending', 'cancelled', 'failed'],
+      enum: ['confirmed', 'pending', 'cancelled', 'failed','agreementAccepted'],
       default: 'pending',
     },
     paymentIntentId: { type: String, default: null },

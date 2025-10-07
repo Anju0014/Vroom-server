@@ -211,7 +211,7 @@ async getCarsCount(filters: {
   });
 }
 
-      async checkOldBooking(bookingData:BookingData): Promise<IBooking|null>{
+      async checkOldBooking(bookingData:Partial<BookingData>): Promise<IBooking|null>{
             return Booking.findOne({
               carId:bookingData.carId,
              userId:bookingData.userId,

@@ -21,13 +21,12 @@ interface ICustomerCarAndBookingRepository{
   saveBooking(bookingData:IBooking): Promise<IBooking>;
   deleteBooking(bookingId: string): Promise<void>;
   findConflictingBooking(carId: string,startDate: Date,endDate: Date): Promise<IBooking | null>;
-  checkOldBooking(bookingData:BookingData): Promise<IBooking|null>
+  checkOldBooking(bookingData:Partial<BookingData>): Promise<IBooking|null>
   generateBookingId():Promise<string>
   getAllCars(page: number, limit: number, filters: {search?: string;minPrice?: number; maxPrice?: number; carType?:string;
     location?:string;latitude?: number;longitude?: number; startDate:string, endDate:string}):Promise<ICar[]>
   getCarsCount(filters: {search?: string;minPrice?: number;maxPrice?: number; carType?:string;
     location?:string;latitude?: number;longitude?: number;startDate:string, endDate:string}):Promise<number> 
-
   updateBookingLocation(bookingId: string, location: { lat: number; lng: number }):Promise<void>
 
 }

@@ -80,6 +80,7 @@ customerRouter.get('/car/getBookingDetails/:carId',(req,res)=>customerCarAndBook
 customerRouter.post('/bookings/create', (req,res)=>customerCarAndBookingController.createPendingBooking(req,res));
 customerRouter.get('/bookings/checkBookingAvailability', (req,res)=>customerCarAndBookingController.checkBookingAvailability(req,res));
 customerRouter.patch(`/bookings/:bookingId/confirm`, (req,res)=>customerCarAndBookingController.confirmBooking(req,res));
+customerRouter.patch(`/bookings/:bookingId/updatePendingBooking`, (req,res)=>customerCarAndBookingController.updatePendingBooking(req,res));
 customerRouter.patch(`/bookings/:bookingId/fail`, (req,res)=>customerCarAndBookingController.failedBooking(req,res));
 
 

@@ -189,6 +189,32 @@ console.log(true)
       this.handleError(res, err, StatusCode.BAD_REQUEST);
     }
   }
+async updatePendingBooking(req: Request, res: Response): Promise<void> {
+  try {
+    const { bookingId } = req.params;           // from URL: /bookings/:bookingId
+    const { status } = req.body;               // from request body
+
+    if (!status) {
+      res.status(400).json({ message: "Status is required" });
+      return;
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      res.status(404).json({ message: "Booking not found" });
+      return;
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    res.status(200).json({ message: "Booking updated", booking });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
   
   async confirmBooking(req: Request, res: Response): Promise<void> {
     const { bookingId } = req.params;
