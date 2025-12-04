@@ -1,83 +1,72 @@
-import ICustomerRepository from "../../../repositories/interfaces/customer/ICustomerRepository";
-import { ICustomerService } from "../../interfaces/customer/ICustomerServices";
-import { sendEmail, sendResetEmail } from "../../../utils/emailconfirm";
-import { ICustomer } from "../../../models/customer/customerModel";
-import PasswordUtils from "../../../utils/passwordUtils";
-import JwtUtils from "../../../utils/jwtUtils";
-import { otpTemplate, passwordResetTemplate } from "../../../templates/emailTemplates";
-import CustomerRepository from "../../../repositories/implementation/customer/customerRepository";
-
+import ICustomerRepository from '../../../repositories/interfaces/customer/ICustomerRepository';
+import { ICustomerService } from '../../interfaces/customer/ICustomerServices';
+import { sendEmail, sendResetEmail } from '../../../utils/emailconfirm';
+import { ICustomer } from '../../../models/customer/customerModel';
+import PasswordUtils from '../../../utils/passwordUtils';
+import JwtUtils from '../../../utils/jwtUtils';
+import { otpTemplate } from '../../../templates/emailTemplates';
 
 class CustomerService implements ICustomerService {
+  private _customerRepository: ICustomerRepository;
 
-    private _customerRepository : ICustomerRepository;
+  constructor(customerRepository: ICustomerRepository) {
+    this._customerRepository = customerRepository;
+  }
 
-    constructor(customerRepository:ICustomerRepository){
-        this._customerRepository=customerRepository
-    }
-    
-   
-async registerBasicDetails(customerDetails: Partial<ICustomer>): Promise<{ customer: ICustomer }> {
-    
-
-    console.log("reached")
+  async registerBasicDetails(
+    customerDetails: Partial<ICustomer>
+  ): Promise<{ customer: ICustomer }> {
+    console.log('reached');
     const { fullName, email, password, phoneNumber } = customerDetails;
-    console.log(customerDetails)
+    console.log(customerDetails);
 
     if (!fullName || !email || !password) {
-        throw new Error("All fields are required")
+      throw new Error('All fields are required');
     }
 
-
-    const existingUser = await this._customerRepository.findUserByEmail(customerDetails.email!)
+    const existingUser = await this._customerRepository.findUserByEmail(customerDetails.email!);
 
     if (existingUser) {
-        console.log("User already exists. Throwing error...");
-        throw new Error("Email already Exist")
+      console.log('User already exists. Throwing error...');
+      throw new Error('Email already Exist');
     }
 
-    const hashedPassword = await PasswordUtils.hashPassword(password)
-
- 
+    const hashedPassword = await PasswordUtils.hashPassword(password);
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date();
-    otpExpires.setMinutes(otpExpires.getMinutes() + 5); 
+    otpExpires.setMinutes(otpExpires.getMinutes() + 5);
 
     const customer = await this._customerRepository.create({
-        fullName,
-        email,
-        password: hashedPassword,
-        phoneNumber,
-        otp,
-        otpExpires,
-        processStatus: 0
-    })
-     
+      fullName,
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      otp,
+      otpExpires,
+      processStatus: 0,
+    });
+
     const otpContent = otpTemplate(otp);
     await sendEmail({ to: email, ...otpContent });
 
     // await sendOTP(email, otp)
-    console.log("create new customer: ", customer);
+    console.log('create new customer: ', customer);
 
+    return { customer };
+  }
 
-    return { customer }
-
-}
-
-
-async otpVerify(email: string, otp: string): Promise<{ customer:ICustomer }> {
-    console.log("otp reached")
+  async otpVerify(email: string, otp: string): Promise<{ customer: ICustomer }> {
+    console.log('otp reached');
     console.log(`Verifying OTP for ${email}: ${otp}`);
 
-   
     const customer = await this._customerRepository.findUserByEmail(email);
 
     if (!customer) {
-        throw new Error("User not found");
+      throw new Error('User not found');
     }
 
-    console.log("Fetched customer from DB:", customer);
+    console.log('Fetched customer from DB:', customer);
     // if (customer.otp !== otp) {
     //     throw new Error("Invalid OTP");
     // }
@@ -86,282 +75,292 @@ async otpVerify(email: string, otp: string): Promise<{ customer:ICustomer }> {
     //     throw new Error("OTP Expired");
     // }
     if (!customer) {
-        throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     if (!customer.otp || customer.otp !== otp) {
-        throw new Error("Invalid OTP");
+      throw new Error('Invalid OTP');
     }
 
     if (!customer.otpExpires || new Date() > customer.otpExpires) {
-        throw new Error("OTP has expired");
+      throw new Error('OTP has expired');
     }
-  
-    customer.processStatus = 2; 
+
+    customer.processStatus = 2;
     customer.verifyStatus = 1;
     customer.otp = null;
     customer.otpExpires = null;
 
     await this._customerRepository.updateCustomer(customer._id.toString(), customer);
 
-
-    console.log("User OTP verified successfully!");
+    console.log('User OTP verified successfully!');
     // return { success: true, message: "OTP Verified Successfully" };
-    return {customer}
-}
+    return { customer };
+  }
 
-
-async resendOtp(email:string): Promise<{message:string}>{
-   
+  async resendOtp(email: string): Promise<{ message: string }> {
     console.log(`Resending OTP for email: ${email}`);
-    const customer=await this._customerRepository.findUserByEmail(email);
-    if(!customer){
-        throw new Error("User not found");
+    const customer = await this._customerRepository.findUserByEmail(email);
+    if (!customer) {
+      throw new Error('User not found');
     }
-    const newOtp= Math.floor(100000+Math.random()*90000).toString();
-    const otpExpires= new Date();
-    otpExpires.setMinutes(otpExpires.getMinutes()+5);
+    const newOtp = Math.floor(100000 + Math.random() * 90000).toString();
+    const otpExpires = new Date();
+    otpExpires.setMinutes(otpExpires.getMinutes() + 5);
 
-    customer.otp=newOtp;
-    customer.otpExpires=otpExpires;
+    customer.otp = newOtp;
+    customer.otpExpires = otpExpires;
 
-    await this._customerRepository.updateCustomer(customer._id.toString(),customer);
+    await this._customerRepository.updateCustomer(customer._id.toString(), customer);
 
     const otpContent = otpTemplate(newOtp);
     await sendEmail({ to: customer.email, ...otpContent });
 
     // await sendOTP(customer.email,newOtp);
-    console.log("New OTP sent Successfully");
-    return {message:"OTP resend successfully"}
-}
+    console.log('New OTP sent Successfully');
+    return { message: 'OTP resend successfully' };
+  }
 
-async loginCustomer(email:string, password:string): Promise<{customerAccessToken:string,refreshToken:string,customer:ICustomer|null}>{
+  async loginCustomer(
+    email: string,
+    password: string
+  ): Promise<{ customerAccessToken: string; refreshToken: string; customer: ICustomer | null }> {
     console.log(`checking login things`);
-    const customer=await this._customerRepository.findUserByEmail(email);
-    console.log(customer)
-    if(!customer){
-        console.log("not correct user")
-        throw new Error("Invalid Credentials");
+    const customer = await this._customerRepository.findUserByEmail(email);
+    console.log(customer);
+    if (!customer) {
+      console.log('not correct user');
+      throw new Error('Invalid Credentials');
     }
-    
+
     if (customer.blockStatus === 1) {
-        throw new Error("This user is blocked by admin")
+      throw new Error('This user is blocked by admin');
     }
 
-    if(customer.processStatus === 0){
-      throw new Error("Signup is not completed")
+    if (customer.processStatus === 0) {
+      throw new Error('Signup is not completed');
     }
 
-//     if (user.status === 0) {
-//         throw new Error("Signup is not completed")
-//     }
-    const passwordTrue = await PasswordUtils.comparePassword(password,customer.password)
-    if(!passwordTrue){
-        console.log("not correct")
-        throw new Error("Invalid Credentials")
+    //     if (user.status === 0) {
+    //         throw new Error("Signup is not completed")
+    //     }
+    const passwordTrue = await PasswordUtils.comparePassword(password, customer.password);
+    if (!passwordTrue) {
+      console.log('not correct');
+      throw new Error('Invalid Credentials');
     }
-    const customerAccessToken=JwtUtils.generateAccessToken({id:customer._id, email:customer.email,role:'customer'});
-    const newRefreshToken=JwtUtils.generateRefreshToken({id:customer._id});
+    const customerAccessToken = JwtUtils.generateAccessToken({
+      id: customer._id,
+      email: customer.email,
+      role: 'customer',
+    });
+    const newRefreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
 
     await this._customerRepository.updateRefreshToken(customer._id.toString(), newRefreshToken);
 
-    return {customerAccessToken,refreshToken:newRefreshToken,customer}
-}
+    return { customerAccessToken, refreshToken: newRefreshToken, customer };
+  }
 
-async renewAuthToken(oldRefreshToken:string):Promise<{accessToken:string,refreshToken:string}>{
-    
-        const decoded = JwtUtils.verifyToken(oldRefreshToken, true)
+  async renewAuthToken(
+    oldRefreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const decoded = JwtUtils.verifyToken(oldRefreshToken, true);
 
-        if (!decoded || typeof decoded === "string") {
-          console.log("Invalid or malformed refresh token");
-          throw new Error("Invalid refresh token");
-        }
-        if (decoded.message === "Token expired") {
-          console.log("Refresh token has expired");
-          throw new Error("Refresh token expired");
-        }
-        if (!decoded.id) {
-          console.log("No ID in refresh token payload");
-          throw new Error("Invalid refresh token");
-        }
-
-        // if (!decoded || typeof decoded === 'string' || !decoded.id) {
-        //     throw new Error("Invalid refresh token");
-        // }
-
-        const customer = await this._customerRepository.findById(decoded.id);
-        console.log("Car owner:", customer);
-        console.log("Stored refresh token:", customer?.refreshToken);
-        console.log("Provided refresh token:", oldRefreshToken);
-      
-        if (!customer || customer.refreshToken !== oldRefreshToken) {
-          console.log("Refresh token mismatch")
-            throw new Error("Invalid refresh token")
-        }
-        const accessToken=JwtUtils.generateAccessToken({id:customer._id,email:customer.email,role:'customer'});
-        const refreshToken=JwtUtils.generateRefreshToken({id:customer._id});
-        await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
-         
-        return {accessToken,refreshToken}
+    if (!decoded || typeof decoded === 'string') {
+      console.log('Invalid or malformed refresh token');
+      throw new Error('Invalid refresh token');
+    }
+    if (decoded.message === 'Token expired') {
+      console.log('Refresh token has expired');
+      throw new Error('Refresh token expired');
+    }
+    if (!decoded.id) {
+      console.log('No ID in refresh token payload');
+      throw new Error('Invalid refresh token');
     }
 
-    async forgotPassword(email: string): Promise<void> {
-        const customer = await this._customerRepository.findUserByEmail(email);
-        if (!customer) {
-          throw new Error('User not found');
-        }
-        const resetToken = JwtUtils.generateResetToken({ userId: customer._id });
-       await sendResetEmail(customer.email, customer.fullName, resetToken, "customer");
-        // await sendResetEmail(email, resetToken, 'customer');
-      }
-    async resetPassword  (token: string, newPassword: string, role: "customer" | "carOwner"):Promise<string>{
-        console.log("reached pt 2")
-        const decoded = JwtUtils.verifyResetToken(token);
-      
-        if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
-          throw new Error("Invalid or expired token");
-        }
-        const hashedPassword = await PasswordUtils.hashPassword(newPassword)
-        if (role === "customer") {
-          await this._customerRepository.updatePassword(decoded.userId, hashedPassword);
-        }
-        return "Password reset successful. Please log in.";
-      };
+    // if (!decoded || typeof decoded === 'string' || !decoded.id) {
+    //     throw new Error("Invalid refresh token");
+    // }
 
+    const customer = await this._customerRepository.findById(decoded.id);
+    console.log('Car owner:', customer);
+    console.log('Stored refresh token:', customer?.refreshToken);
+    console.log('Provided refresh token:', oldRefreshToken);
 
+    if (!customer || customer.refreshToken !== oldRefreshToken) {
+      console.log('Refresh token mismatch');
+      throw new Error('Invalid refresh token');
+    }
+    const accessToken = JwtUtils.generateAccessToken({
+      id: customer._id,
+      email: customer.email,
+      role: 'customer',
+    });
+    const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
+    await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
 
-
-       async changePassword(customerId: string, passwordDetails: { oldPassword: string; newPassword: string }): Promise<string > {
-              const { oldPassword, newPassword } = passwordDetails;
-              console.log("reachedkjkkf")
-          
-         
-              const customer = await this._customerRepository.findById(customerId);
-              if (!customer) {
-                console.log("ijhjebhigbhinjdsn")
-                  throw new Error("Car Owner not found");
-              }
-      
-              const passwordMatch = await PasswordUtils.comparePassword(oldPassword, customer.password);
-              if (!passwordMatch) {
-                console.log("jdjfu??")
-                  throw new Error("Old password is incorrect" );
-              }
-      
-              const hashedPassword = await PasswordUtils.hashPassword(newPassword);
-      
-              await this._customerRepository.updatePassword(customerId, hashedPassword);
-           
-              return "Password updated successfully" ;
-          }
-          
-      
-
-
-async logoutCustomer(refreshToken: string): Promise<void> {
-    
-    console.log("reached")
-    console.log(refreshToken)
-    const customer = await this._customerRepository.findUserByRefreshToken(refreshToken);
-  if (!customer) {
-    console.log("error no customer")
-    throw new Error("User not found");
+    return { accessToken, refreshToken };
   }
-  await this._customerRepository.clearRefreshToken(customer._id.toString());
-}
 
+  async forgotPassword(email: string): Promise<void> {
+    const customer = await this._customerRepository.findUserByEmail(email);
+    if (!customer) {
+      throw new Error('User not found');
+    }
+    const resetToken = JwtUtils.generateResetToken({ userId: customer._id });
+    await sendResetEmail(customer.email, customer.fullName, resetToken, 'customer');
+    // await sendResetEmail(email, resetToken, 'customer');
+  }
+  async resetPassword(
+    token: string,
+    newPassword: string,
+    role: 'customer' | 'carOwner'
+  ): Promise<string> {
+    console.log('reached pt 2');
+    const decoded = JwtUtils.verifyResetToken(token);
 
+    if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
+      throw new Error('Invalid or expired token');
+    }
+    const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+    if (role === 'customer') {
+      await this._customerRepository.updatePassword(decoded.userId, hashedPassword);
+    }
+    return 'Password reset successful. Please log in.';
+  }
 
-async loginCustomerGoogle(fullName: string, email: string, profileImage: string, provider: string, role?: string):Promise<{customerAccessToken:string,refreshToken:string,customer:ICustomer|null}> {
- 
-   console.log(profileImage)
-    console.log("helloooooooo")
+  async changePassword(
+    customerId: string,
+    passwordDetails: { oldPassword: string; newPassword: string }
+  ): Promise<string> {
+    const { oldPassword, newPassword } = passwordDetails;
+    console.log('reachedkjkkf');
+
+    const customer = await this._customerRepository.findById(customerId);
+    if (!customer) {
+      console.log('ijhjebhigbhinjdsn');
+      throw new Error('Car Owner not found');
+    }
+
+    const passwordMatch = await PasswordUtils.comparePassword(oldPassword, customer.password);
+    if (!passwordMatch) {
+      console.log('jdjfu??');
+      throw new Error('Old password is incorrect');
+    }
+
+    const hashedPassword = await PasswordUtils.hashPassword(newPassword);
+
+    await this._customerRepository.updatePassword(customerId, hashedPassword);
+
+    return 'Password updated successfully';
+  }
+
+  async logoutCustomer(refreshToken: string): Promise<void> {
+    console.log('reached');
+    console.log(refreshToken);
+    const customer = await this._customerRepository.findUserByRefreshToken(refreshToken);
+    if (!customer) {
+      console.log('error no customer');
+      throw new Error('User not found');
+    }
+    await this._customerRepository.clearRefreshToken(customer._id.toString());
+  }
+
+  async loginCustomerGoogle(
+    fullName: string,
+    email: string,
+    profileImage: string,
+    provider: string,
+    role?: string
+  ): Promise<{ customerAccessToken: string; refreshToken: string; customer: ICustomer | null }> {
+    console.log(profileImage);
+    console.log('helloooooooo');
     // let customer;
     let customer = await this._customerRepository.findUserByEmail(email);
 
-    console.log("1//////////",customer)
+    console.log('1//////////', customer);
 
-    if (customer&& customer.blockStatus === 1) {
-      throw new Error("User is blocked by the Admin .");
+    if (customer && customer.blockStatus === 1) {
+      throw new Error('User is blocked by the Admin .');
     }
-  
+
     if (!customer) {
-     customer = await this._customerRepository.create({
+      customer = await this._customerRepository.create({
         fullName,
         email,
         profileImage,
         provider,
-        processStatus:2,
-        verifyStatus:1,
+        processStatus: 2,
+        verifyStatus: 1,
         // role: role || "customer", // Default to "customer" if role isn't provided
       });
     }
 
-    const customerAccessToken = JwtUtils.generateAccessToken({ id: customer._id, email: customer.email,role:'customer' });
+    const customerAccessToken = JwtUtils.generateAccessToken({
+      id: customer._id,
+      email: customer.email,
+      role: 'customer',
+    });
     const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
-  
-    
+
     await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
     console.log(refreshToken);
     let customer2 = await this._customerRepository.findUserByEmail(email);
-    console.log(customer2)
-    
+    console.log(customer2);
+
     return { customerAccessToken, refreshToken, customer };
   }
 
+  async getCustomerProfile(customerId: string): Promise<{ customer: ICustomer }> {
+    const customer = await this._customerRepository.findById(customerId);
+    if (!customer) throw new Error('customer not found');
 
-    async getCustomerProfile(customerId: string):Promise<{customer:ICustomer}> {
-        const customer = await this._customerRepository.findById(customerId);
-        if (!customer) throw new Error("customer not found");
-    
-        return {customer};
-      }
+    return { customer };
+  }
 
-
-      async updateCustomerProfile(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> {
-
-        if (updatedData.phoneNumber && !/^\d{10}$/.test(updatedData.phoneNumber)) {
-          throw new Error("Invalid phone number format. Must be 10 digits.");
-        }
-    
-     
-        if (updatedData.address) {
-          const requiredFields = ["addressLine1", "city", "state", "postalCode", "country"];
-          for (const field of requiredFields) {
-            if (!(updatedData.address as any)[field]) {
-              throw new Error(`Missing address field: ${field}`);
-            }
-          }
-        }
-    
-        const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
-        if (!updatedcustomer) {
-          throw new Error("Ccustomer not found or update failed.");
-        }
-    
-        return updatedcustomer;
-      }
-
-
-
-      async updateCustomerProfileId(customerId: string,updatedData: Partial<ICustomer>): Promise<ICustomer> {
-
-        console.log("id",updatedData.idProof)
-        updatedData.processStatus=1;
-        const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
-        console.log("updatedcustomer",updatedcustomer)
-        if (!updatedcustomer) {
-          console.log("error2")
-          throw new Error("Car customer not found or update failed.");
-        }
-        return updatedcustomer;
-      }
-
-
-      async checkBlockStatus(userId: string): Promise<number> {
-       return await this._customerRepository.getBlockStatusByUserId(userId);
+  async updateCustomerProfile(
+    customerId: string,
+    updatedData: Partial<ICustomer>
+  ): Promise<ICustomer> {
+    if (updatedData.phoneNumber && !/^\d{10}$/.test(updatedData.phoneNumber)) {
+      throw new Error('Invalid phone number format. Must be 10 digits.');
     }
 
+    if (updatedData.address) {
+      const requiredFields = ['addressLine1', 'city', 'state', 'postalCode', 'country'];
+      for (const field of requiredFields) {
+        if (!(updatedData.address as any)[field]) {
+          throw new Error(`Missing address field: ${field}`);
+        }
+      }
+    }
 
+    const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
+    if (!updatedcustomer) {
+      throw new Error('Ccustomer not found or update failed.');
+    }
+
+    return updatedcustomer;
+  }
+
+  async updateCustomerProfileId(
+    customerId: string,
+    updatedData: Partial<ICustomer>
+  ): Promise<ICustomer> {
+    console.log('id', updatedData.idProof);
+    updatedData.processStatus = 1;
+    const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
+    console.log('updatedcustomer', updatedcustomer);
+    if (!updatedcustomer) {
+      console.log('error2');
+      throw new Error('Car customer not found or update failed.');
+    }
+    return updatedcustomer;
+  }
+
+  async checkBlockStatus(userId: string): Promise<number> {
+    return await this._customerRepository.getBlockStatusByUserId(userId);
+  }
 }
-export default CustomerService
+export default CustomerService;

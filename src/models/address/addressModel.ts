@@ -1,10 +1,9 @@
-import mongoose, { Document, ObjectId, Schema } from "mongoose";
-
+import mongoose, { Document, ObjectId, Schema } from 'mongoose';
 
 interface IAddress extends Document {
   _id: ObjectId;
-  userId: ObjectId; 
-  userType: "carOwner" | "customer";
+  userId: ObjectId;
+  userType: 'carOwner' | 'customer';
   fullName: string;
   phoneNumber: string;
   addressLine1: string;
@@ -18,67 +17,65 @@ interface IAddress extends Document {
   createdAt?: Date;
 }
 
-
 const AddressSchema = new Schema<IAddress>(
   {
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
-      refPath: "userType" 
+      refPath: 'userType',
     },
     userType: {
       type: String,
-      enum: ["carOwner", "customer"],
-      required: true
+      enum: ['carOwner', 'customer'],
+      required: true,
     },
     fullName: {
       type: String,
-      required: true
+      required: true,
     },
     phoneNumber: {
       type: String,
-      required: true
+      required: true,
     },
     addressLine1: {
       type: String,
-      required: true
+      required: true,
     },
     addressLine2: {
-      type: String
+      type: String,
     },
     city: {
       type: String,
-      required: true
+      required: true,
     },
     state: {
       type: String,
-      required: true
+      required: true,
     },
     postalCode: {
       type: String,
-      required: true
+      required: true,
     },
     country: {
       type: String,
-      required: true
+      required: true,
     },
     isDefault: {
       type: Boolean,
-      default: false
+      default: false,
     },
     updatedAt: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     createdAt: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
 
-
-const Address = mongoose.model<IAddress>("address", AddressSchema);
+const Address = mongoose.model<IAddress>('address', AddressSchema);
 
 export { IAddress, Address };

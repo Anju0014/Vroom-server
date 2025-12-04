@@ -1,36 +1,34 @@
-
-
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface ICar extends Document {
   carName: string;
   brand: string;
   year?: string;
-  fuelType?: "Petrol" | "Diesel" | "Electric" | "Hybrid";
+  fuelType?: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
   rcBookNo?: string;
   expectedWage: string;
-  rcBookProof:string;
-  insuranceProof:string;
+  rcBookProof: string;
+  insuranceProof: string;
   location: {
     address: string;
     landmark: string;
     coordinates: {
-      type: "Point";
+      type: 'Point';
       coordinates: [number, number]; // [lng, lat]
     };
   };
   make?: string;
   carModel?: string;
-  carType?:string;
+  carType?: string;
   verifyStatus?: number;
-  blockStatus?:number;
+  blockStatus?: number;
   images: string[];
   videos?: string[];
   owner: mongoose.Types.ObjectId;
   available?: boolean;
   isDeleted?: boolean;
   unavailableDates: Date[];
-  rejectionReason:string;
+  rejectionReason: string;
 }
 
 const CarSchema = new Schema<ICar>(
@@ -40,52 +38,51 @@ const CarSchema = new Schema<ICar>(
     year: { type: String },
     fuelType: {
       type: String,
-      enum: ["Petrol", "Diesel", "Electric", "Hybrid"]
+      enum: ['Petrol', 'Diesel', 'Electric', 'Hybrid'],
     },
-    carType:{
+    carType: {
       type: String,
-      enum:["Sedan","SUV","Hatchback","VAN/MPV"]
+      enum: ['Sedan', 'SUV', 'Hatchback', 'VAN/MPV'],
     },
-    blockStatus:{
-        type: Number,
-        enum: [0,1], 
-        default: 0,
+    blockStatus: {
+      type: Number,
+      enum: [0, 1],
+      default: 0,
     },
     rcBookNo: { type: String, unique: true },
     expectedWage: { type: String, required: true },
-    rcBookProof:{type:String},
-    insuranceProof:{type:String},
+    rcBookProof: { type: String },
+    insuranceProof: { type: String },
     location: {
       address: { type: String, required: true },
       landmark: { type: String, required: true },
       coordinates: {
         type: {
           type: String,
-          enum: ["Point"],
-          default: "Point"
+          enum: ['Point'],
+          default: 'Point',
         },
         coordinates: {
           type: [Number], // [lng, lat]
-          required: true
-        }
-      }
+          required: true,
+        },
+      },
     },
     make: { type: String },
     carModel: { type: String },
     verifyStatus: { type: Number, default: 0 },
     images: { type: [String], required: true },
     videos: { type: [String], default: [] },
-    owner: { type: Schema.Types.ObjectId, ref: "CarOwner", required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'CarOwner', required: true },
     available: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
     unavailableDates: { type: [Date], default: [] },
-    rejectionReason :{type:String}
+    rejectionReason: { type: String },
   },
   { timestamps: true }
 );
 
+CarSchema.index({ 'location.coordinates': '2dsphere' });
 
-CarSchema.index({ "location.coordinates": "2dsphere" });
-
-const Car = mongoose.model<ICar>("Car", CarSchema);
+const Car = mongoose.model<ICar>('Car', CarSchema);
 export { Car, ICar };

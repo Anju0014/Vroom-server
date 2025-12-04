@@ -1,4 +1,3 @@
-
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 interface ILocation {
@@ -6,26 +5,26 @@ interface ILocation {
   lng: number;
 }
 interface IBooking extends Document {
-  bookingId:string,
+  bookingId: string;
   carId: Types.ObjectId;
   userId: Types.ObjectId;
   carOwnerId: Types.ObjectId;
   startDate: Date;
   endDate: Date;
   totalPrice: number;
-  status: 'confirmed' | 'pending' | 'cancelled' | 'failed'| 'agreementAccepted';
+  status: 'confirmed' | 'pending' | 'cancelled' | 'failed' | 'agreementAccepted';
   paymentIntentId?: string;
   paymentMethod?: 'stripe' | 'wallet';
- cancellationFee :number
-  refundedAmount :number,
- cancelledAt?:Date,
+  cancellationFee: number;
+  refundedAmount: number;
+  cancelledAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  trackingToken: String,      
-  trackingUrl: String, 
+  trackingToken: string;
+  trackingUrl: string;
   currentLocation?: ILocation;
-  receiptUrl?:String,
-  lockedUntil?:Date
+  receiptUrl?: string;
+  lockedUntil?: Date;
 }
 
 const BookingSchema = new Schema<IBooking>(
@@ -39,7 +38,7 @@ const BookingSchema = new Schema<IBooking>(
     totalPrice: { type: Number, required: true },
     status: {
       type: String,
-      enum: ['confirmed', 'pending', 'cancelled', 'failed','agreementAccepted'],
+      enum: ['confirmed', 'pending', 'cancelled', 'failed', 'agreementAccepted'],
       default: 'pending',
     },
     paymentIntentId: { type: String, default: null },
@@ -47,17 +46,17 @@ const BookingSchema = new Schema<IBooking>(
       type: String,
       enum: ['stripe', 'wallet'],
     },
-    cancellationFee:{type: Number},
-    refundedAmount:{type: Number},
-    cancelledAt:{type: Date},
-    trackingToken: {type:String},      
-    trackingUrl: {type:String}, 
-    receiptUrl:{type:String},
+    cancellationFee: { type: Number },
+    refundedAmount: { type: Number },
+    cancelledAt: { type: Date },
+    trackingToken: { type: String },
+    trackingUrl: { type: String },
+    receiptUrl: { type: String },
     currentLocation: {
       lat: { type: Number },
       lng: { type: Number },
     },
-    lockedUntil:{type:Date},
+    lockedUntil: { type: Date },
   },
   {
     timestamps: true,

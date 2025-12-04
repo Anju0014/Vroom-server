@@ -1,243 +1,238 @@
-import {Admin,IAdmin} from "../../../models/admin/adminModel"
-import ICustomerCarAndBookingRepository from "../../interfaces/customer/ICustomerCarAndBookingRepository";
-import { BaseRepository } from "../../base/BaseRepository";
+import ICustomerCarAndBookingRepository from '../../interfaces/customer/ICustomerCarAndBookingRepository';
+import { BaseRepository } from '../../base/BaseRepository';
 import { HydratedDocument } from 'mongoose';
-import {Customer,ICustomer} from "../../../models/customer/customerModel"
-import {CarOwner,ICarOwner} from "../../../models/carowner/carOwnerModel"
-import { Car, ICar } from "../../../models/car/carModel";
-import { Booking,IBooking } from "../../../models/booking/bookingModel";
-import { BookingData } from "../../../types/bookingData";
+import { Car, ICar } from '../../../models/car/carModel';
+import { Booking, IBooking } from '../../../models/booking/bookingModel';
+import { BookingData } from '../../../types/bookingData';
 import { Counter } from '../../../models/counter/counterModel'; // wherever your model is
 
+class CustomerCarAndBookingRepository
+  extends BaseRepository<ICar>
+  implements ICustomerCarAndBookingRepository
+{
+  constructor() {
+    super(Car);
+  }
 
-
-class CustomerCarAndBookingRepository extends BaseRepository<ICar> implements ICustomerCarAndBookingRepository {
-    constructor(){
-        super(Car);
-     }
-
-      async findNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
-        return Car.find({
-          verifyStatus: 1,
-          isDeleted: false,
-          available: true,
-          'location.coordinates': {
-            $nearSphere: {
-              $geometry: {
-                type: 'Point',
-                coordinates: [lng, lat],
-              },
-              $maxDistance: maxDistance * 1000, // km to meters
-            },
+  async findNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
+    return Car.find({
+      verifyStatus: 1,
+      isDeleted: false,
+      available: true,
+      'location.coordinates': {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lng, lat],
           },
-        });
-      }
-    
-      async findFeaturedCars(): Promise<ICar[]> {
-        return Car.find({
-          verifyStatus: 1,
-          isDeleted: false,
-          available: true,
-        });
-      }
-
-async getAllCars(page: number, limit: number, filters: {
-  search?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  carType?: string;
-  location?: string;
-  startDate?: string;
-  endDate?: string;
-}): Promise<ICar[]> {
-  const query: any = { isDeleted: false, verifyStatus: 1 };
-
-  if (filters.search) {
-    query.carName = { $regex: filters.search, $options: 'i' };
-  }
-
-  if (filters.minPrice) {
-    query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
-  }
-
-  if (filters.maxPrice !== Infinity) {
-    query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
-  }
-
-  if (filters.carType) {
-    query.carType = filters.carType;
-  }
-
-  if (filters.location) {
-    query.$or = [
-      { "location.address": { $regex: filters.location, $options: "i" } },
-      { "location.landmark": { $regex: filters.location, $options: "i" } },
-    ];
-  }
-
-  // 🆕 Handle availability between startDate and endDate
-  if (filters.startDate && filters.endDate) {
-    const start = new Date(filters.startDate);
-    const end = new Date(filters.endDate);
-
-    // Find bookings that overlap with the requested date range
-    const overlappingBookings = await Booking.find({
-      status: { $in: ['confirmed', 'pending'] },
-      startDate: { $lt: end },
-      endDate: { $gt: start },
-    }).select("carId");
-
-    const bookedCarIds = overlappingBookings.map(b => b.carId);
-
-    if (bookedCarIds.length > 0) {
-      query._id = { $nin: bookedCarIds };
-    }
-  }
-
-  const cars = await Car.find(query)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .lean();
-
-  return cars;
-}
-
-
-async getCarsCount(filters: {
-  search?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  carType?: string;
-  location?: string;
-  startDate?: string;
-  endDate?: string;
-}): Promise<number> {
-  const query: any = { isDeleted: false, verifyStatus: 1 };
-
-  if (filters.search) query.carName = { $regex: filters.search, $options: 'i' };
-  if (filters.minPrice) query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
-  if (filters.maxPrice !== Infinity) query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
-  if (filters.carType) query.carType = filters.carType;
-  if (filters.location) {
-    query.$or = [
-      { "location.address": { $regex: filters.location, $options: "i" } },
-      { "location.landmark": { $regex: filters.location, $options: "i" } },
-    ];
-  }
-
-  if (filters.startDate && filters.endDate) {
-    const start = new Date(filters.startDate);
-    const end = new Date(filters.endDate);
-
-    const overlappingBookings = await Booking.find({
-      status: { $in: ['confirmed', 'pending'] },
-      startDate: { $lt: end },
-      endDate: { $gt: start },
-    }).select("carId");
-
-    const bookedCarIds = overlappingBookings.map(b => b.carId);
-    if (bookedCarIds.length > 0) query._id = { $nin: bookedCarIds };
-  }
-
-  return Car.countDocuments(query).exec();
-}
-
-
-      async findCarById(carId: string): Promise<ICar | null> {
-        return Car.findById(carId);
-      }
-    
-      async findBookedDates(carId: string): Promise<{ start: Date; end: Date }[]> {
-        const bookings = await Booking.find({ carId, status: 'confirmed' }, 'startDate endDate');
-        return bookings.map(b => ({ start: b.startDate, end: b.endDate }));
-      }
-
-
-   async createBooking(data: BookingData): Promise<IBooking> {
-  return Booking.create(data);
-}
-
-    
-      async findBookingById(bookingId: string): Promise<IBooking | null> {
-        return Booking.findById(bookingId);
-      }
-    
-      // async saveBooking(bookingData: IBooking): Promise<IBooking> {
-      //   return bookingData.save();
-      // }
-      async saveBooking(bookingData: HydratedDocument<IBooking>): Promise<IBooking> {
-        console.log("reached for save")
-        return bookingData.save();
-      }
-    
-      async deleteBooking(bookingId: string): Promise<void> {
-        await Booking.deleteOne({ _id: bookingId });
-      }
-    
-      // async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
-      //   return Booking.findOne({
-      //     carId,
-      //     status: { $in: ['confirmed'] },
-      //     $or: [
-      //       { startDate: { $lte: endDate, $gte: startDate } },
-      //       { endDate: { $lte: endDate, $gte: startDate } },
-      //     ],
-      //   });
-      // }
-      async findConflictingBooking(
-  carId: string,
-  startDate: Date,
-  endDate: Date
-): Promise<IBooking | null> {
-  const now = new Date();
-
-  return Booking.findOne({
-    carId,
-    $and: [
-      {
-        $or: [
-          { status: 'confirmed' },
-          { status: 'pending', lockedUntil: { $gt: now } }
-        ]
+          $maxDistance: maxDistance * 1000, // km to meters
+        },
       },
-      {
-        $or: [
-          { startDate: { $lte: endDate, $gte: startDate } },
-          { endDate: { $lte: endDate, $gte: startDate } },
-          { startDate: { $lte: startDate }, endDate: { $gte: endDate } } // fully overlapping
-        ]
-      }
-    ]
-  });
-}
+    });
+  }
 
-      async checkOldBooking(bookingData:Partial<BookingData>): Promise<IBooking|null>{
-            return Booking.findOne({
-              carId:bookingData.carId,
-             userId:bookingData.userId,
-            startDate:bookingData.startDate,
-            endDate:bookingData.endDate,
-            status: 'pending',
-            })
-      }
-    async generateBookingId():Promise<string> {
-        const counter = await Counter.findOneAndUpdate(
-          { id: 'bookingId' },
-          { $inc: { seq: 1 } },
-          { new: true, upsert: true }
-        );
-      
-        const paddedSeq = counter.seq.toString().padStart(4, '0'); // 0001, 0023, etc
-        return `VROOM-RIDE-${paddedSeq}`;
-      }
-    
-    async updateBookingLocation(bookingId: string, location: { lat: number; lng: number }) {
-        return Booking.findByIdAndUpdate(
-          bookingId,
-          { $set: { currentLocation: location } },
-          { new: true }
-     );
-     }
+  async findFeaturedCars(): Promise<ICar[]> {
+    return Car.find({
+      verifyStatus: 1,
+      isDeleted: false,
+      available: true,
+    });
+  }
 
+  async getAllCars(
+    page: number,
+    limit: number,
+    filters: {
+      search?: string;
+      minPrice?: number;
+      maxPrice?: number;
+      carType?: string;
+      location?: string;
+      startDate?: string;
+      endDate?: string;
+    }
+  ): Promise<ICar[]> {
+    const query: any = { isDeleted: false, verifyStatus: 1 };
+
+    if (filters.search) {
+      query.carName = { $regex: filters.search, $options: 'i' };
+    }
+
+    if (filters.minPrice) {
+      query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+    }
+
+    if (filters.maxPrice !== Infinity) {
+      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+    }
+
+    if (filters.carType) {
+      query.carType = filters.carType;
+    }
+
+    if (filters.location) {
+      query.$or = [
+        { 'location.address': { $regex: filters.location, $options: 'i' } },
+        { 'location.landmark': { $regex: filters.location, $options: 'i' } },
+      ];
+    }
+
+    // 🆕 Handle availability between startDate and endDate
+    if (filters.startDate && filters.endDate) {
+      const start = new Date(filters.startDate);
+      const end = new Date(filters.endDate);
+
+      // Find bookings that overlap with the requested date range
+      const overlappingBookings = await Booking.find({
+        status: { $in: ['confirmed', 'pending'] },
+        startDate: { $lt: end },
+        endDate: { $gt: start },
+      }).select('carId');
+
+      const bookedCarIds = overlappingBookings.map((b) => b.carId);
+
+      if (bookedCarIds.length > 0) {
+        query._id = { $nin: bookedCarIds };
+      }
+    }
+
+    const cars = await Car.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    return cars;
+  }
+
+  async getCarsCount(filters: {
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    carType?: string;
+    location?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Promise<number> {
+    const query: any = { isDeleted: false, verifyStatus: 1 };
+
+    if (filters.search) query.carName = { $regex: filters.search, $options: 'i' };
+    if (filters.minPrice) query.expectedWage = { ...query.expectedWage, $gte: filters.minPrice };
+    if (filters.maxPrice !== Infinity)
+      query.expectedWage = { ...query.expectedWage, $lte: filters.maxPrice };
+    if (filters.carType) query.carType = filters.carType;
+    if (filters.location) {
+      query.$or = [
+        { 'location.address': { $regex: filters.location, $options: 'i' } },
+        { 'location.landmark': { $regex: filters.location, $options: 'i' } },
+      ];
+    }
+
+    if (filters.startDate && filters.endDate) {
+      const start = new Date(filters.startDate);
+      const end = new Date(filters.endDate);
+
+      const overlappingBookings = await Booking.find({
+        status: { $in: ['confirmed', 'pending'] },
+        startDate: { $lt: end },
+        endDate: { $gt: start },
+      }).select('carId');
+
+      const bookedCarIds = overlappingBookings.map((b) => b.carId);
+      if (bookedCarIds.length > 0) query._id = { $nin: bookedCarIds };
+    }
+
+    return Car.countDocuments(query).exec();
+  }
+
+  async findCarById(carId: string): Promise<ICar | null> {
+    return Car.findById(carId);
+  }
+
+  async findBookedDates(carId: string): Promise<{ start: Date; end: Date }[]> {
+    const bookings = await Booking.find({ carId, status: 'confirmed' }, 'startDate endDate');
+    return bookings.map((b) => ({ start: b.startDate, end: b.endDate }));
+  }
+
+  async createBooking(data: BookingData): Promise<IBooking> {
+    return Booking.create(data);
+  }
+
+  async findBookingById(bookingId: string): Promise<IBooking | null> {
+    return Booking.findById(bookingId);
+  }
+
+  // async saveBooking(bookingData: IBooking): Promise<IBooking> {
+  //   return bookingData.save();
+  // }
+  async saveBooking(bookingData: HydratedDocument<IBooking>): Promise<IBooking> {
+    console.log('reached for save');
+    return bookingData.save();
+  }
+
+  async deleteBooking(bookingId: string): Promise<void> {
+    await Booking.deleteOne({ _id: bookingId });
+  }
+
+  // async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
+  //   return Booking.findOne({
+  //     carId,
+  //     status: { $in: ['confirmed'] },
+  //     $or: [
+  //       { startDate: { $lte: endDate, $gte: startDate } },
+  //       { endDate: { $lte: endDate, $gte: startDate } },
+  //     ],
+  //   });
+  // }
+  async findConflictingBooking(
+    carId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<IBooking | null> {
+    const now = new Date();
+
+    return Booking.findOne({
+      carId,
+      $and: [
+        {
+          $or: [{ status: 'confirmed' }, { status: 'pending', lockedUntil: { $gt: now } }],
+        },
+        {
+          $or: [
+            { startDate: { $lte: endDate, $gte: startDate } },
+            { endDate: { $lte: endDate, $gte: startDate } },
+            { startDate: { $lte: startDate }, endDate: { $gte: endDate } }, // fully overlapping
+          ],
+        },
+      ],
+    });
+  }
+
+  async checkOldBooking(bookingData: Partial<BookingData>): Promise<IBooking | null> {
+    return Booking.findOne({
+      carId: bookingData.carId,
+      userId: bookingData.userId,
+      startDate: bookingData.startDate,
+      endDate: bookingData.endDate,
+      status: 'pending',
+    });
+  }
+  async generateBookingId(): Promise<string> {
+    const counter = await Counter.findOneAndUpdate(
+      { id: 'bookingId' },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const paddedSeq = counter.seq.toString().padStart(4, '0'); // 0001, 0023, etc
+    return `VROOM-RIDE-${paddedSeq}`;
+  }
+
+  async updateBookingLocation(bookingId: string, location: { lat: number; lng: number }) {
+    return Booking.findByIdAndUpdate(
+      bookingId,
+      { $set: { currentLocation: location } },
+      { new: true }
+    );
+  }
 }
-export default CustomerCarAndBookingRepository
+export default CustomerCarAndBookingRepository;

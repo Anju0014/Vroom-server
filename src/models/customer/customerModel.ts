@@ -1,127 +1,124 @@
-import mongoose,{Document, ObjectId, Schema} from "mongoose";
-
+import mongoose, { Document, ObjectId, Schema } from 'mongoose';
 
 interface IAddress {
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  }
-
-interface ICustomer extends Document{
-    _id:ObjectId;
-    fullName:string;
-    email:string;
-    phoneNumber:string;
-    password:string;
-    isVerified:boolean;
-    status:number;
-    processStatus:number;
-    verifyStatus:number;
-    blockStatus:number;
-    previousStatus:number|null;
-    otp?:string|null;
-    otpExpires?:Date|null;
-    profileImage:string;
-    googleId:string;
-    idProof:string;
-    idVerified:boolean;
-    provider:string;
-    refreshToken:string;
-    role:"customer";
-    updatedAt?:Date;
-    address?: IAddress;
-    createdAt?: Date;
-    
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
 }
 
-const CustomerSchema = new Schema<ICustomer>({
+interface ICustomer extends Document {
+  _id: ObjectId;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  isVerified: boolean;
+  status: number;
+  processStatus: number;
+  verifyStatus: number;
+  blockStatus: number;
+  previousStatus: number | null;
+  otp?: string | null;
+  otpExpires?: Date | null;
+  profileImage: string;
+  googleId: string;
+  idProof: string;
+  idVerified: boolean;
+  provider: string;
+  refreshToken: string;
+  role: 'customer';
+  updatedAt?: Date;
+  address?: IAddress;
+  createdAt?: Date;
+}
+
+const CustomerSchema = new Schema<ICustomer>(
+  {
     fullName: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: true,
-        lowercase: true
+      type: String,
+      required: true,
+      lowercase: true,
     },
     phoneNumber: {
-        type: String,
+      type: String,
     },
     password: {
-        type: String,
-      
+      type: String,
     },
     isVerified: {
-        type: Boolean, 
-        default: false
+      type: Boolean,
+      default: false,
     },
-    profileImage:{
-        type:String
+    profileImage: {
+      type: String,
     },
-    role:{
-        type:String,
-        enum:["customer"],
-        default:"customer"
+    role: {
+      type: String,
+      enum: ['customer'],
+      default: 'customer',
     },
-    processStatus:{
-        type: Number,
-        enum: [0, 1, 2, 3], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
-        default: 0,
+    processStatus: {
+      type: Number,
+      enum: [0, 1, 2, 3], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+      default: 0,
     },
-    blockStatus:{
-        type: Number,
-        enum: [0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
-        default: 0,
+    blockStatus: {
+      type: Number,
+      enum: [0, 1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+      default: 0,
     },
-    verifyStatus:{
-        type: Number,
-        enum: [-1,0,1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
-        default: 0,
+    verifyStatus: {
+      type: Number,
+      enum: [-1, 0, 1], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
+      default: 0,
     },
-    
+
     // status: {
     //     type: Number,
-    //     enum: [-2, -1, 0, 1, 2, 3 ], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified 
+    //     enum: [-2, -1, 0, 1, 2, 3 ], // -2: Blocked, -1: Doc Not Verified, 0: Not Verified, 1: Doc Verified, 2: Verified
     //     default: 0,
     //   },
-  
-    
+
     previousStatus: { type: Number, enum: [-1, 0, 1, 2], default: 0 },
 
     otp: { type: String, required: false },
     otpExpires: { type: Date, required: false, expires: 300 },
     updatedAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
     createdAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
-    refreshToken: { type: String, default:null },
+    refreshToken: { type: String, default: null },
     address: {
-        addressLine1: { type: String },
-        addressLine2: { type: String },
-        city: { type: String },
-        state: { type: String },
-        postalCode: { type: String },
-        country: { type: String }
-      },
-      idProof: {
-        type: String,
-        required: false 
-      },
-      idVerified:{
-        type:Boolean,
-        default:false
-      }
+      addressLine1: { type: String },
+      addressLine2: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
+    },
+    idProof: {
+      type: String,
+      required: false,
+    },
+    idVerified: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true })
-
-
-const Customer = mongoose.model<ICustomer>("customer", CustomerSchema)
+const Customer = mongoose.model<ICustomer>('customer', CustomerSchema);
 
 export { ICustomer, Customer };

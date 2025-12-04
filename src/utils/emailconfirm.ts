@@ -1,21 +1,20 @@
 import nodemailer from 'nodemailer';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 import { passwordResetTemplate } from '../templates/emailTemplates';
 
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
+// const resetLink = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/forgotpassword/newPassword?token=${token}&role=${role}`;
 
-  // const resetLink = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/forgotpassword/newPassword?token=${token}&role=${role}`;
-
-  // const resetLink = `${process.env.FRONTEND_URL}/forgotpassword/newPassword?token=${token}&role=${role}`;
+// const resetLink = `${process.env.FRONTEND_URL}/forgotpassword/newPassword?token=${token}&role=${role}`;
 
 // export const sendResetEmail = async (email: string, token: string,role: "customer" | "carOwner") => {
 //   try{
@@ -28,8 +27,6 @@ const transporter = nodemailer.createTransport({
 
 // const resetLink = `${frontendUrl}/forgotpassword/newPassword?token=${token}&role=${role}`;
 
-
-  
 //   const mailOptions = {
 //     from: process.env.EMAIL_USER,
 //     to: email,
@@ -43,10 +40,9 @@ const transporter = nodemailer.createTransport({
 //  }
 // }
 
-
 // export const sendOTP = async (email: string, otp: string) => {
 //     try{
-      
+
 //   const mailOptions = {
 //     from: process.env.EMAIL_USER,
 //     to: email,
@@ -64,15 +60,14 @@ export const sendResetEmail = async (
   email: string,
   name: string,
   token: string,
-  role: "customer" | "carOwner"
+  role: 'customer' | 'carOwner'
 ) => {
   try {
     const frontendUrl = process.env.FRONTEND_URL;
     if (!frontendUrl) {
-      throw new Error("FRONTEND_URL is not defined!");
+      throw new Error('FRONTEND_URL is not defined!');
     }
 
-    
     const resetLink = `${frontendUrl}/forgotpassword/newPassword?token=${token}&role=${role}`;
 
     const emailContent = passwordResetTemplate(name, resetLink);
@@ -82,13 +77,21 @@ export const sendResetEmail = async (
       ...emailContent,
     });
   } catch (error) {
-    console.error("Error sending reset email:", error);
+    console.error('Error sending reset email:', error);
   }
 };
 
-export const sendEmail = async ({ to, subject, text }: { to: string; subject: string; text: string }) => {
+export const sendEmail = async ({
+  to,
+  subject,
+  text,
+}: {
+  to: string;
+  subject: string;
+  text: string;
+}) => {
   try {
-    console.log("sending email")
+    console.log('sending email');
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
@@ -97,10 +100,9 @@ export const sendEmail = async ({ to, subject, text }: { to: string; subject: st
     });
     console.log(`Email sent to ${to}`);
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error('Error sending email:', error);
   }
 };
-
 
 // export const  sendTrackingEmail=async(to:string,trackingUrl:string)=>{
 //   try{
@@ -116,5 +118,3 @@ export const sendEmail = async ({ to, subject, text }: { to: string; subject: st
 //     console.log("error sending trackingid:",error)
 //   }
 // }
-
-

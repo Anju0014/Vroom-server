@@ -1,6 +1,6 @@
-import {Request,Response} from "express"
+import { Request, Response } from 'express';
 
-interface IChatController{
-    getChatHistory (req: Request, res: Response): Promise<void>
+interface IChatController {
+  getChatHistory(req: Request, res: Response): Promise<void>;
 }
-export default IChatController
+export default IChatController;

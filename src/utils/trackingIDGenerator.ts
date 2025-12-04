@@ -1,7 +1,7 @@
-import crypto from "crypto";
+import crypto from 'crypto';
 
 function generateTrackingToken() {
-  return crypto.randomBytes(32).toString("hex"); 
+  return crypto.randomBytes(32).toString('hex');
 }
 
-export default generateTrackingToken
+export default generateTrackingToken;

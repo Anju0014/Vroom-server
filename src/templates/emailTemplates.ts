@@ -1,7 +1,5 @@
-
-export const verificationRejectedTemplate = (name: string, reason: string|undefined) => ({
-
-  subject: "❌ Vroom Verification Rejected",
+export const verificationRejectedTemplate = (name: string, reason: string | undefined) => ({
+  subject: '❌ Vroom Verification Rejected',
   text: `Dear ${name},
 
 Thank you for submitting your verification details. Unfortunately, your verification request has been rejected for the following reason:
@@ -26,13 +24,11 @@ The Vroom Support Team 🚗`,
       <p>Please review the issue and reapply. If you need help, contact our support team.</p>
       <p style="margin-top:30px;">Best regards,<br/><strong>The Vroom Team 🚗</strong></p>
     </div>
-  `
+  `,
 });
 
-
 export const verificationApprovedTemplate = (name: string) => ({
-
-  subject: "✅ Vroom Verification Approved",
+  subject: '✅ Vroom Verification Approved',
   text: `Dear ${name},
 
 Good news! 🎉 Your Vroom verification has been successfully approved.  
@@ -53,14 +49,11 @@ The Vroom Support Team 🚗`,
       <p>We’re excited to have you onboard and look forward to seeing your cars listed on Vroom!</p>
       <p style="margin-top:30px;">Best regards,<br/><strong>The Vroom Team 🚗</strong></p>
     </div>
-  `
+  `,
 });
 
-
-
-
 export const otpTemplate = (otp: string) => ({
-  subject: "🔑 Your Vroom Verification Code (Valid for 10 Minutes)",
+  subject: '🔑 Your Vroom Verification Code (Valid for 10 Minutes)',
   text: `Hello,
 
 We received a request to verify your identity on Vroom. 
@@ -85,11 +78,11 @@ The Vroom Team`,
       <p>If you did not request this verification, ignore this email.</p>
       <p>Thanks,<br/>The Vroom Team 🚗</p>
     </div>
-  `
+  `,
 });
 
 export const trackingEmailTemplate = (trackingUrl: string) => ({
-  subject: "🚗 Your Vroom Ride Starts Tomorrow – Share Your Live Location",
+  subject: '🚗 Your Vroom Ride Starts Tomorrow – Share Your Live Location',
   text: `Hello,
 
 Your scheduled ride with Vroom is starting tomorrow! 🎉  
@@ -120,12 +113,15 @@ The Vroom Team`,
       <p>If you have any questions, contact our support team.</p>
       <p>Safe travels,<br/>The Vroom Team 🚗</p>
     </div>
-  `
+  `,
 });
 
-
-export const carVerificationRejectedTemplate = (userName: string, carName: string, reason: string|undefined) => ({
-  subject: "❌ Vroom Car Verification Rejected",
+export const carVerificationRejectedTemplate = (
+  userName: string,
+  carName: string,
+  reason: string | undefined
+) => ({
+  subject: '❌ Vroom Car Verification Rejected',
   text: `Dear ${userName},
 
 Your car "${carName}" verification has been rejected due to the following reason:
@@ -147,13 +143,11 @@ Vroom Support Team 🚗`,
     <p>Please review the issue and reapply for verification.</p>
     <p style="margin-top:30px;">Best regards,<br/><strong>Vroom Support Team 🚗</strong></p>
   </div>
-  `
+  `,
 });
 
-
-
 export const passwordResetTemplate = (name: string, resetLink: string) => ({
-  subject: "🔒 Reset Your Vroom Password",
+  subject: '🔒 Reset Your Vroom Password',
   text: `Dear ${name},
 
 We received a request to reset the password for your Vroom account.
@@ -187,6 +181,5 @@ The Vroom Team 🚗`,
     <p style="margin-top: 30px;">Best regards,</p>
     <p><strong>The Vroom Team 🚗</strong></p>
   </div>
-  `
+  `,
 });
-

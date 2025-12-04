@@ -1,6 +1,6 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import dotenv from "dotenv";
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ const s3 = new S3Client({
 });
 
 export const generatePresignedUrl = async (fileName: string, fileType: string) => {
-    console.log("ffjjifjij")
+  console.log('ffjjifjij');
   const key = `car-images/${Date.now()}-${fileName}`;
 
   const command = new PutObjectCommand({

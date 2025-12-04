@@ -1,65 +1,3 @@
-
-
-
-
-// import { Request, Response } from 'express';
-// import { stripe } from '../../../config/stripeConfig';
-
-// export const createPaymentData = async (req: Request, res: Response): Promise<void> => {
-//     console.log('Received payment intent request:', req.body);
-//     const { carId, startDate, endDate, totalPrice, customerEmail } = req.body;
-
-//     // Validate input
-//     if (!carId || !startDate || !endDate || !totalPrice || !customerEmail) {
-//         console.log('Missing required fields:', { carId, startDate, endDate, totalPrice, customerEmail });
-//         res.status(400).json({ error: 'Missing required fields: carId, startDate, endDate, totalPrice, customerEmail' });
-//         return;
-//     }
-
-//     if (!Number.isInteger(totalPrice) || totalPrice <= 0) {
-//         console.log('Invalid totalPrice:', totalPrice);
-//         res.status(400).json({ error: 'Valid totalPrice in rupees is required' });
-//         return;
-//     }
-
-//     const { totalPrice, customerEmail, bookingId } = data;
-
-//   // Validate booking
-//   const booking = await Booking.findById(bookingId);
-//   if (!booking || booking.status !== 'pending') {
-//     throw new Error('Invalid or non-pending booking');
-//   }
-
-//     try {
-//         const paymentIntent = await stripe.paymentIntents.create({
-//             amount: Math.round(totalPrice * 100), // Convert rupees to paise
-//             currency: 'inr',
-//             payment_method_types: ['card'],
-//             receipt_email: customerEmail,
-//             metadata: { 
-//                 carId, 
-//                 startDate, 
-//                 endDate, 
-//                 integration_check: 'accept_a_payment' 
-//             },
-//         });
-
-//         console.log('Payment intent created:', paymentIntent.id);
-//         res.json({ clientSecret: paymentIntent.client_secret });
-//     } catch (err) {
-//         if (err instanceof Error && 'code' in err) {
-//             const statusCode = 'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : 400;
-//             console.error('Stripe error:', err.message, 'Code:', (err as any).code);
-//             res.status(statusCode).json({ error: err.message });
-//             return;
-//         }
-//         console.error('Unexpected error:', err);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// };
-
-
-
 import { Request, Response } from 'express';
 import { stripe } from '../../../config/stripeConfig';
 import { Booking } from '../../../models/booking/bookingModel'; // Adjust path to your Booking model
@@ -70,9 +8,17 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
 
   // Validate input
   if (!carId || !startDate || !endDate || !totalPrice || !customerEmail || !bookingId) {
-    console.log('Missing required fields:', { carId, startDate, endDate, totalPrice, customerEmail, bookingId });
+    console.log('Missing required fields:', {
+      carId,
+      startDate,
+      endDate,
+      totalPrice,
+      customerEmail,
+      bookingId,
+    });
     res.status(400).json({
-      error: 'Missing required fields: carId, startDate, endDate, totalPrice, customerEmail, bookingId',
+      error:
+        'Missing required fields: carId, startDate, endDate, totalPrice, customerEmail, bookingId',
     });
     return;
   }
@@ -111,7 +57,8 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     if (err instanceof Error && 'code' in err) {
-      const statusCode = 'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : 400;
+      const statusCode =
+        'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : 400;
       console.error('Stripe error:', err.message, 'Code:', (err as any).code);
       res.status(statusCode).json({ error: err.message });
       return;

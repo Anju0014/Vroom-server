@@ -1,5 +1,3 @@
-
-
 import { Router } from 'express';
 import { createPaymentData } from '../../controllers/implementation/stripe/stripeController';
 

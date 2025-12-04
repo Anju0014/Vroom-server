@@ -1,11 +1,8 @@
-import { IChatMessage } from "../../../models/chatMessage/chatMessageModel"
-import { OwnerChat } from "../../../types/chatData"
+import { IChatMessage } from '../../../models/chatMessage/chatMessageModel';
 
-interface IChatRepository{
-
-    saveMessage (data: Partial<IChatMessage>):Promise<IChatMessage>
-    getMessagesByRoom (roomId: string): Promise<IChatMessage[]>
-    getActiveChatsByOwner(ownerId: string):Promise<IChatMessage[]>
-
+interface IChatRepository {
+  saveMessage(data: Partial<IChatMessage>): Promise<IChatMessage>;
+  getMessagesByRoom(roomId: string): Promise<IChatMessage[]>;
+  getActiveChatsByOwner(ownerId: string): Promise<IChatMessage[]>;
 }
-export default IChatRepository
+export default IChatRepository;

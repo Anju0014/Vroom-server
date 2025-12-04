@@ -1,4 +1,4 @@
-import { ClientSession, FilterQuery, UpdateQuery } from "mongoose";
+import { ClientSession, FilterQuery, UpdateQuery } from 'mongoose';
 
 export interface IBaseRepository<T> {
   create(data: Partial<T>): Promise<T>;
@@ -7,7 +7,7 @@ export interface IBaseRepository<T> {
   findOne(condition: FilterQuery<T>): Promise<T | null>;
   findWithPagination(skip: number, limit: number): Promise<T[]>;
   update(id: string, data: UpdateQuery<T>): Promise<T | null>;
-  softDelete(id: string): Promise<T | null>;  // Optional, if you're using soft delete
+  softDelete(id: string): Promise<T | null>; // Optional, if you're using soft delete
   delete(id: string): Promise<T | null>;
-  withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void>;  // Optional, for transactions
+  withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void>; // Optional, for transactions
 }

@@ -1,9 +1,7 @@
-import { Server } from "socket.io";
-import http from "http";
-import bookingSocket from "./bookingSocket";
-import chatSocket from "./chatSocket";
-
-
+import { Server } from 'socket.io';
+import http from 'http';
+import bookingSocket from './bookingSocket';
+import chatSocket from './chatSocket';
 
 let io: Server;
 
@@ -15,16 +13,13 @@ export const initSockets = (server: http.Server) => {
     },
   });
 
-
   bookingSocket(io);
   chatSocket(io);
-
-
 
   return io;
 };
 
 export const getIO = () => {
-  if (!io) throw new Error("Socket.io not initialized");
+  if (!io) throw new Error('Socket.io not initialized');
   return io;
 };
