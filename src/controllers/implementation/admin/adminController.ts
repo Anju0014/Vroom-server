@@ -42,7 +42,7 @@ class AdminController implements IAdminController {
         res.status(400).json({ error: 'admin not found' });
         return;
       }
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         adminAccessToken,
@@ -52,9 +52,10 @@ class AdminController implements IAdminController {
           role: 'admin',
         },
       });
-    } catch (error) {
-      console.log('LoginError from Admin:', error);
-      res.status(400).json({ error: error instanceof Error ? error.message : 'Login failed' });
+    } catch (error:any) {
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      // console.log('LoginError from Admin:', error);
+      // res.status(StatusCode.NOT_FOUND).json({ error: error instanceof Error ? error.message : 'Login failed' });
     }
   }
 
@@ -85,10 +86,11 @@ class AdminController implements IAdminController {
         message: MESSAGES.SUCCESS.LOGOUT_SUCCESS,
       });
     } catch (error) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -105,10 +107,11 @@ class AdminController implements IAdminController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -125,10 +128,12 @@ class AdminController implements IAdminController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+  
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
     }
   }
 
@@ -152,12 +157,30 @@ class AdminController implements IAdminController {
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Customer status updated successfully',
         user: updatedUser,
       });
-    } catch (error) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+    } catch (error:any) {
+       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
     }
+  }
+
+
+
+   private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    console.error('Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
   }
 }
 export default AdminController;

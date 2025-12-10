@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { stripe } from '../../../config/stripeConfig';
 import { Booking } from '../../../models/booking/bookingModel'; // Adjust path to your Booking model
+import { StatusCode } from '../../../constants/statusCode';
 
 export const createPaymentData = async (req: Request, res: Response): Promise<void> => {
   console.log('Received payment intent request:', req.body);
@@ -25,7 +26,7 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
 
   if (!Number.isInteger(totalPrice) || totalPrice <= 0) {
     console.log('Invalid totalPrice:', totalPrice);
-    res.status(400).json({ error: 'Valid totalPrice in rupees is required' });
+    res.status(StatusCode.NOT_FOUND).json({ error: 'Valid totalPrice in rupees is required' });
     return;
   }
 
@@ -34,7 +35,7 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
     const booking = await Booking.findById(bookingId);
     if (!booking || booking.status !== 'agreementAccepted') {
       console.log('Invalid or non-pending booking:', bookingId);
-      res.status(400).json({ error: 'Invalid or non-pending booking' });
+      res.status(StatusCode.NOT_FOUND).json({ error: 'Invalid or non-pending booking' });
       return;
     }
 

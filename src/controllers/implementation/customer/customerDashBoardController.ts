@@ -35,11 +35,12 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       res.status(200).json({ bookings, total });
       return;
     } catch (error) {
-      console.error('Failed to fetch bookings:', error);
-      res
-        .status(StatusCode.INTERNAL_SERVER_ERROR)
-        .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
-      return;
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      // console.error('Failed to fetch bookings:', error);
+      // res
+      //   .status(StatusCode.INTERNAL_SERVER_ERROR)
+      //   .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
+      // return;
     }
   }
 
@@ -51,12 +52,28 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       await generateAndUploadReceipt(bookingId);
       console.log(booking);
       res.status(StatusCode.OK).json({ success: true });
-    } catch (err) {
-      res
-        .status(StatusCode.INTERNAL_SERVER_ERROR)
-        .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
+    } catch (error:any) {
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      // res
+      //   .status(StatusCode.INTERNAL_SERVER_ERROR)
+      //   .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
     }
   }
+
+    private handleError(
+      res: Response,
+      error: unknown,
+      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+    ): void {
+      console.error('Error:', error);
+  
+      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+  
+      res.status(statusCode).json({
+        success: false,
+        message: errorMessage,
+      });
+    }
 }
 
 export default CustomerDashBoardController;

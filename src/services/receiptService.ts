@@ -175,9 +175,10 @@ export async function generateAndUploadReceipt(bookingId: string): Promise<strin
     })
   );
 
-  const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  booking.receiptUrl = fileUrl;
+ 
+  booking.receiptKey = key;
   await booking.save();
 
-  return fileUrl;
+  // return fileUrl;
+  return key;
 }

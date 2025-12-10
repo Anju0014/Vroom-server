@@ -29,10 +29,11 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -54,10 +55,11 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -79,10 +81,11 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
   async getAllBookings(req: Request, res: Response): Promise<void> {
@@ -105,10 +108,11 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -118,7 +122,7 @@ class AdminOwnerController implements IAdminOwnerController {
       const { status, reason } = req.body;
 
       if (!userId || status === undefined) {
-        res.status(400).json({ message: 'Missing required fields' });
+        res.status(StatusCode.NOT_FOUND).json({ message: 'Missing required fields' });
         return;
       }
 
@@ -135,12 +139,13 @@ class AdminOwnerController implements IAdminOwnerController {
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Owner status updated successfully',
         user: updatedUser,
       });
-    } catch (error) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+    } catch (error:any) {
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
     }
+    this.handleError(res, Error, StatusCode.INTERNAL_SERVER_ERROR);
   }
 
   async updateOwnerBlockStatus(req: Request, res: Response): Promise<void> {
@@ -162,10 +167,11 @@ class AdminOwnerController implements IAdminOwnerController {
         user: updatedUser,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -189,11 +195,13 @@ class AdminOwnerController implements IAdminOwnerController {
         car: updatedCar,
       });
     } catch (error: any) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
+
   }
 
   async updateCarVerifyStatus(req: Request, res: Response): Promise<void> {
@@ -202,7 +210,7 @@ class AdminOwnerController implements IAdminOwnerController {
       const { status, reason } = req.body;
 
       if (!carId || status === undefined) {
-        res.status(400).json({ message: 'Missing required fields' });
+        res.status(StatusCode.NOT_FOUND).json({ message: 'Missing required fields' });
         return;
       }
 
@@ -217,11 +225,27 @@ class AdminOwnerController implements IAdminOwnerController {
         car: updatedCar,
       });
     } catch (error) {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: MESSAGES.ERROR.SERVER_ERROR,
-      });
+      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: MESSAGES.ERROR.SERVER_ERROR,
+      // });
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
+
+   private handleError(
+      res: Response,
+      error: unknown,
+      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+    ): void {
+      console.error('Error:', error);
+  
+      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+  
+      res.status(statusCode).json({
+        success: false,
+        message: errorMessage,
+      });
+    }
 }
 export default AdminOwnerController;

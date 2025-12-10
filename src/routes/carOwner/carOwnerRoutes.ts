@@ -113,4 +113,8 @@ carOwnerRouter.get('/activebooking/:carId', authMiddleware, (req, res) =>
   carOwnerCarsController.getActiveBooking(req, res)
 );
 
+ carOwnerRouter.get('/booking/:bookingId/receipt-url', authMiddleware, (req, res) =>
+  carOwnerBookingController.getReceiptUrl(req, res)
+);
+
 export default carOwnerRouter;

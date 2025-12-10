@@ -144,7 +144,9 @@ class AdminOwnerService implements IAdminOwnerService {
     if (!car) {
       throw new Error('Car not found');
     }
-
+    if(car.verifyStatus!==0){
+      throw new Error('Car has already Verified. Please try Later')
+    }
     const updatedCar = await this._adminOwnerRepository.updateCarStatus(carId, verifyDetails);
     if (!updatedCar) {
       throw new Error('Error updating car status');

@@ -223,8 +223,8 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
     }
     try {
       await this._customerCarService.confirmBooking(bookingId, paymentIntentId);
-      const receiptUrl = await generateAndUploadReceipt(bookingId);
-      res.status(StatusCode.OK).json({ success: true, bookingId, receiptUrl });
+      const receiptKey = await generateAndUploadReceipt(bookingId);
+      res.status(StatusCode.OK).json({ success: true, bookingId, receiptKey });
     } catch (err) {
       this.handleError(res, err, StatusCode.BAD_REQUEST);
     }
