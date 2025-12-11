@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import bookingSocket from './bookingSocket';
 import chatSocket from './chatSocket';
+import notificationSocket from './notificationSocket';
 
 let io: Server;
 
@@ -15,6 +16,7 @@ export const initSockets = (server: http.Server) => {
 
   bookingSocket(io);
   chatSocket(io);
+  notificationSocket(io)
 
   return io;
 };

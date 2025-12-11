@@ -12,6 +12,9 @@ import CustomerDashBoardService from '../../services/implementation/customer/cus
 import CustomerDashBoardRepository from '../../repositories/implementation/customer/customerDashBoardRepository';
 
 import authMiddleware from '../../middlewares/authMiddleWare';
+import NotificationService from '../../services/implementation/notification/notificationServices';
+import NotificationRepository from '../../repositories/implementation/notification/notificationRepository';
+
 const customerRouter = Router();
 
 const customerRepository = new CustomerRepository();
@@ -19,8 +22,13 @@ const customerService = new CustomerService(customerRepository);
 const customerController = new CustomerController(customerService);
 
 const customerCarAndBookingRepository = new CustomerCarAndBookingRepository();
+
+const notificationService = new NotificationService(new NotificationRepository());
+const notificationRepository=new NotificationRepository()
+
 const customerCarAndBookingService = new CustomerCarAndBookingService(
-  customerCarAndBookingRepository
+  customerCarAndBookingRepository,
+  notificationService
 );
 const customerCarAndBookingController = new CustomerCarAndBookingController(
   customerCarAndBookingService

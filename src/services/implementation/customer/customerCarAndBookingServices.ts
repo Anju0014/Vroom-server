@@ -1,6 +1,6 @@
 import ICustomerCarAndBookingRepository from '../../../repositories/interfaces/customer/ICustomerCarAndBookingRepository';
 import { ICustomerCarAndBookingService } from '../../interfaces/customer/ICustomerCarAndBookingServices';
-import { ICar } from '../../../models/car/carModel';
+import { Car, ICar } from '../../../models/car/carModel';
 import { BookingData, UpdateTrackingProps } from '../../../types/bookingData';
 import mongoose from 'mongoose';
 import generateTrackingToken from '../../../utils/trackingIDGenerator';
@@ -8,12 +8,20 @@ import { getIO } from '../../../sockets/socket';
 import { endOfDay } from 'date-fns';
 
 import { Booking, IBooking } from '../../../models/booking/bookingModel';
+import { NotificationTemplates } from '../../../templates/notificationTemplates';
+import INotificationRepository from '../../../repositories/interfaces/notification/INotificationRepository';
+import { INotificationService } from '../../interfaces/notification/INotificationServices';
 
 class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
   private _customerCarRepository: ICustomerCarAndBookingRepository;
+  private _notificationService: INotificationService;
 
-  constructor(customerCarRepository: ICustomerCarAndBookingRepository) {
+  constructor(
+    customerCarRepository: ICustomerCarAndBookingRepository,
+    notificationService: INotificationService
+  ) {
     this._customerCarRepository = customerCarRepository;
+    this._notificationService = notificationService;
   }
 
   async getNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]> {
@@ -195,8 +203,21 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     booking.trackingUrl = trackingUrl;
 
     const updatedBooking = await this._customerCarRepository.saveBooking(booking);
+    const car = await Car.findById(booking.carId);
+    const carModel = car?.carName ?? "Car";
+
+    const notification=await this._notificationService.create(
+      NotificationTemplates.bookingConfirmed(
+        booking.carOwnerId.toString(),
+        bookingId,
+        carModel
+      )
+    );
+  //   const io = getIO();
+  // io.to(booking.carOwnerId.toString()).emit("newNotification", notification);
     return updatedBooking;
   }
+
 
   async failedBooking(bookingId: string): Promise<void> {
     const booking = await this._customerCarRepository.findBookingById(bookingId);
