@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -12,12 +13,13 @@ import chatRouter from './routes/chat/chatRoutes';
 import stripeRoutes from './routes/stripe/stripeRoutes';
 import { initSockets } from './sockets/socket';
 import './jobs/bookingTrackingJob';
+import notificationRouter from './routes/notification/notificationRoutes';
 
 dotenv.config();
 connectDB();
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 5051;
+const PORT = process.env.PORT;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -40,6 +42,7 @@ app.use('/admin', adminRouter);
 app.use('/api/s3', s3Routes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/chats', chatRouter);
+app.use('/notifications',notificationRouter)
 
 initSockets(server);
 

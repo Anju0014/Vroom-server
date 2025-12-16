@@ -6,12 +6,20 @@ import PasswordUtils from '../../../utils/passwordUtils';
 import JwtUtils from '../../../utils/jwtUtils';
 
 import { otpTemplate } from '../../../templates/emailTemplates';
+import { getIO } from '../../../sockets/socket';
+import { NotificationTemplates } from '../../../templates/notificationTemplates';
+import IAdminRepository from '../../../repositories/interfaces/admin/IAdminRepository';
+import { INotificationService } from '../../interfaces/notification/INotificationServices';
 
 class CarOwnerService implements ICarOwnerService {
   private _carOwnerRepository: ICarOwnerRepository;
+  private readonly _adminRepository: IAdminRepository;
+  private readonly _notificationService: INotificationService;
 
-  constructor(carOwnerRepository: ICarOwnerRepository) {
+  constructor(carOwnerRepository: ICarOwnerRepository, adminRepository:IAdminRepository, notificationService:INotificationService) {
     this._carOwnerRepository = carOwnerRepository;
+    this._adminRepository=adminRepository;
+    this._notificationService= notificationService;
   }
 
   async registerBasicDetails(
@@ -222,8 +230,21 @@ class CarOwnerService implements ICarOwnerService {
     if (!updatedOwner) {
       throw new Error('Car owner not found or update failed.');
     }
-
+  
     updatedOwner.processStatus = 2;
+
+    const admin=await this._adminRepository.findPrimaryAdmin()
+     if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+     const notification=await this._notificationService.create(
+        NotificationTemplates.newCarOwnerForApproval(
+          admin._id.toString(),
+          ownerId.toString(),
+          updatedOwner.fullName
+        )
+      );
 
     return updatedOwner;
   }

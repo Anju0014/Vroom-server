@@ -11,15 +11,23 @@ import CarOwnerCarsRepository from '../../repositories/implementation/carOwner/c
 import CarOwnerBookingRepository from '../../repositories/implementation/carOwner/carOwnerBookingRepository';
 import CarOwnerBookingService from '../../services/implementation/carOwner/carOwnerBookingServices';
 import CarOwnerBookingController from '../../controllers/implementation/carOwner/carOwnerBookingController';
+import NotificationService from '../../services/implementation/notification/notificationServices';
+import NotificationRepository from '../../repositories/implementation/notification/notificationRepository';
+import AdminRepository from '../../repositories/implementation/admin/adminRepository';
 
 const carOwnerRouter = Router();
 
+const notificationRepository=new NotificationRepository()
+const notificationService = new NotificationService(notificationRepository);
+
+const adminRepository=new AdminRepository()
+
 const carOwnerRepository = new CarOwnerRepository();
-const carOwnerService = new CarOwnerService(carOwnerRepository);
+const carOwnerService = new CarOwnerService(carOwnerRepository,adminRepository,notificationService);
 const carOwnerController = new CarOwnerController(carOwnerService);
 
 const carOwnerCarsRepository = new CarOwnerCarsRepository();
-const carOwnerCarsService = new CarOwnerCarsService(carOwnerCarsRepository);
+const carOwnerCarsService = new CarOwnerCarsService(carOwnerCarsRepository, carOwnerRepository,adminRepository,notificationService);
 const carOwnerCarsController = new CarOwnerCarsController(carOwnerCarsService);
 
 const carOwnerBookingRepository = new CarOwnerBookingRepository();

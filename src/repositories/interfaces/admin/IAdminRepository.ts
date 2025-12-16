@@ -4,6 +4,7 @@ import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 import { ICustomer } from '../../../models/customer/customerModel';
 
 interface IAdminRepository {
+  findPrimaryAdmin(): Promise<IAdmin | null> ;
   findUserByEmail(email: string): Promise<IAdmin | null>;
   create(user: Partial<IAdmin>): Promise<IAdmin>;
   updatePassword(adminId: string, password: string): Promise<void>;
