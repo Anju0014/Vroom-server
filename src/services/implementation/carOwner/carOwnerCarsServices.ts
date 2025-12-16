@@ -1,19 +1,33 @@
 import ICarOwnerCarsRepository from '../../../repositories/interfaces/carOwner/ICarOwnerCarsRepository';
 import { ICarOwnerCarsService } from '../../interfaces/carOwner/ICarOwnerCarsServices';
-import { ICar } from '../../../models/car/carModel';
+import { Car, ICar } from '../../../models/car/carModel';
 import { IBooking } from '../../../models/booking/bookingModel';
 import mongoose from 'mongoose';
+import { INotificationService } from '../../interfaces/notification/INotificationServices';
+import IAdminRepository from '../../../repositories/interfaces/admin/IAdminRepository';
+import { NotificationTemplates } from '../../../templates/notificationTemplates';
+import ICarOwnerRepository from '../../../repositories/interfaces/carOwner/ICarOwnerRepository';
 
 class CarOwnerCarsService implements ICarOwnerCarsService {
   private _ownersCarRepository: ICarOwnerCarsRepository;
+  private _ownerRepository:ICarOwnerRepository;
+   private readonly _adminRepository: IAdminRepository;
+  private readonly _notificationService: INotificationService;
 
-  constructor(carRepository: ICarOwnerCarsRepository) {
+  constructor(carRepository: ICarOwnerCarsRepository, ownerRepository:ICarOwnerRepository,adminRepository:IAdminRepository, notificationService:INotificationService) {
     this._ownersCarRepository = carRepository;
+    this._ownerRepository=ownerRepository;
+    this._adminRepository=adminRepository;
+    this._notificationService= notificationService;
   }
 
   async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
     console.log('registering car for owner', ownerId);
     if (!ownerId) throw new Error('Owner ID is required');
+      const owner=await this._ownerRepository.findById(ownerId)
+       if (!owner ){
+        throw new Error("Owner not found");
+      }
 
     const carData: Partial<ICar> = {
       ...carDetails,
@@ -22,8 +36,26 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
       videos: carDetails.videos && Array.isArray(carDetails.videos) ? carDetails.videos : [],
     };
 
-    return await this._ownersCarRepository.createCar(carData);
+    const createdCar = await this._ownersCarRepository.createCar(carData);
+    // return await this._ownersCarRepository.createCar(carData);
+
+     const admin=await this._adminRepository.findPrimaryAdmin()
+         if (!admin) {
+        throw new Error("Admin not found");
+      }
+  
+     const notifications=await this._notificationService.create(
+     NotificationTemplates.newCarForApproval(
+      admin._id.toString(),
+      createdCar.id.toString(),
+      owner.fullName || "Car Owner"
+    )
+  );
+
+  return createdCar;
+
   }
+
   async getCarsByOwner(ownerId: string, page: number, limit: number): Promise<ICar[]> {
     return await this._ownersCarRepository.getCarsByOwner(ownerId, page, limit);
   }

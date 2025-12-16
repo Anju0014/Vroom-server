@@ -13,6 +13,10 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
   constructor() {
     super(Admin);
   }
+
+  async findPrimaryAdmin(): Promise<IAdmin | null> {
+    return Admin.findOne({ email: "admin@vroom.com" });
+  }
   async findUserByEmail(email: string): Promise<IAdmin | null> {
     return await Admin.findOne({ email });
   }

@@ -210,7 +210,9 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
       NotificationTemplates.bookingConfirmed(
         booking.carOwnerId.toString(),
         bookingId,
-        carModel
+        carModel,
+        booking.startDate,
+        booking.endDate
       )
     );
   //   const io = getIO();
