@@ -11,6 +11,20 @@ import {
   verificationRejectedTemplate,
 } from '../../../templates/emailTemplates';
 
+import {
+  OwnerVerifyListItemDTO,
+  OwnerVerifyListResponseDTO
+} from '../../../dtos/adminOwner/carOwnerVerifyList.response.dto';
+import {
+  CarVerifyListItemDTO,
+  CarVerifyListResponseDTO
+} from '../../../dtos/adminOwner/carVerifyList.response.dto';
+import {
+  BookingListResponseDTO
+} from '../../../dtos/adminOwner/bookingList.response.dto';
+import { AdminOwnerMapper } from '../../../mappers/adminOwner.mapper';
+
+
 class AdminOwnerService implements IAdminOwnerService {
   private _adminOwnerRepository: IAdminOwnerRepository;
 
@@ -22,10 +36,16 @@ class AdminOwnerService implements IAdminOwnerService {
     page: number,
     limit: number,
     search: string
-  ): Promise<{ carOwners: ICarOwner[]; total: number }> {
+  ): Promise<OwnerVerifyListResponseDTO> {
     try {
       console.log('reached222');
-      return await this._adminOwnerRepository.getAllOwnerforVerify(page, limit, search);
+      const { carOwners, total } = await this._adminOwnerRepository.getAllOwnerforVerify(page, limit, search);
+
+  return {
+    carOwners: carOwners.map(AdminOwnerMapper.toOwnerVerifyDTO),
+    total,
+  };
+      // return await this._adminOwnerRepository.getAllOwnerforVerify(page, limit, search);
     } catch (error) {
       console.error('Error in listAllCustomers:', error);
       throw new Error('Failed to fetch customers');
@@ -36,10 +56,15 @@ class AdminOwnerService implements IAdminOwnerService {
     page: number,
     limit: number,
     search: string
-  ): Promise<{ cars: ICar[]; total: number }> {
+  ): Promise<CarVerifyListResponseDTO> {
     try {
       console.log('reached222');
-      return await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
+      const { cars, total } =await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
+      // return await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
+      return {
+       cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
+       total,
+      };
     } catch (error) {
       console.error('Error in listAllCustomers:', error);
       throw new Error('Failed to fetch customers');
@@ -50,10 +75,16 @@ class AdminOwnerService implements IAdminOwnerService {
     page: number,
     limit: number,
     search: string
-  ): Promise<{ cars: ICar[]; total: number }> {
+  ): Promise<CarVerifyListResponseDTO> {
     try {
       console.log('reached222');
-      return await this._adminOwnerRepository.getAllVerifiedCars(page, limit, search);
+       const { cars, total } =await this._adminOwnerRepository.getAllVerifiedCars(page, limit, search);
+      // return await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
+      return {
+       cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
+       total,
+      };
+      // return await this._adminOwnerRepository.getAllVerifiedCars(page, limit, search);
     } catch (error) {
       console.error('Error in listAllCustomers:', error);
       throw new Error('Failed to fetch customers');
@@ -64,10 +95,17 @@ class AdminOwnerService implements IAdminOwnerService {
     page: number,
     limit: number,
     search: string
-  ): Promise<{ bookings: IBooking[]; total: number }> {
+  ): Promise<BookingListResponseDTO> {
     try {
       console.log('reached222');
-      return await this._adminOwnerRepository.getAllBookings(page, limit, search);
+      const { bookings, total } =
+    await this._adminOwnerRepository.getAllBookings(page, limit, search);
+
+  return {
+    bookings: bookings.map(AdminOwnerMapper.toBookingDTO),
+    total,
+  };
+      // return await this._adminOwnerRepository.getAllBookings(page, limit, search);
     } catch (error) {
       console.error('Error in listAllBookings:', error);
       throw new Error('Failed to fetch bookings');
@@ -77,7 +115,7 @@ class AdminOwnerService implements IAdminOwnerService {
   async updateOwnerVerifyStatus(
     ownerId: string,
     verifyDetails: Partial<ICarOwner>
-  ): Promise<ICarOwner | null> {
+  ): Promise<OwnerVerifyListItemDTO> {
     const { verifyStatus, rejectionReason } = verifyDetails;
     if (verifyStatus === -1 && !rejectionReason) {
       throw new Error('Reason is required when rejecting');
@@ -93,18 +131,6 @@ class AdminOwnerService implements IAdminOwnerService {
       throw new Error('Error in updating the status');
     }
     console.log('useremail ', updatedUser.email);
-    //  if (verifyStatus === -1) {
-    //     await sendEmail({
-    //       to: updatedUser.email,
-    //       subject: "Verification Rejected",
-    //       text: `Dear ${updatedUser.fullName},\n\nYour verification has been rejected due to the following reason:\n${rejectionReason}\n\nPlease address the issue and  reapply.\n\nBest regards,\nVroom Support Team`
-    //     });
-    //   }else if(verifyStatus===1){
-    //     await sendEmail({
-    //       to:updatedUser.email,
-    //       subject:"Verification Approved",
-    //       text: `Dear ${updatedUser.fullName},\n\nYour Vroom  verification has been Approved. You can login to your account and add the car listings. \n\nBest regards,\nVroom Support Team`
-    //     })
     if (verifyStatus === -1) {
       const emailContent = verificationRejectedTemplate(updatedUser.fullName, rejectionReason);
       await sendEmail({ to: updatedUser.email, ...emailContent });
@@ -114,26 +140,43 @@ class AdminOwnerService implements IAdminOwnerService {
     }
 
     console.log('message');
-    return updatedUser;
+    return AdminOwnerMapper.toOwnerVerifyDTO(updatedUser);
+    // return updatedUser;
   }
 
-  async updateOwnerBlockStatus(ownerId: string, newStatus: number): Promise<ICarOwner | null> {
+  async updateOwnerBlockStatus(ownerId: string, newStatus: number): Promise<OwnerVerifyListItemDTO> {
     console.log('Processing status update:', ownerId, newStatus);
     const user = await this._adminOwnerRepository.findCarOwnerById(ownerId);
     if (!user) throw new Error('User not found');
-    let updateData: Partial<ICarOwner> = { blockStatus: newStatus };
-    return await this._adminOwnerRepository.updateOwnerStatus(ownerId, updateData);
+    // let updateData: Partial<ICarOwner> = { blockStatus: newStatus };
+    // return await this._adminOwnerRepository.updateOwnerStatus(ownerId, updateData);
+     const updatedOwner =
+    await this._adminOwnerRepository.updateOwnerStatus(ownerId, {
+      blockStatus: newStatus,
+    });
+
+  if (!updatedOwner) throw new Error('Error updating owner block status');
+
+  return AdminOwnerMapper.toOwnerVerifyDTO(updatedOwner);
   }
 
-  async updateCarBlockStatus(carId: string, newStatus: number): Promise<ICar | null> {
+  async updateCarBlockStatus(carId: string, newStatus: number):  Promise<CarVerifyListItemDTO>{
     console.log('Processing status update:', carId, newStatus);
     const car = await this._adminOwnerRepository.findCarById(carId);
     if (!car) throw new Error('Car not found');
-    let updateData: Partial<ICar> = { blockStatus: newStatus };
-    return await this._adminOwnerRepository.updateCarStatus(carId, updateData);
+    // let updateData: Partial<ICar> = { blockStatus: newStatus };
+    // return await this._adminOwnerRepository.updateCarStatus(carId, updateData);
+     const updatedCar =
+    await this._adminOwnerRepository.updateCarStatus(carId, {
+      blockStatus: newStatus,
+    });
+
+  if (!updatedCar) throw new Error('Error updating car block status');
+
+  return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
   }
 
-  async updateCarVerifyStatus(carId: string, verifyDetails: Partial<ICar>): Promise<ICar | null> {
+  async updateCarVerifyStatus(carId: string, verifyDetails: Partial<ICar>): Promise<CarVerifyListItemDTO> {
     const { verifyStatus, rejectionReason } = verifyDetails;
 
     if (verifyStatus === -1 && !rejectionReason) {
@@ -167,14 +210,9 @@ class AdminOwnerService implements IAdminOwnerService {
       );
       await sendEmail({ to: updatedUser.email, ...emailContent });
 
-      // await sendEmail({
-      //   to: updatedUser.email,
-      //   subject: "Verification Rejected",
-      //   text: `Dear ${updatedUser.fullName},\n\nYour car ${updatedCar.carName} verification has been rejected due to the following reason:\n${rejectionReason}\n\nPlease address the issue and reapply.\n\nBest regards,\nVroom Support Team`,
-      // });
     }
-
-    return updatedCar;
+ return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
+    // return updatedCar;
   }
 }
 

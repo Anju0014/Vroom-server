@@ -4,6 +4,13 @@ import { IAdminService } from '../../../services/interfaces/admin/IAdminServices
 import { StatusCode } from '../../../constants/statusCode';
 import { MESSAGES } from '../../../constants/message';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import { AdminMapper } from '../../../mappers/admin.mapper';
+import { CustomerMapper } from '../../../mappers/customer.mapper';
+import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
+
+import { AdminLoginRequestDTO } from '../../../dtos/admin/adminLogin.request.dto';
+import { UpdateCustomerBlockStatusRequestDTO } from '../../../dtos/customer/customerStatusUpdate.request.dto';
+
 class AdminController implements IAdminController {
   private _adminService: IAdminService;
 
@@ -13,7 +20,7 @@ class AdminController implements IAdminController {
 
   async loginAdmin(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
+      const { email, password }: AdminLoginRequestDTO = req.body;
       if (!email || !password) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -38,20 +45,31 @@ class AdminController implements IAdminController {
       res.cookie('adminRefreshToken', refreshToken, getCookieOptions(true));
       res.cookie('adminAccessToken', adminAccessToken, getCookieOptions(false));
 
-      if (!admin) {
-        res.status(400).json({ error: 'admin not found' });
-        return;
-      }
-      res.status(StatusCode.OK).json({
-        success: true,
-        message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
-        adminAccessToken,
-        user: {
-          id: admin._id,
-          email: admin.email,
-          role: 'admin',
-        },
-      });
+       const responseDTO = AdminMapper.toLoginResponse(
+      admin,
+      adminAccessToken,
+      refreshToken
+    );
+
+    res.status(StatusCode.OK).json({
+      success: true,
+      message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
+      data: responseDTO,
+    });
+      // if (!admin) {
+      //   res.status(400).json({ error: 'admin not found' });
+      //   return;
+      // }
+      // res.status(StatusCode.OK).json({
+      //   success: true,
+      //   message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
+      //   adminAccessToken,
+      //   user: {
+      //     id: admin._id,
+      //     email: admin.email,
+      //     role: 'admin',
+      //   },
+      // });
     } catch (error:any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       // console.log('LoginError from Admin:', error);
@@ -100,10 +118,13 @@ class AdminController implements IAdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
       const { customers, total } = await this._adminService.listAllCustomers(page, limit, search);
+      //  const customerDTOs = customers.map(CustomerMapper.toDTO);
+       const customerDTOs = CustomerMapper.toDTOList(customers);
+
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.CUSTOMERS_FETCHED || 'Customers fetched successfully',
-        data: customers,
+        data: customerDTOs,
         total,
       });
     } catch (error: any) {
@@ -121,10 +142,12 @@ class AdminController implements IAdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
       const { carOwners, total } = await this._adminService.listAllCarOwners(page, limit, search);
+      const ownerDTOs = carOwners.map(CarOwnerMapper.toListDTO);
+
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OWNERS_FETCHED || 'Car owners fetched successfully',
-        data: carOwners,
+        data: ownerDTOs,
         total,
       });
     } catch (error: any) {
@@ -140,7 +163,7 @@ class AdminController implements IAdminController {
   async updateCustomerBlockStatus(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const { status } = req.body;
+      const { status }: UpdateCustomerBlockStatusRequestDTO  = req.body;
       console.log(userId, status);
       if (!userId || status === undefined) {
         res.status(StatusCode.BAD_REQUEST).json({
@@ -150,12 +173,23 @@ class AdminController implements IAdminController {
         return;
       }
 
-      const updatedUser = await this._adminService.updateCustomerBlockStatus(userId, status);
+      const updatedCustomer = await this._adminService.updateCustomerBlockStatus(userId, status);
+
+     if(!updatedCustomer) {
+      res.status(StatusCode.NOT_FOUND).json({
+        success: false,
+        message: MESSAGES.ERROR.CUSTOMER_NOT_FOUND,
+      });
+      return;
+    }
+
+   
+    const customerDTO = CustomerMapper.toListDTO(updatedCustomer);
 
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Customer status updated successfully',
-        user: updatedUser,
+        data: customerDTO,
       });
     } catch (error:any) {
        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
