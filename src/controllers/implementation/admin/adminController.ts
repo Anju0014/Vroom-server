@@ -4,6 +4,7 @@ import { IAdminService } from '../../../services/interfaces/admin/IAdminServices
 import { StatusCode } from '../../../constants/statusCode';
 import { MESSAGES } from '../../../constants/message';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import logger from '../../../utils/logger';
 class AdminController implements IAdminController {
   private _adminService: IAdminService;
 
@@ -53,8 +54,9 @@ class AdminController implements IAdminController {
         },
       });
     } catch (error:any) {
+      logger.log('LoginError from Admin:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // console.log('LoginError from Admin:', error);
+    
       // res.status(StatusCode.NOT_FOUND).json({ error: error instanceof Error ? error.message : 'Login failed' });
     }
   }
@@ -63,7 +65,7 @@ class AdminController implements IAdminController {
     try {
       const refreshToken = req.cookies.adminRefreshToken;
       if (!refreshToken) {
-        console.log('No refresh token found');
+        logger.info('No refresh token found');
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
           message: MESSAGES.ERROR.NO_REFRESH_TOKEN,
@@ -141,7 +143,7 @@ class AdminController implements IAdminController {
     try {
       const { userId } = req.params;
       const { status } = req.body;
-      console.log(userId, status);
+      logger.info(userId, status);
       if (!userId || status === undefined) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,

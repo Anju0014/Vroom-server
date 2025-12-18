@@ -3,6 +3,7 @@ import IAdminOwnerController from '../../interfaces/admin/IAdminOwnerController'
 import { IAdminOwnerService } from '../../../services/interfaces/admin/IAdminOwnerServices';
 import { StatusCode } from '../../../constants/statusCode';
 import { MESSAGES } from '../../../constants/message';
+import logger from '../../../utils/logger';
 
 class AdminOwnerController implements IAdminOwnerController {
   private _adminOwnerService: IAdminOwnerService;
@@ -99,8 +100,8 @@ class AdminOwnerController implements IAdminOwnerController {
         limit,
         search
       );
-      console.log('Finished calling listAllBookings()');
-      console.log(bookings);
+      logger.info('Finished calling listAllBookings()');
+     logger.info(bookings);
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.BOOKINGS_FETCHED || 'Bookings fetched successfully',
@@ -177,7 +178,7 @@ class AdminOwnerController implements IAdminOwnerController {
 
   async updateCarBlockStatus(req: Request, res: Response): Promise<void> {
     try {
-      console.log('show the details of block');
+      logger.info('show the details of block');
       const { carId } = req.params;
       const { status } = req.body;
       if (!carId || status === undefined) {

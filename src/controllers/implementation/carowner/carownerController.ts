@@ -5,6 +5,7 @@ import { CustomRequest } from '../../../middlewares/authMiddleWare';
 import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import logger from '../../../utils/logger';
 
 class CarOwnerController implements ICarOwnerController {
   private _carOwnerService: ICarOwnerService;
@@ -64,7 +65,7 @@ class CarOwnerController implements ICarOwnerController {
 
   async loginOwner(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reeached login1');
+      logger.info('reeached login1');
       const { email, password } = req.body;
       if (!email || !password) {
         res
@@ -172,7 +173,7 @@ class CarOwnerController implements ICarOwnerController {
         .status(StatusCode.OK)
         .json({ success: true, message: MESSAGES.SUCCESS.PASSWORD_RESET_SENT });
     } catch (error) {
-      console.error('Forgot password error:', error);
+      logger.error('Forgot password error:', error);
       this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
@@ -195,7 +196,7 @@ class CarOwnerController implements ICarOwnerController {
         message,
       });
     } catch (error) {
-      console.error('Reset Password Error:', error);
+      logger.error('Reset Password Error:', error);
       this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
@@ -246,7 +247,7 @@ class CarOwnerController implements ICarOwnerController {
         message: MESSAGES.SUCCESS.LOGOUT_SUCCESS,
       });
     } catch (error) {
-      console.error('Logout Error:', error);
+      logger.error('Logout Error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -295,7 +296,7 @@ class CarOwnerController implements ICarOwnerController {
         },
       });
     } catch (error) {
-      console.error('Google Sign-In Error:', error);
+      logger.error('Google Sign-In Error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -304,7 +305,7 @@ class CarOwnerController implements ICarOwnerController {
     try {
       console.log('helloooooo');
       const ownerId = req.userId;
-      console.log(ownerId);
+      logger.info(ownerId);
       if (!ownerId) {
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
@@ -333,8 +334,8 @@ class CarOwnerController implements ICarOwnerController {
   async updateProfileOwner(req: CustomRequest, res: Response): Promise<void> {
     try {
       const carOwnerId = req.userId;
-      console.log('reached heriii');
-      console.log(carOwnerId);
+      logger.info('reached heriii');
+      logger.info(carOwnerId);
       if (!carOwnerId) {
         res.status(StatusCode.FORBIDDEN).json({
           success: false,
@@ -362,14 +363,14 @@ class CarOwnerController implements ICarOwnerController {
         updatedOwner,
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
   async getBlockStatus(req: Request, res: Response): Promise<void> {
     try {
-      console.log('block status checking..................');
+      logger.info('block status checking..................');
       const { userId } = req.params;
       const status = await this._carOwnerService.checkBlockStatus(userId);
 

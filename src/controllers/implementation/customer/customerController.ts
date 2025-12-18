@@ -5,6 +5,7 @@ import { CustomRequest } from '../../../middlewares/authMiddleWare';
 import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import logger from '../../../utils/logger';
 
 class CustomerContoller implements ICustomerController {
   private _customerService: ICustomerService;
@@ -94,7 +95,7 @@ class CustomerContoller implements ICustomerController {
 
   async renewRefreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reached here at renewal');
+      logger.info('reached here at renewal');
       const oldRefreshToken = req.cookies.customerRefreshToken;
       if (!oldRefreshToken) {
         res
@@ -360,7 +361,7 @@ class CustomerContoller implements ICustomerController {
       const { idProof } = req.body;
       console.log('id', idProof);
       if (!idProof) {
-        console.log('error1');
+        logger.error('error1');
         // res.status(400).json({ message: "No data provided to update." });
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,

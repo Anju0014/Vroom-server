@@ -7,6 +7,7 @@ import ICustomerCarAndBookingController from '../../interfaces/customer/ICustome
 import { ICustomerCarAndBookingService } from '../../../services/interfaces/customer/ICustomerCarAndBookingServices';
 import { generateAndUploadReceipt } from '../../../services/receiptService';
 import { Booking } from '../../../models/booking/bookingModel';
+import logger from '../../../utils/logger';
 
 class CustomerCarAndBookingController implements ICustomerCarAndBookingController {
   private _customerCarService: ICustomerCarAndBookingService;
@@ -139,7 +140,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
   }
   // controller
   async checkBookingAvailability(req: Request, res: Response): Promise<void> {
-    console.log('reached availability point');
+    logger.info('reached availability point');
     try {
       const { carId, startDate, endDate } = req.query; // or req.body
 
@@ -168,18 +169,18 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
         return;
       }
       console.log(true);
-      res.json({ available: true });
+      res.status(StatusCode.OK).json({ available: true });
       return;
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
+      logger.error(err);
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
   }
 
   async createPendingBooking(req: Request, res: Response): Promise<void> {
     try {
       const bookingId = await this._customerCarService.createPendingBooking(req.body);
-      console.log(bookingId);
+      logger.info(bookingId);
       res.status(StatusCode.CREATED).json({ success: true, bookingId });
     } catch (err) {
       this.handleError(res, err, StatusCode.BAD_REQUEST);
@@ -206,7 +207,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
       res.status(200).json({ message: 'Booking updated', booking });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: 'Server error' });
     }
   }

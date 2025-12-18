@@ -6,6 +6,7 @@ import { StatusCode } from '../../../constants/statusCode';
 
 import ICarOwnerCarsController from '../../interfaces/carowner/ICarOwnerCarsController';
 import { ICarOwnerCarsService } from '../../../services/interfaces/carOwner/ICarOwnerCarsServices';
+import logger from '../../../utils/logger';
 
 class CarOwnerCarsController implements ICarOwnerCarsController {
   private _ownerscarService: ICarOwnerCarsService;
@@ -89,7 +90,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         car: newCar,
       });
     } catch (error) {
-      console.log('Car upload error:', error);
+     logger.warn('Car upload error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -199,7 +200,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         data: car,
       });
     } catch (error) {
-      console.error('Error updating availability:', error);
+      logger.error('Error updating availability:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -221,7 +222,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         car: deletedCar,
       });
     } catch (error) {
-      console.error('Delete Error:', error);
+      logger.error('Delete Error:', error);
       this.handleError(res, error, 500);
     }
   }
@@ -302,7 +303,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         car: updatedCar,
       });
     } catch (error) {
-      console.error('Update Car Error:', error);
+      logger.error('Update Car Error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -311,7 +312,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
     try {
       const { carId } = req.params;
       const booking = await this._ownerscarService.getActiveBookingForCar(carId);
-      console.log('booking/ ', booking);
+      logger.info('booking/ ', booking);
       res.status(StatusCode.OK).json({ success: true, booking });
     } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);

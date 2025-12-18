@@ -6,6 +6,7 @@ import ICarOwnerBookingController from '../../interfaces/carowner/ICarOwnerBooki
 import { ICarOwnerBookingService } from '../../../services/interfaces/carOwner/ICarOwnerBookingServices';
 import { Booking } from '../../../models/booking/bookingModel';
 import { generatePresignedUrl, generateViewPresignedUrl, generateViewRecieptPresignedUrl } from '../../../services/s3Service';
+import logger from '../../../utils/logger';
 
 
 class CarOwnerBookingController implements ICarOwnerBookingController {
@@ -56,7 +57,7 @@ class CarOwnerBookingController implements ICarOwnerBookingController {
 
 async getReceiptUrl(req: CustomRequest, res: Response) {
   try {
-console.log("reached at")
+logger.info("reached at")
     const { bookingId } = req.params;
     console.log("bookingId",bookingId)
     const userId = req.userId;
@@ -88,11 +89,11 @@ console.log("reached at")
       return;
     }
 
-    // ✅ Business authorization
+ 
     const isAuthorized =
       booking.userId.toString() === userId ||
       booking.carOwnerId.toString() === userId
-      // userRole === 'ADMIN';
+    
 
     if (!isAuthorized) {
       res.status(StatusCode.FORBIDDEN).json({
@@ -105,7 +106,7 @@ console.log("reached at")
     
     const url = await generateViewRecieptPresignedUrl(booking.receiptKey);
 
-    console.log(url)
+    logger.info(url)
     res.status(StatusCode.OK).json({
       success: true,
       url,
