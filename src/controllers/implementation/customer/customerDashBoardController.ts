@@ -7,6 +7,7 @@ import ICustomerDashBoardController from '../../interfaces/customer/ICustomerDas
 import { ICustomerDashBoardService } from '../../../services/interfaces/customer/ICustomerDashBoardServices';
 import { generateAndUploadReceipt } from '../../../services/receiptService';
 import { CustomerBookingMapper } from '../../../mappers/customerBooking.mapper';
+import logger from '../../../utils/logger';
 
 class CustomerDashBoardController implements ICustomerDashBoardController {
   private _customerDashService: ICustomerDashBoardService;
@@ -19,7 +20,7 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
     try {
       const userId = req.userId;
       if (!userId) {
-        res.status(404).json({ message: 'User Id not found' });
+        res.status(StatusCode.NOT_FOUND).json({ message: 'User Id not found' });
         return;
       }
       const page = parseInt(req.query.page as string) || 1;
@@ -42,27 +43,19 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       return;
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // console.error('Failed to fetch bookings:', error);
-      // res
-      //   .status(StatusCode.INTERNAL_SERVER_ERROR)
-      //   .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
-      // return;
     }
   }
 
   async cancelBooking(req: Request, res: Response): Promise<void> {
-    console.log('**************booking cancel controller*******************************');
+    logger.info('**************booking cancel controller*******************************');
     const { bookingId } = req.params;
     try {
       let booking = await this._customerDashService.cancelBooking(bookingId);
       await generateAndUploadReceipt(bookingId);
-      console.log(booking);
+      logger.info("booking data",booking);
       res.status(StatusCode.OK).json({ success: true });
     } catch (error:any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // res
-      //   .status(StatusCode.INTERNAL_SERVER_ERROR)
-      //   .json({ message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -71,7 +64,7 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       error: unknown,
       statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
     ): void {
-      console.error('Error:', error);
+      logger.error('Error:', error);
   
       const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
   

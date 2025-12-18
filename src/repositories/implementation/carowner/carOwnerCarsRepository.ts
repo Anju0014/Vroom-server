@@ -3,6 +3,7 @@ import { BaseRepository } from '../../base/BaseRepository';
 import { Car, ICar } from '../../../models/car/carModel';
 import { Booking, IBooking } from '../../../models/booking/bookingModel';
 import { startOfDay, endOfDay } from 'date-fns';
+import logger from '../../../utils/logger';
 
 class CarOwnerCarsRepository extends BaseRepository<ICar> implements ICarOwnerCarsRepository {
   constructor() {
@@ -39,12 +40,12 @@ class CarOwnerCarsRepository extends BaseRepository<ICar> implements ICarOwnerCa
 
   async findByCarId(carId: string, ownerId: string): Promise<IBooking[]> {
     try {
-      console.log(carId, ownerId);
+     
       let bookinglist = await Booking.find({
         carId: carId,
         // carOwnerId: new Types.ObjectId(ownerId),
       }).exec();
-      console.log(bookinglist);
+    
       return bookinglist;
     } catch (error) {
       throw new Error(`Failed to fetch bookings for car ${carId}: ${error}`);
@@ -74,7 +75,7 @@ class CarOwnerCarsRepository extends BaseRepository<ICar> implements ICarOwnerCa
       startDate: { $lte: end },
       endDate: { $gte: start },
     });
-    console.log('active booking?:', activeBookings);
+    logger.info('active booking?:', activeBookings);
     return activeBookings;
   }
 }

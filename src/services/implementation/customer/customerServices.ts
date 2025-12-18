@@ -5,6 +5,7 @@ import { ICustomer } from '../../../models/customer/customerModel';
 import PasswordUtils from '../../../utils/passwordUtils';
 import JwtUtils from '../../../utils/jwtUtils';
 import { otpTemplate } from '../../../templates/emailTemplates';
+import logger from '../../../utils/logger';
 
 class CustomerService implements ICustomerService {
   private _customerRepository: ICustomerRepository;
@@ -16,18 +17,18 @@ class CustomerService implements ICustomerService {
   async registerBasicDetails(
     customerDetails: Partial<ICustomer>
   ): Promise<{ customer: ICustomer }> {
-    console.log('reached');
+  
     const { fullName, email, password, phoneNumber } = customerDetails;
-    console.log(customerDetails);
-
+  
     if (!fullName || !email || !password) {
+      logger.warn('All fields are requires')
       throw new Error('All fields are required');
     }
 
     const existingUser = await this._customerRepository.findUserByEmail(customerDetails.email!);
 
     if (existingUser) {
-      console.log('User already exists. Throwing error...');
+     logger.warn('User already exists. Throwing error...');
       throw new Error('Email already Exist');
     }
 
@@ -51,14 +52,14 @@ class CustomerService implements ICustomerService {
     await sendEmail({ to: email, ...otpContent });
 
     // await sendOTP(email, otp)
-    console.log('create new customer: ', customer);
+    logger.info('create new customer: ', customer);
 
     return { customer };
   }
 
   async otpVerify(email: string, otp: string): Promise<{ customer: ICustomer }> {
-    console.log('otp reached');
-    console.log(`Verifying OTP for ${email}: ${otp}`);
+   
+    logger.info(`Verifying OTP for ${email}: ${otp}`);
 
     const customer = await this._customerRepository.findUserByEmail(email);
 
@@ -66,14 +67,8 @@ class CustomerService implements ICustomerService {
       throw new Error('User not found');
     }
 
-    console.log('Fetched customer from DB:', customer);
-    // if (customer.otp !== otp) {
-    //     throw new Error("Invalid OTP");
-    // }
-
-    // if (new Date() > customer.otpExpires) {
-    //     throw new Error("OTP Expired");
-    // }
+    logger.info('Fetched customer from DB:', customer);
+   
     if (!customer) {
       throw new Error('User not found');
     }
@@ -93,13 +88,13 @@ class CustomerService implements ICustomerService {
 
     await this._customerRepository.updateCustomer(customer._id.toString(), customer);
 
-    console.log('User OTP verified successfully!');
+   logger.info('User OTP verified successfully!');
     // return { success: true, message: "OTP Verified Successfully" };
     return { customer };
   }
 
   async resendOtp(email: string): Promise<{ message: string }> {
-    console.log(`Resending OTP for email: ${email}`);
+    logger.info(`Resending OTP for email: ${email}`);
     const customer = await this._customerRepository.findUserByEmail(email);
     if (!customer) {
       throw new Error('User not found');
@@ -117,7 +112,7 @@ class CustomerService implements ICustomerService {
     await sendEmail({ to: customer.email, ...otpContent });
 
     // await sendOTP(customer.email,newOtp);
-    console.log('New OTP sent Successfully');
+   logger.info('New OTP sent Successfully');
     return { message: 'OTP resend successfully' };
   }
 
@@ -125,11 +120,10 @@ class CustomerService implements ICustomerService {
     email: string,
     password: string
   ): Promise<{ customerAccessToken: string; refreshToken: string; customer: ICustomer | null }> {
-    console.log(`checking login things`);
+    logger.info(`checking login things`);
     const customer = await this._customerRepository.findUserByEmail(email);
-    console.log(customer);
     if (!customer) {
-      console.log('not correct user');
+      logger.warn('not correct user');
       throw new Error('Invalid Credentials');
     }
 
@@ -141,12 +135,10 @@ class CustomerService implements ICustomerService {
       throw new Error('Signup is not completed');
     }
 
-    //     if (user.status === 0) {
-    //         throw new Error("Signup is not completed")
-    //     }
+  
     const passwordTrue = await PasswordUtils.comparePassword(password, customer.password);
     if (!passwordTrue) {
-      console.log('not correct');
+     logger.warn('not correct');
       throw new Error('Invalid Credentials');
     }
     const customerAccessToken = JwtUtils.generateAccessToken({
@@ -167,15 +159,15 @@ class CustomerService implements ICustomerService {
     const decoded = JwtUtils.verifyToken(oldRefreshToken, true);
 
     if (!decoded || typeof decoded === 'string') {
-      console.log('Invalid or malformed refresh token');
+      logger.warn('Invalid or malformed refresh token');
       throw new Error('Invalid refresh token');
     }
     if (decoded.message === 'Token expired') {
-      console.log('Refresh token has expired');
+      logger.warn('Refresh token has expired');
       throw new Error('Refresh token expired');
     }
     if (!decoded.id) {
-      console.log('No ID in refresh token payload');
+     logger.warn('No ID in refresh token payload');
       throw new Error('Invalid refresh token');
     }
 
@@ -184,12 +176,12 @@ class CustomerService implements ICustomerService {
     // }
 
     const customer = await this._customerRepository.findById(decoded.id);
-    console.log('Car owner:', customer);
-    console.log('Stored refresh token:', customer?.refreshToken);
-    console.log('Provided refresh token:', oldRefreshToken);
+    logger.info('Car owner:', customer);
+     logger.info('Stored refresh token:', customer?.refreshToken);
+     logger.info('Provided refresh token:', oldRefreshToken);
 
     if (!customer || customer.refreshToken !== oldRefreshToken) {
-      console.log('Refresh token mismatch');
+       logger.warn('Refresh token mismatch');
       throw new Error('Invalid refresh token');
     }
     const accessToken = JwtUtils.generateAccessToken({
@@ -217,7 +209,7 @@ class CustomerService implements ICustomerService {
     newPassword: string,
     role: 'customer' | 'carOwner'
   ): Promise<string> {
-    console.log('reached pt 2');
+   
     const decoded = JwtUtils.verifyResetToken(token);
 
     if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
@@ -235,17 +227,17 @@ class CustomerService implements ICustomerService {
     passwordDetails: { oldPassword: string; newPassword: string }
   ): Promise<string> {
     const { oldPassword, newPassword } = passwordDetails;
-    console.log('reachedkjkkf');
+   
 
     const customer = await this._customerRepository.findById(customerId);
     if (!customer) {
-      console.log('ijhjebhigbhinjdsn');
-      throw new Error('Car Owner not found');
+      logger.warn('User not found'); 
+      throw new Error('Customer not found');
     }
 
     const passwordMatch = await PasswordUtils.comparePassword(oldPassword, customer.password);
     if (!passwordMatch) {
-      console.log('jdjfu??');
+      logger.warn('incorrect oldpassword');
       throw new Error('Old password is incorrect');
     }
 
@@ -257,11 +249,10 @@ class CustomerService implements ICustomerService {
   }
 
   async logoutCustomer(refreshToken: string): Promise<void> {
-    console.log('reached');
-    console.log(refreshToken);
+  
     const customer = await this._customerRepository.findUserByRefreshToken(refreshToken);
     if (!customer) {
-      console.log('error no customer');
+      logger.warn('error no customer');
       throw new Error('User not found');
     }
     await this._customerRepository.clearRefreshToken(customer._id.toString());
@@ -274,12 +265,11 @@ class CustomerService implements ICustomerService {
     provider: string,
     role?: string
   ): Promise<{ customerAccessToken: string; refreshToken: string; customer: ICustomer | null }> {
-    console.log(profileImage);
-    console.log('helloooooooo');
-    // let customer;
+    
+  
     let customer = await this._customerRepository.findUserByEmail(email);
 
-    console.log('1//////////', customer);
+    logger.info('google login', customer);
 
     if (customer && customer.blockStatus === 1) {
       throw new Error('User is blocked by the Admin .');
@@ -305,17 +295,13 @@ class CustomerService implements ICustomerService {
     const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
 
     await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
-    console.log(refreshToken);
     let customer2 = await this._customerRepository.findUserByEmail(email);
-    console.log(customer2);
-
     return { customerAccessToken, refreshToken, customer };
   }
 
   async getCustomerProfile(customerId: string): Promise<{ customer: ICustomer }> {
     const customer = await this._customerRepository.findById(customerId);
     if (!customer) throw new Error('customer not found');
-
     return { customer };
   }
 
@@ -348,12 +334,12 @@ class CustomerService implements ICustomerService {
     customerId: string,
     updatedData: Partial<ICustomer>
   ): Promise<ICustomer> {
-    console.log('id', updatedData.idProof);
+    logger.info('id', updatedData.idProof);
     updatedData.processStatus = 1;
     const updatedcustomer = await this._customerRepository.updateCustomer(customerId, updatedData);
-    console.log('updatedcustomer', updatedcustomer);
+    logger.info('updatedcustomer', updatedcustomer);
     if (!updatedcustomer) {
-      console.log('error2');
+      logger.warn(' update error for customer profile');
       throw new Error('Car customer not found or update failed.');
     }
     return updatedcustomer;

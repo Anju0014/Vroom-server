@@ -3,6 +3,7 @@ import IAdminOwnerController from '../../interfaces/admin/IAdminOwnerController'
 import { IAdminOwnerService } from '../../../services/interfaces/admin/IAdminOwnerServices';
 import { StatusCode } from '../../../constants/statusCode';
 import { MESSAGES } from '../../../constants/message';
+import logger from '../../../utils/logger';
 
 class AdminOwnerController implements IAdminOwnerController {
   private _adminOwnerService: IAdminOwnerService;
@@ -29,10 +30,6 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -55,10 +52,6 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -99,8 +92,8 @@ class AdminOwnerController implements IAdminOwnerController {
         limit,
         search
       );
-      console.log('Finished calling listAllBookings()');
-      console.log(bookings);
+      logger.info('Finished calling listAllBookings()');
+      logger.info(bookings);
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.BOOKINGS_FETCHED || 'Bookings fetched successfully',
@@ -108,10 +101,6 @@ class AdminOwnerController implements IAdminOwnerController {
         total,
       });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -140,12 +129,9 @@ class AdminOwnerController implements IAdminOwnerController {
         user: updatedUser,
       });
     } catch (error:any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
+      this.handleError(res, Error, StatusCode.INTERNAL_SERVER_ERROR);
     }
-    this.handleError(res, Error, StatusCode.INTERNAL_SERVER_ERROR);
+    
   }
 
   async updateOwnerBlockStatus(req: Request, res: Response): Promise<void> {
@@ -167,17 +153,13 @@ class AdminOwnerController implements IAdminOwnerController {
         user: updatedUser,
       });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
   async updateCarBlockStatus(req: Request, res: Response): Promise<void> {
     try {
-      console.log('show the details of block');
+      logger.info('show the details of block');
       const { carId } = req.params;
       const { status } = req.body;
       if (!carId || status === undefined) {
@@ -195,10 +177,6 @@ class AdminOwnerController implements IAdminOwnerController {
         car: updatedCar,
       });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
 
@@ -225,10 +203,6 @@ class AdminOwnerController implements IAdminOwnerController {
         car: updatedCar,
       });
     } catch (error) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -238,7 +212,7 @@ class AdminOwnerController implements IAdminOwnerController {
       error: unknown,
       statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
     ): void {
-      console.error('Error:', error);
+      logger.error('Error:', error);
   
       const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
   

@@ -6,6 +6,7 @@ import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import { getCookieOptions } from '../../../utils/cookieOptions';
 import { CustomerMapper } from '../../../mappers/customer.mapper';
+import logger from '../../../utils/logger';
 
 class CustomerContoller implements ICustomerController {
   private _customerService: ICustomerService;
@@ -73,7 +74,7 @@ class CustomerContoller implements ICustomerController {
       res.cookie('customerRefreshToken', refreshToken, getCookieOptions(true));
       res.cookie('customerAccessToken', customerAccessToken, getCookieOptions(false));
       if (!customer) {
-        res.status(400).json({ error: 'Customer not found' });
+        res.status(StatusCode.NOT_FOUND).json({ error: 'Customer not found' });
         return;
       }
       res.status(StatusCode.OK).json({
@@ -96,7 +97,7 @@ class CustomerContoller implements ICustomerController {
 
   async renewRefreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reached here at renewal');
+      logger.info('reached here at renewal');
       const oldRefreshToken = req.cookies.customerRefreshToken;
       if (!oldRefreshToken) {
         res
@@ -158,10 +159,9 @@ class CustomerContoller implements ICustomerController {
   async changePassword(req: CustomRequest, res: Response): Promise<void> {
     try {
       const customerId = req.userId; // Set in middleware
-      console.log('reached at change password');
-      console.log(customerId);
+      
       if (!customerId) {
-        console.log('reached  noy at change password');
+        logger.warn('customer not reached  at change password');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
           message: MESSAGES.ERROR.UNAUTHORIZED,
@@ -175,18 +175,13 @@ class CustomerContoller implements ICustomerController {
         message,
       });
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-          success: false,
-          message: error.message,
-        });
-      }
+     this.handleError(res,error,StatusCode.INTERNAL_SERVER_ERROR)
     }
   }
 
   async logout(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reached');
+     
       const refreshToken = req.cookies.customerRefreshToken;
 
       if (!refreshToken) {
@@ -217,9 +212,9 @@ class CustomerContoller implements ICustomerController {
 
   async googleSignIn(req: Request, res: Response): Promise<void> {
     try {
-      console.log('*******************reached here at google signin');
+      logger.info('*******************reached here at google signin');
       const { fullName, email, profileImage, provider, role } = req.body;
-      console.log(profileImage);
+      logger.info(profileImage);
       if (!email || !provider) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -251,7 +246,7 @@ class CustomerContoller implements ICustomerController {
       });
 
       if (!customer) {
-        res.status(400).json({ error: 'Customer not found' });
+        res.status(StatusCode.BAD_REQUEST).json({ error: 'Customer not found' });
         return;
       }
 
@@ -278,9 +273,8 @@ class CustomerContoller implements ICustomerController {
   async getCustomerProfile(req: CustomRequest, res: Response): Promise<void> {
     try {
       const customerId = req.userId;
-      console.log(customerId);
-
       if (!customerId) {
+         logger.warn('no customerId');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
           message: MESSAGES.ERROR.UNAUTHORIZED,
@@ -316,9 +310,8 @@ class CustomerContoller implements ICustomerController {
   async updateProfileCustomer(req: CustomRequest, res: Response): Promise<void> {
     try {
       const customerId = req.userId;
-      console.log('reached heriii');
-      console.log(customerId);
       if (!customerId) {
+        logger.warn('no customerId');
         res.status(StatusCode.FORBIDDEN).json({
           success: false,
           message: MESSAGES.ERROR.NO_CUSTOMER_ID_FOUND,
@@ -351,9 +344,8 @@ class CustomerContoller implements ICustomerController {
   async updateProfileCustomerIdProof(req: CustomRequest, res: Response): Promise<void> {
     try {
       const customerId = req.userId;
-      console.log('reached heriii');
-      console.log(customerId);
       if (!customerId) {
+        logger.warn('no customerId');
         res.status(StatusCode.FORBIDDEN).json({
           success: false,
           message: MESSAGES.ERROR.NO_CUSTOMER_ID_FOUND,
@@ -361,9 +353,9 @@ class CustomerContoller implements ICustomerController {
         return;
       }
       const { idProof } = req.body;
-      console.log('id', idProof);
+      logger.info('id', idProof);
       if (!idProof) {
-        console.log('error1');
+        logger.warn(' no id proof error1');
         // res.status(400).json({ message: "No data provided to update." });
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -388,7 +380,7 @@ class CustomerContoller implements ICustomerController {
 
   async getBlockStatus(req: Request, res: Response): Promise<void> {
     try {
-      console.log('block status checking..................');
+      logger.info('block status checking..................');
       const { userId } = req.params;
       const status = await this._customerService.checkBlockStatus(userId);
 
@@ -403,7 +395,7 @@ class CustomerContoller implements ICustomerController {
     error: unknown,
     statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
   ): void {
-    console.error('Error:', error);
+    logger.error('Error:', error);
 
     const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 

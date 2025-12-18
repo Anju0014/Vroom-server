@@ -5,6 +5,7 @@ import { StatusCode } from '../../../constants/statusCode';
 import INotificationController from '../../interfaces/notification/INotificationController';
 import { INotificationService } from '../../../services/interfaces/notification/INotificationServices';
 import { MESSAGES } from '../../../constants/message';
+import logger from '../../../utils/logger';
 
 class NotificationController implements INotificationController {
   private _notificationService: INotificationService;
@@ -22,17 +23,18 @@ class NotificationController implements INotificationController {
         data: notification,
       });
     } catch (error: any) {
-      console.error("Create Notification Error:", error);
+      logger.error("Create Notification Error:", error);
  this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
 
   async getByUser(req: Request, res: Response): Promise<void> {
     try {
-        console.log("reachedHere")
+        
       const userId = req.query.userId as string;
 
       if (!userId) {
+        logger.warn("No user")
         res.status(StatusCode.BAD_REQUEST).json({ message: "UserId is required" });
         return;
       }
@@ -44,8 +46,7 @@ class NotificationController implements INotificationController {
         data: notifications,
       });
     } catch (error: any) {
-      console.error("Get Notifications Error:", error);
-
+      logger.error("Get Notifications Error:", error);
        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -70,7 +71,7 @@ class NotificationController implements INotificationController {
         data: updated,
       });
     } catch (error: any) {
-      console.error("Mark As Read Error:", error);
+      logger.error("Mark As Read Error:", error);
  this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -95,7 +96,7 @@ class NotificationController implements INotificationController {
         count,
       });
     } catch (error: any) {
-      console.error("Unread Count Error:", error);
+      logger.error("Unread Count Error:", error);
 
        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       
@@ -107,7 +108,7 @@ class NotificationController implements INotificationController {
       error: unknown,
       statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
     ): void {
-      console.error('Error:', error);
+      logger.error('Error:', error);
   
       const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
   

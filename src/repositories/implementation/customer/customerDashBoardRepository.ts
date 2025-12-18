@@ -5,6 +5,7 @@ import { Booking, IBooking } from '../../../models/booking/bookingModel';
 
 import { HydratedDocument } from 'mongoose';
 import { Wallet, IWallet } from '../../../models/wallet/walletModel';
+import logger from '../../../utils/logger';
 
 class CustomerDashBoardRepository
   extends BaseRepository<ICustomer>
@@ -27,7 +28,7 @@ class CustomerDashBoardRepository
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean(); // makes it a plain JS object
+      .lean(); 
 
     return bookings.map((booking) => ({
       _id: booking._id,
@@ -52,7 +53,7 @@ class CustomerDashBoardRepository
 
   async bookingsByUserCount(userId: string): Promise<number> {
     const count = await Booking.countDocuments({ userId }).exec();
-    console.log('Total bookings count:', count);
+    logger.info('Total bookings count:', count);
     return count;
   }
   async findBookingById(bookingId: string): Promise<IBooking | null> {
@@ -60,9 +61,9 @@ class CustomerDashBoardRepository
   }
 
   async saveBooking(bookingData: HydratedDocument<IBooking>): Promise<IBooking> {
-    console.log('reached for save');
+   
     let booking = await bookingData.save();
-    console.log(booking);
+    logger.info(booking);
     return booking;
   }
 
@@ -79,7 +80,7 @@ class CustomerDashBoardRepository
     };
 
     await Wallet.updateOne({ userId }, { $push: { transactions: transaction } });
-    console.log('Transaction logged:', transaction);
+   logger.info('Transaction logged:', transaction);
   }
 
   async findWalletByUserId(userId: string): Promise<IWallet | null> {
@@ -93,7 +94,7 @@ class CustomerDashBoardRepository
       transactions: [],
     });
     await wallet.save();
-    console.log('Wallet created for userId:', userId);
+    logger.info('Wallet created for userId:', userId);
     return wallet;
   }
 
@@ -101,8 +102,5 @@ class CustomerDashBoardRepository
     return Wallet.findOneAndUpdate({ userId: wallet.userId }, wallet, { new: true });
   }
 
-  // async saveBooking(booking: IBooking): Promise<IBooking|null> {
-  //     return Booking.findOneAndUpdate({ bookingId: booking.bookingId }, booking, { new: true });
-  //   }
 }
 export default CustomerDashBoardRepository;

@@ -5,6 +5,7 @@ import { StatusCode } from '../../../constants/statusCode';
 import IChatController from '../../interfaces/chat/IChatController';
 import { IChatService } from '../../../services/interfaces/chat/IChatServices';
 import { MESSAGES } from '../../../constants/message';
+import logger from '../../../utils/logger';
 
 class ChatController implements IChatController {
   private _chatService: IChatService;
@@ -15,9 +16,9 @@ class ChatController implements IChatController {
 
   async getChatHistory(req: Request, res: Response): Promise<void> {
     try {
-      console.log('showw');
+     
       const { roomId } = req.params;
-      console.log(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,', roomId);
+      logger.info(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,', roomId);
       const messages = await this._chatService.fetchMessages(roomId);
       res.status(StatusCode.OK).json(messages);
     } catch (error:any) 
@@ -28,19 +29,18 @@ class ChatController implements IChatController {
   }
 
   async getOwnerChats(req: CustomRequest, res: Response) {
-    console.log('eee');
+  
     const ownerId = req.userId;
     if (!ownerId) {
-      console.log('missing');
+      logger.warn('missing');
       return;
     }
 
     try {
       const chats = await this._chatService.fetchOwnerChats(ownerId);
-      console.log('ChatService', chats);
+      logger.info('ChatService', chats);
       res.status(StatusCode.OK).json(chats);
     } catch(error:any) {
-      // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch owner chats' });
     this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
@@ -49,7 +49,7 @@ class ChatController implements IChatController {
       error: unknown,
       statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
     ): void {
-      console.error('Error:', error);
+      logger.error('Error:', error);
   
       const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
   

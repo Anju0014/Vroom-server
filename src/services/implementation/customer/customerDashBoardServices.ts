@@ -3,6 +3,7 @@ import { ICustomerDashBoardService } from '../../interfaces/customer/ICustomerDa
 
 import { stripe } from '../../../config/stripeConfig';
 import { IBooking } from '../../../models/booking/bookingModel';
+import logger from '../../../utils/logger';
 
 class CustomerDashBoardService implements ICustomerDashBoardService {
   private _customerDashRepository: ICustomerDashBoardRepository;
@@ -20,7 +21,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
   }
 
   async cancelBooking(bookingId: string): Promise<IBooking> {
-    // Check if the booking exists and its status
+  
     const booking = await this._customerDashRepository.findBookingById(bookingId);
 
     if (!booking || booking.status !== 'confirmed') {
@@ -37,7 +38,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
         payment_intent: booking.paymentIntentId,
         amount: refundAmount * 100,
       });
-      console.log('Refund processed through Stripe:', refund.id);
+      logger.info('Refund processed through Stripe:', refund.id);
 
       await this._customerDashRepository.logWalletTransaction(
         booking.userId.toString(),
@@ -50,7 +51,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     let wallet = await this._customerDashRepository.findWalletByUserId(booking.userId.toString());
 
     if (!wallet) {
-      console.log('Wallet not found. Creating a new wallet...');
+      logger.warn('Wallet not found. Creating a new wallet...');
       wallet = await this._customerDashRepository.createWallet(booking.userId.toString());
     }
 
@@ -60,7 +61,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
 
     wallet.balance += refundAmount;
     await this._customerDashRepository.saveWallet(wallet);
-    console.log('Wallet updated with refund. New balance:', wallet.balance);
+    logger.info('Wallet updated with refund. New balance:', wallet.balance);
 
     await this._customerDashRepository.logWalletTransaction(
       booking.userId.toString(),
@@ -77,7 +78,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     // await this._customerDashRepository.saveBooking(booking);
 
     const updatedBooking = await this._customerDashRepository.saveBooking(booking);
-    console.log('Booking cancelled and saved successfully.');
+   logger.info('Booking cancelled and saved successfully.');
     return updatedBooking;
   }
 }

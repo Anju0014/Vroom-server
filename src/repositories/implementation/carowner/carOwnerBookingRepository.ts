@@ -8,14 +8,6 @@ class CarOwnerBookingRepository extends BaseRepository<ICar> implements ICarOwne
     super(Car);
   }
 
-  //  async getBookingsForCarOwner(carOwnerId: string): Promise<IBooking[]> {
-  //     const bookings = await Booking.find({
-  //       carOwnerId: carOwnerId,
-  //       status: { $in: ['confirmed', 'cancelled'] },
-  //     }).sort({ createdAt: -1 });
-
-  //     return bookings;
-  //   }
   async getBookingsForCarOwner(
     carOwnerId: string,
     page: number,
@@ -26,7 +18,6 @@ class CarOwnerBookingRepository extends BaseRepository<ICar> implements ICarOwne
       status: { $in: ['confirmed', 'cancelled'] },
     };
 
-    // Total count (before pagination)
     const total = await Booking.countDocuments(query);
 
     const bookings = await Booking.find(query)

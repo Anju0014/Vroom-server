@@ -10,6 +10,7 @@ import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
 
 import { AdminLoginRequestDTO } from '../../../dtos/admin/adminLogin.request.dto';
 import { UpdateCustomerBlockStatusRequestDTO } from '../../../dtos/customer/customerStatusUpdate.request.dto';
+import logger from '../../../utils/logger';
 
 class AdminController implements IAdminController {
   private _adminService: IAdminService;
@@ -58,6 +59,7 @@ class AdminController implements IAdminController {
       message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
       data: responseDTO,
     });
+
       // if (!admin) {
       //   res.status(400).json({ error: 'admin not found' });
       //   return;
@@ -72,10 +74,10 @@ class AdminController implements IAdminController {
       //     role: 'admin',
       //   },
       // });
+      
     } catch (error:any) {
-      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // console.log('LoginError from Admin:', error);
-      // res.status(StatusCode.NOT_FOUND).json({ error: error instanceof Error ? error.message : 'Login failed' });
+        logger.error('LoginError from Admin:', error);
+        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -83,7 +85,7 @@ class AdminController implements IAdminController {
     try {
       const refreshToken = req.cookies.adminRefreshToken;
       if (!refreshToken) {
-        console.log('No refresh token found');
+        logger.info('No refresh token found');
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
           message: MESSAGES.ERROR.NO_REFRESH_TOKEN,
@@ -92,9 +94,6 @@ class AdminController implements IAdminController {
       }
       await this._adminService.logoutAdmin(refreshToken);
 
-      // res.clearCookie("adminRefreshToken", {
-      //       ...getCookieOptions(true),
-      // });
       res.clearCookie('adminRefreshToken', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -106,10 +105,6 @@ class AdminController implements IAdminController {
         message: MESSAGES.SUCCESS.LOGOUT_SUCCESS,
       });
     } catch (error) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -119,8 +114,8 @@ class AdminController implements IAdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
-   const { customers, total } =
-  await this._adminService.listAllCustomers(page, limit, search);
+      const { customers, total } =
+          await this._adminService.listAllCustomers(page, limit, search);
 
 res.status(StatusCode.OK).json({
   success: true,
@@ -129,10 +124,7 @@ res.status(StatusCode.OK).json({
   total,
 });
     } catch (error: any) {
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
+     
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -143,7 +135,7 @@ res.status(StatusCode.OK).json({
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
       const { carOwners, total } = await this._adminService.listAllCarOwners(page, limit, search);
-      // const ownerDTOs = carOwners.map(CarOwnerMapper.toListDTO);
+    
 
       res.status(StatusCode.OK).json({
         success: true,
@@ -154,10 +146,7 @@ res.status(StatusCode.OK).json({
     } catch (error: any) {
   
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
+    
     }
   }
 
@@ -165,7 +154,6 @@ res.status(StatusCode.OK).json({
     try {
       const { userId } = req.params;
       const { status }: UpdateCustomerBlockStatusRequestDTO  = req.body;
-      console.log(userId, status);
       if (!userId || status === undefined) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -192,10 +180,7 @@ res.status(StatusCode.OK).json({
       });
     } catch (error:any) {
        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: MESSAGES.ERROR.SERVER_ERROR,
-      // });
+      
     }
   }
 
@@ -206,7 +191,7 @@ res.status(StatusCode.OK).json({
     error: unknown,
     statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
   ): void {
-    console.error('Error:', error);
+    logger.error('Error:', error);
 
     const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 

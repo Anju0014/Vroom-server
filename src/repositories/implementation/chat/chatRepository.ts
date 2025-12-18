@@ -5,21 +5,15 @@ import { BaseRepository } from '../../base/BaseRepository';
 import { Booking } from '../../../models/booking/bookingModel';
 import { Customer } from '../../../models/customer/customerModel';
 import { CarOwner } from '../../../models/carowner/carOwnerModel';
+import logger from '../../../utils/logger';
 
 class ChatRepository extends BaseRepository<IChatMessage> implements IChatRepository {
   constructor() {
     super(ChatMessage);
   }
 
-  //  async saveMessage (data: Partial<IChatMessage>):Promise<IChatMessage> {
-  //   const user = await Customer.findById(data.senderId);
-  //   const user=await carOwner.findById(data.senderId);
-  //    return await ChatMessage.create(...data,senderName:user.name,senderRole:user.role);
-
-  // };
-
   async saveMessage(data: Partial<IChatMessage>): Promise<IChatMessage> {
-    // Try to find the user in Customer first, then CarOwner
+   
     let user = await Customer.findById(data.senderId);
     if (!user) {
       user = await CarOwner.findById(data.senderId);
@@ -44,12 +38,12 @@ class ChatRepository extends BaseRepository<IChatMessage> implements IChatReposi
 
   async getActiveChatsByOwner(ownerId: string): Promise<IChatMessage[]> {
     const bookings = await Booking.find({ carOwnerId: ownerId }).select('bookingId');
-    console.log(bookings);
+    logger.info("bookings",bookings);
     const bookingIds = bookings.map((b) => b.bookingId);
 
     const chats = await ChatMessage.find({ roomId: { $in: bookingIds } }).sort({ timestamp: 1 });
 
-    console.log('chats', chats);
+    logger.info('chats', chats);
     return chats;
   }
 }

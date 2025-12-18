@@ -8,6 +8,7 @@ import ICarOwnerCarsController from '../../interfaces/carowner/ICarOwnerCarsCont
 import { ICarOwnerCarsService } from '../../../services/interfaces/carOwner/ICarOwnerCarsServices';
 import { CarMapper } from '../../../mappers/car.mapper';
 import { CarListResponseDTO } from '../../../dtos/car/carList.response.dto';
+import logger from '../../../utils/logger';
 
 class CarOwnerCarsController implements ICarOwnerCarsController {
   private _ownerscarService: ICarOwnerCarsService;
@@ -35,8 +36,8 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       const ownerId = req.userId;
 
       if (!ownerId) {
-        console.log(req.userId);
-        console.log('no owner');
+        
+        logger.warn('no owner');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
           message: MESSAGES.ERROR.UNAUTHORIZED,
@@ -92,7 +93,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         car: carResponse,
       });
     } catch (error) {
-      console.log('Car upload error:', error);
+      logger.error('Car upload error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -123,12 +124,8 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
   const response: CarListResponseDTO = { cars: carDTOs, total };
 
   res.status(StatusCode.OK).json({ success: true, ...response });
-      // res.status(StatusCode.OK).json({
-      //   cars,
-      //   total,
-      // });
     } catch (error) {
-      console.error('Error fetching cars:', error);
+      logger.error('Error fetching cars:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -161,7 +158,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         data: bookingDTOs,
       });
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      logger.error('Error fetching bookings:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -207,7 +204,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         data: carResponse,
       });
     } catch (error) {
-      console.error('Error updating availability:', error);
+      logger.error('Error updating availability:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -224,14 +221,14 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       }
       const deletedCar = await this._ownerscarService.deleteCar(carId);
       const carResponse = CarMapper.toCarDTO(deletedCar);
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.CAR_DELETED || 'Car deleted successfully',
         car: carResponse,
       });
     } catch (error) {
-      console.error('Delete Error:', error);
-      this.handleError(res, error, 500);
+      logger.error('Delete Error:', error);
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -312,7 +309,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         car: carResponse,
       });
     } catch (error) {
-      console.error('Update Car Error:', error);
+      logger.info('Update Car Error:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
@@ -324,12 +321,12 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       if (!booking) {
        res.status(StatusCode.OK).json({
         success: true,
-        booking: null, // explicitly say no active booking
+        booking: null, 
       });
       return
     }
       const bookingDTOs = CarMapper.toCarBookingDTO(booking);
-      console.log('booking/ ', booking);
+      logger.info('booking/ ', booking);
       res.status(StatusCode.OK).json({ success: true, booking:bookingDTOs });
     } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -341,7 +338,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
     error: unknown,
     statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
   ): void {
-    console.error('Error:', error);
+    logger.error('Error:', error);
 
     const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 

@@ -161,11 +161,7 @@ class CustomerCarAndBookingRepository
     return Booking.findById(bookingId);
   }
 
-  // async saveBooking(bookingData: IBooking): Promise<IBooking> {
-  //   return bookingData.save();
-  // }
   async saveBooking(bookingData: HydratedDocument<IBooking>): Promise<IBooking> {
-    console.log('reached for save');
     return bookingData.save();
   }
 
@@ -173,16 +169,7 @@ class CustomerCarAndBookingRepository
     await Booking.deleteOne({ _id: bookingId });
   }
 
-  // async findConflictingBooking(carId: string, startDate: Date, endDate: Date): Promise<IBooking | null> {
-  //   return Booking.findOne({
-  //     carId,
-  //     status: { $in: ['confirmed'] },
-  //     $or: [
-  //       { startDate: { $lte: endDate, $gte: startDate } },
-  //       { endDate: { $lte: endDate, $gte: startDate } },
-  //     ],
-  //   });
-  // }
+ 
   async findConflictingBooking(
     carId: string,
     startDate: Date,
@@ -200,7 +187,7 @@ class CustomerCarAndBookingRepository
           $or: [
             { startDate: { $lte: endDate, $gte: startDate } },
             { endDate: { $lte: endDate, $gte: startDate } },
-            { startDate: { $lte: startDate }, endDate: { $gte: endDate } }, // fully overlapping
+            { startDate: { $lte: startDate }, endDate: { $gte: endDate } }, 
           ],
         },
       ],

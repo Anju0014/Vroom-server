@@ -6,6 +6,7 @@ import { Car, ICar } from '../../../models/car/carModel';
 import { Booking } from '../../../models/booking/bookingModel';
 import { PipelineStage } from 'mongoose';
 import { buildSearchQuery } from '../../../utils/queryUtils';
+import logger from '../../../utils/logger';
 
 class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwnerRepository {
   constructor() {
@@ -49,7 +50,7 @@ class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwner
 
       return { carOwners, total };
     } catch (error) {
-      console.error('Error in getAllOwnerVerify:', error);
+      logger.error('Error in getAllOwnerVerify:', error);
       throw new Error('Database query failed');
     }
   }
@@ -91,7 +92,7 @@ class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwner
 
       return { cars, total };
     } catch (error) {
-      console.error('Error in getAllCarsVerify:', error);
+      logger.error('Error in getAllCarsVerify:', error);
       throw new Error('Database query failed');
     }
   }
@@ -128,7 +129,7 @@ class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwner
 
       return { cars, total };
     } catch (error) {
-      console.error('Error in getAllVerifiedCars:', error);
+      logger.error('Error in getAllVerifiedCars:', error);
       throw new Error('Database query failed');
     }
   }
@@ -237,16 +238,13 @@ class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwner
 
       return { bookings, total: totalResult[0]?.total || 0 };
     } catch (err) {
-      console.error('Error in getAllBookings aggregation:', err);
+      logger.error('Error in getAllBookings aggregation:', err);
       throw new Error('Failed to fetch bookings');
     }
   }
 
   async findCarOwnerById(ownerId: string): Promise<ICarOwner | null> {
-    console.log('kiki');
-    console.log(ownerId);
-    let response = await CarOwner.findById(ownerId);
-    console.log(response);
+    let response = await CarOwner.findById(ownerId)
     return response;
   }
 

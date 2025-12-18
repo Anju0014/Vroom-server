@@ -11,6 +11,7 @@ import { Booking, IBooking } from '../../../models/booking/bookingModel';
 import { NotificationTemplates } from '../../../templates/notificationTemplates';
 import INotificationRepository from '../../../repositories/interfaces/notification/INotificationRepository';
 import { INotificationService } from '../../interfaces/notification/INotificationServices';
+import logger from '../../../utils/logger';
 
 class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
   private _customerCarRepository: ICustomerCarAndBookingRepository;
@@ -128,59 +129,7 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     }
     return booking._id.toString();
   }
-
-  //       async createPendingBooking(bookingData: BookingData): Promise<string> {
-  //   const { carId, startDate, endDate } = bookingData;
-
-  //   if (!startDate || !endDate) {
-  //     throw new Error('Start date and end date are required');
-  //   }
-
-  //   const car = await this._customerCarRepository.findCarById(carId);
-  //   if (!car) {
-  //     throw new Error('Car not found');
-  //   }
-
-  //   const start = new Date(startDate);
-  //   const end = endOfDay(new Date(endDate));
-
-  //   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-  //     throw new Error('Invalid date format');
-  //   }
-
-  //   const conflict = await this._customerCarRepository.findConflictingBooking(carId,start,end);
-  //   if (conflict) {
-  //     throw new Error('Car is not available for the selected dates');
-  //   }
-
-  //   console.log("conflict",conflict)
-
-  // //   const existingBooking = await  this._customerCarRepository.checkOldBooking(bookingData)
-
-  // //   if (existingBooking &&  existingBooking._id) {
-  // //     console.log("existingone")
-  // //     return  existingBooking._id.toString() ;
-  // //   }
-
-  // console.log("create pending booking phase1")
-  // const now = new Date();
-  // const lockDuration = 10 * 60 * 1000; // 10 minutes
-  //   const booking = await this._customerCarRepository.createBooking({
-  //     ...bookingData,
-  //     startDate: start,
-  //     endDate: end,
-  //     status: 'pending',
-  //     lockedUntil: new Date(now.getTime() + lockDuration),
-
-  //   });
-
-  // console.log("booking new pending",booking);
-  //   if(!booking || !booking._id){
-  //     throw new Error(' Error in Creating the Booking')
-  //   }
-  //   return booking._id.toString();
-  // }
-
+  
   async confirmBooking(bookingId: string, paymentIntentId: string): Promise<IBooking> {
     const booking = await this._customerCarRepository.findBookingById(bookingId);
     console.log('booking-old-confirm', booking);
@@ -227,41 +176,25 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
       throw new Error('Invalid or non-pending booking');
     }
 
-    // Option 1: update status
     booking.status = 'failed';
     await this._customerCarRepository.saveBooking(booking);
   }
 
-  // async updateTrackingLocation({bookingId,token,lat,lng,}: UpdateTrackingProps): Promise<void> {
-  //   const booking = await this._customerCarRepository.findBookingById(bookingId);
-  //   console.log(booking)
-
-  //   if (!booking || booking.trackingToken !== token) {
-  //     throw new Error("Unauthorized tracking link");
-  //   }
-
-  //   await this._customerCarRepository.updateBookingLocation(bookingId, { lat, lng });
-
-  //   const io = getIO();
-  //   console.log(`Emitting location to booking_${bookingId}:`, { lat, lng });
-  //   io.to(`booking_${bookingId}`).emit("location:update", { lat, lng });
-  // }
-
   async updateTrackingLocation({ bookingId, token, lat, lng }: UpdateTrackingProps): Promise<void> {
-    console.log('Updating location for booking:', bookingId, { lat, lng });
+    logger.info('Updating location for booking:', bookingId, { lat, lng });
     const booking = await this._customerCarRepository.findBookingById(bookingId);
-    console.log('Booking found:', booking);
+    logger.info('Booking found:', booking);
 
     if (!booking || booking.trackingToken !== token) {
-      console.error('Unauthorized tracking link for booking:', bookingId);
+      logger.error('Unauthorized tracking link for booking:', bookingId);
       throw new Error('Unauthorized tracking link');
     }
 
     await this._customerCarRepository.updateBookingLocation(bookingId, { lat, lng });
-    console.log('Location updated in DB for booking:', bookingId);
+    logger.info('Location updated in DB for booking:', bookingId);
 
     const io = getIO();
-    console.log(`Emitting location to booking_${bookingId}:`, { lat, lng });
+    logger.info(`Emitting location to booking_${bookingId}:`, { lat, lng });
     io.to(`booking_${bookingId}`).emit('location:update', { lat, lng });
   }
 }

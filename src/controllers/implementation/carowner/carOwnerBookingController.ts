@@ -8,6 +8,7 @@ import { Booking } from '../../../models/booking/bookingModel';
 import { generatePresignedUrl, generateViewPresignedUrl, generateViewRecieptPresignedUrl } from '../../../services/s3Service';
 import { OwnerBookingListResponseDTO } from '../../../dtos/booking/carOwnerBookingList.response.dto';
 import { toBookingDTOs } from '../../../mappers/ownerBooking.mapper';
+import logger from '../../../utils/logger';
 
 
 class CarOwnerBookingController implements ICarOwnerBookingController {
@@ -51,24 +52,16 @@ class CarOwnerBookingController implements ICarOwnerBookingController {
       });
     } catch (error:any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-    //   console.error('Failed to fetch car owner bookings:', error);
-    //   res
-    //     .status(StatusCode.INTERNAL_SERVER_ERROR)
-    //     .json({ success: false, message: 'Something went wrong' });
-    // }
   }
 }
 
-// ownerBooking.controller.ts (or booking.controller.ts)
+
 
 async getReceiptUrl(req: CustomRequest, res: Response) {
   try {
-console.log("reached at")
     const { bookingId } = req.params;
-    console.log("bookingId",bookingId)
+    logger.info("bookingId",bookingId)
     const userId = req.userId;
-    // const userRole = req.role; // assuming role is added in auth middleware
-
     if (!bookingId) {
       res.status(StatusCode.BAD_REQUEST).json({
         success: false,
@@ -99,7 +92,7 @@ console.log("reached at")
     const isAuthorized =
       booking.userId.toString() === userId ||
       booking.carOwnerId.toString() === userId
-      // userRole === 'ADMIN';
+   
 
     if (!isAuthorized) {
       res.status(StatusCode.FORBIDDEN).json({
@@ -112,7 +105,7 @@ console.log("reached at")
     
     const url = await generateViewRecieptPresignedUrl(booking.receiptKey);
 
-    console.log(url)
+    logger.info(url)
     res.status(StatusCode.OK).json({
       success: true,
       url,
@@ -128,7 +121,7 @@ console.log("reached at")
       error: unknown,
       statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
     ): void {
-      console.error('Error:', error);
+      logger.error('Error:', error);
   
       const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
   

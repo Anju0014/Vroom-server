@@ -8,6 +8,7 @@ import { ICustomerCarAndBookingService } from '../../../services/interfaces/cust
 import { generateAndUploadReceipt } from '../../../services/receiptService';
 import { Booking } from '../../../models/booking/bookingModel';
 import { CustomerCarMapper } from '../../../mappers/customerCar.mapper';
+import logger from '../../../utils/logger';
 
 class CustomerCarAndBookingController implements ICustomerCarAndBookingController {
   private _customerCarService: ICustomerCarAndBookingService;
@@ -42,7 +43,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
   async getFeaturedCars(req: Request, res: Response): Promise<void> {
     try {
-      console.log('featuredcars');
+      logger.info('featuredcars');
       const cars = await this._customerCarService.getFeaturedCars();
       res.status(StatusCode.OK).json({ success: true, data:  CustomerCarMapper.toCarDTOs(cars) });
     } catch (err) {
@@ -64,7 +65,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
 
-      console.log('reached at controller', search, minPrice, maxPrice, carType, location);
+      logger.info('reached at getAllCars controller', search, minPrice, maxPrice, carType, location);
       if (page < 1 || limit < 1 || limit > 100) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
@@ -91,11 +92,11 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
         startDate,
         endDate,
       });
-      console.log('Cars:', cars, 'Total:', total);
+      logger.info('Cars:', cars, 'Total:', total);
 
       res.status(StatusCode.OK).json({ data:  CustomerCarMapper.toCarDTOs(cars), total });
     } catch (error) {
-      console.error('Failed to fetch cars:', error);
+      logger.error('Failed to fetch cars:', error);
       res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: MESSAGES.ERROR.INTERNAL_SERVER_ERROR,
@@ -132,7 +133,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       }
 
       const bookedRanges = await this._customerCarService.getBookedDateRanges(carId);
-      console.log('bookedRanges', bookedRanges);
+      logger.info('bookedRanges', bookedRanges);
       res.status(StatusCode.OK).json({ success: true, data: CustomerCarMapper.toBookedDateRangeDTO(bookedRanges)});
     } catch (err) {
       this.handleError(res, err);
@@ -140,20 +141,18 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
   }
   // controller
   async checkBookingAvailability(req: Request, res: Response): Promise<void> {
-    console.log('reached availability point');
+    logger.info('reached availability point');
     try {
-      const { carId, startDate, endDate } = req.query; // or req.body
+      const { carId, startDate, endDate } = req.query; 
 
       const bookings = await Booking.find({
         carId,
         $or: [
-          // confirmed overlapping
           {
             status: 'confirmed',
             startDate: { $lte: endDate },
             endDate: { $gte: startDate },
           },
-          // pending overlapping
           {
             status: 'pending',
             lockedUntil: { $gte: new Date() },
@@ -164,15 +163,15 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       });
 
       if (bookings.length > 0) {
-        console.log(false);
+        logger.warn(false);
         res.json({ available: false });
         return;
       }
-      console.log(true);
+      logger.info(true);
       res.json({ available: true });
       return;
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }
@@ -180,7 +179,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
   async createPendingBooking(req: Request, res: Response): Promise<void> {
     try {
       const bookingId = await this._customerCarService.createPendingBooking(req.body);
-      console.log(bookingId);
+      logger.info(bookingId);
       res.status(StatusCode.CREATED).json({ success: true, bookingId });
     } catch (err) {
       this.handleError(res, err, StatusCode.BAD_REQUEST);
@@ -188,27 +187,27 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
   }
   async updatePendingBooking(req: Request, res: Response): Promise<void> {
     try {
-      const { bookingId } = req.params; // from URL: /bookings/:bookingId
-      const { status } = req.body; // from request body
+      const { bookingId } = req.params; 
+      const { status } = req.body; 
 
       if (!status) {
-        res.status(400).json({ message: 'Status is required' });
+        res.status(StatusCode.NOT_FOUND).json({ message: 'Status is required' });
         return;
       }
 
       const booking = await Booking.findById(bookingId);
       if (!booking) {
-        res.status(404).json({ message: 'Booking not found' });
+        res.status(StatusCode.NOT_FOUND).json({ message: 'Booking not found' });
         return;
       }
 
       booking.status = status;
       await booking.save();
 
-      res.status(200).json({ message: 'Booking updated', booking });
+      res.status(StatusCode.OK).json({ message: 'Booking updated', booking });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      logger.error(error);
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
 
@@ -243,8 +242,6 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
   async updateCarTracking(req: Request, res: Response): Promise<void> {
     try {
-      console.log('here i am');
-      console.log(req.body);
       const { bookingId, token, lat, lng } = req.body;
 
       await this._customerCarService.updateTrackingLocation({
@@ -265,7 +262,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
     error: unknown,
     statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
   ): void {
-    console.error('Error:', error);
+    logger.error('Error:', error);
 
     const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 

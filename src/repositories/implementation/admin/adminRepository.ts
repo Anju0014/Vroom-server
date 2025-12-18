@@ -4,6 +4,7 @@ import { BaseRepository } from '../../base/BaseRepository';
 import { Customer, ICustomer } from '../../../models/customer/customerModel';
 import { CarOwner, ICarOwner } from '../../../models/carowner/carOwnerModel';
 import { buildSearchQuery } from '../../../utils/queryUtils';
+import logger from '../../../utils/logger';
 
 // interface PaginationResult<T> {
 //   data: T[];
@@ -27,17 +28,13 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
     await Admin.findByIdAndUpdate(adminId, { password });
   }
   async findUserByRefreshToken(refreshToken: string): Promise<IAdmin | null> {
-    console.log(refreshToken);
-
     const admin = await Admin.findOne({ refreshToken });
-    console.log(admin);
+    logger.info("admin refreshcheck",admin);
     return admin;
   }
 
   async updateRefreshToken(adminId: string, refreshToken: string): Promise<void> {
-    console.log('gyubb', refreshToken);
     const admin = await Admin.findByIdAndUpdate(adminId, { refreshToken });
-    console.log('//////', admin);
   }
 
   async clearRefreshToken(adminId: string): Promise<void> {
@@ -95,7 +92,7 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
 
       return { customers, total };
     } catch (error) {
-      console.error('Error in getAllCustomers:', error);
+      logger.error('Error in getAllCustomers:', error);
       throw new Error('Database query failed');
     }
   }
@@ -120,16 +117,15 @@ class AdminRepository extends BaseRepository<IAdmin> implements IAdminRepository
 
       return { carOwners, total };
     } catch (error) {
-      console.error('Error in getAllOwners:', error);
+      logger.error('Error in getAllOwners:', error);
       throw new Error('Database query failed');
     }
   }
 
   async findCustomerById(customerId: string): Promise<ICustomer | null> {
-    console.log('kiki');
-    console.log(customerId);
+
     let response = await Customer.findById(customerId);
-    console.log(response);
+  
     return response;
   }
 

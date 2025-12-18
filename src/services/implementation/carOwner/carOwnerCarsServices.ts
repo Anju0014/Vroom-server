@@ -7,6 +7,7 @@ import { INotificationService } from '../../interfaces/notification/INotificatio
 import IAdminRepository from '../../../repositories/interfaces/admin/IAdminRepository';
 import { NotificationTemplates } from '../../../templates/notificationTemplates';
 import ICarOwnerRepository from '../../../repositories/interfaces/carOwner/ICarOwnerRepository';
+import logger from '../../../utils/logger';
 
 class CarOwnerCarsService implements ICarOwnerCarsService {
   private _ownersCarRepository: ICarOwnerCarsRepository;
@@ -22,7 +23,7 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
   }
 
   async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
-    console.log('registering car for owner', ownerId);
+    logger.info('registering car for owner', ownerId);
     if (!ownerId) throw new Error('Owner ID is required');
       const owner=await this._ownerRepository.findById(ownerId)
        if (!owner ){
@@ -81,7 +82,6 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
   }
 
   async getBookingsByCarId(carId: string, ownerId: string): Promise<IBooking[]> {
-    console.log('whre are u');
     return await this._ownersCarRepository.findByCarId(carId, ownerId);
   }
 
@@ -108,7 +108,7 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
   }
 
   async getActiveBookingForCar(carId: string) {
-    console.log(carId);
+    logger.info("booking for car with id",carId);
     const booking = await this._ownersCarRepository.findActiveBookingByCarId(carId);
     return booking;
   }

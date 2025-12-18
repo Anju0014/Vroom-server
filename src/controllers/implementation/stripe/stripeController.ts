@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import { stripe } from '../../../config/stripeConfig';
 import { Booking } from '../../../models/booking/bookingModel'; // Adjust path to your Booking model
 import { StatusCode } from '../../../constants/statusCode';
+import logger from '../../../utils/logger';
 
 export const createPaymentData = async (req: Request, res: Response): Promise<void> => {
-  console.log('Received payment intent request:', req.body);
+  logger.info('Received payment intent request:', req.body);
   const { carId, startDate, endDate, totalPrice, customerEmail, bookingId } = req.body;
 
-  // Validate input
   if (!carId || !startDate || !endDate || !totalPrice || !customerEmail || !bookingId) {
-    console.log('Missing required fields:', {
+    logger.warn('Missing required fields:', {
       carId,
       startDate,
       endDate,
@@ -17,7 +17,7 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
       customerEmail,
       bookingId,
     });
-    res.status(400).json({
+    res.status(StatusCode.BAD_REQUEST).json({
       error:
         'Missing required fields: carId, startDate, endDate, totalPrice, customerEmail, bookingId',
     });
@@ -25,16 +25,15 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
   }
 
   if (!Number.isInteger(totalPrice) || totalPrice <= 0) {
-    console.log('Invalid totalPrice:', totalPrice);
+    logger.log('Invalid totalPrice:', totalPrice);
     res.status(StatusCode.NOT_FOUND).json({ error: 'Valid totalPrice in rupees is required' });
     return;
   }
 
   try {
-    // Validate booking
     const booking = await Booking.findById(bookingId);
     if (!booking || booking.status !== 'agreementAccepted') {
-      console.log('Invalid or non-pending booking:', bookingId);
+      logger.info('Invalid or non-pending booking:', bookingId);
       res.status(StatusCode.NOT_FOUND).json({ error: 'Invalid or non-pending booking' });
       return;
     }
@@ -54,17 +53,17 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
       },
     });
 
-    console.log('Payment intent created:', paymentIntent.id);
+    logger.info('Payment intent created:', paymentIntent.id);
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     if (err instanceof Error && 'code' in err) {
       const statusCode =
-        'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : 400;
-      console.error('Stripe error:', err.message, 'Code:', (err as any).code);
+        'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : StatusCode.BAD_REQUEST;
+      logger.error('Stripe error:', err.message, 'Code:', (err as any).code);
       res.status(statusCode).json({ error: err.message });
       return;
     }
-    console.error('Unexpected error:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    logger.error('Unexpected error:', err);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error' });
   }
 };

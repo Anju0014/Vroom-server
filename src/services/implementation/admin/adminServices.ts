@@ -16,6 +16,7 @@ import { AdminMapper } from '../../../mappers/admin.mapper';
 import { CustomerMapper } from '../../../mappers/customer.mapper';
 import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
 import { CustomerDTO } from '../../../dtos/customer/customer.dto';
+import logger from '../../../utils/logger';
 
 
 class AdminService implements IAdminService {
@@ -28,16 +29,16 @@ class AdminService implements IAdminService {
     email: string,
     password: string
   ): Promise<AdminLoginResponseDTO> {
-    console.log(`checking login things`);
+    logger.info(`checking login things`);
     const admin = await this._adminRepository.findUserByEmail(email);
-    console.log(admin);
+    logger.info(admin);
     if (!admin) {
-      console.log('not correct user');
+      logger.warn('not correct user');
       throw new Error('Invalid Credentials');
     }
     const passwordTrue = await PasswordUtils.comparePassword(password, admin.password);
     if (!passwordTrue) {
-      console.log('not correct');
+      logger.warn('not correct password');
       throw new Error('Invalid Credentials');
     }
     const adminAccessToken = JwtUtils.generateAccessToken({
@@ -49,18 +50,18 @@ class AdminService implements IAdminService {
 
     await this._adminRepository.updateRefreshToken(admin._id.toString(), newRefreshToken);
     const admin2 = await this._adminRepository.findUserByRefreshToken(newRefreshToken);
-    console.log(admin2);
-    console.log(newRefreshToken);
+    logger.info(admin2);
+    logger.info(newRefreshToken);
      return AdminMapper.toLoginResponse(admin, adminAccessToken, newRefreshToken);
     // return { adminAccessToken, refreshToken: newRefreshToken, admin };
   }
 
   async logoutAdmin(refreshToken: string): Promise<void> {
-    console.log(refreshToken);
+    logger.info(refreshToken);
     const admin = await this._adminRepository.findUserByRefreshToken(refreshToken);
-    console.log(admin);
+   logger.info(admin);
     if (!admin) {
-      console.log('error');
+      logger.info(': no admin error');
       throw new Error('User not found');
     }
     await this._adminRepository.clearRefreshToken(admin._id.toString());
@@ -72,7 +73,7 @@ class AdminService implements IAdminService {
     search: string
   ): Promise<CustomerListResponseDTO>{
     try {
-      console.log('reached222');
+      
     const { customers, total } =
     await this._adminRepository.getAllCustomers(page, limit, search);
 
@@ -82,7 +83,7 @@ class AdminService implements IAdminService {
   };
       // return await this._adminRepository.getAllCustomers(page, limit, search);
     } catch (error) {
-      console.error('Error in listAllCustomers:', error);
+      logger.error('Error in listAllCustomers:', error);
       throw new Error('Failed to fetch customers');
     }
   }
@@ -92,7 +93,7 @@ class AdminService implements IAdminService {
     search: string
   ): Promise<CarOwnerListResponseDTO> {
     try {
-      console.log('reached222');
+     
         const { carOwners, total } =
       await this._adminRepository.getAllOwners(page, limit, search);
 return {
@@ -101,7 +102,7 @@ return {
 };
       // return await this._adminRepository.getAllOwners(page, limit, search);
     } catch (error) {
-      console.error('Error in listAllCustomers:', error);
+      logger.error('Error in listAllCustomers:', error);
       throw new Error('Failed to fetch customers');
     }
   }
@@ -110,7 +111,7 @@ return {
     customerId: string,
     newStatus: number
   ): Promise<CustomerDTO> {
-    console.log('Processing status update:', customerId, newStatus);
+    logger.info('Processing status update:', customerId, newStatus);
     // const user = await this._adminRepository.findCustomerById(customerId);
     // if (!user) throw new Error('User not found');
     // let updateData: Partial<ICustomer> = { blockStatus: newStatus };

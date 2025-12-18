@@ -1,6 +1,7 @@
 import { CarOwner, ICarOwner } from '../../../models/carowner/carOwnerModel';
 import ICarOwnerRepository from '../../interfaces/carOwner/ICarOwnerRepository';
 import { BaseRepository } from '../../base/BaseRepository';
+import logger from '../../../utils/logger';
 
 class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerRepository {
   constructor() {
@@ -18,7 +19,7 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
   async updateRefreshToken(carOwnerId: string, refreshToken: string): Promise<void> {
     const result = await CarOwner.findByIdAndUpdate(carOwnerId, { refreshToken });
     if (!result) {
-      console.log('not updating');
+     logger.warn('not updating');
     }
   }
   async updatePassword(carOwnerId: string, password: string): Promise<void> {
