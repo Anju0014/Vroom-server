@@ -1,8 +1,7 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 interface ICar extends Document<Types.ObjectId> {
-
-   _id: Types.ObjectId;
+  _id: Types.ObjectId;
   carName: string;
   brand: string;
   year?: string;
@@ -31,7 +30,7 @@ interface ICar extends Document<Types.ObjectId> {
   isDeleted?: boolean;
   unavailableDates: Date[];
   rejectionReason: string;
-  createdAt:Date;
+  createdAt: Date;
   updatedAt: Date;
 }
 

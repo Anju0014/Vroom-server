@@ -28,7 +28,7 @@ class CustomerDashBoardRepository
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean(); 
+      .lean();
 
     return bookings.map((booking) => ({
       _id: booking._id,
@@ -61,7 +61,6 @@ class CustomerDashBoardRepository
   }
 
   async saveBooking(bookingData: HydratedDocument<IBooking>): Promise<IBooking> {
-   
     let booking = await bookingData.save();
     logger.info(booking);
     return booking;
@@ -80,7 +79,7 @@ class CustomerDashBoardRepository
     };
 
     await Wallet.updateOne({ userId }, { $push: { transactions: transaction } });
-   logger.info('Transaction logged:', transaction);
+    logger.info('Transaction logged:', transaction);
   }
 
   async findWalletByUserId(userId: string): Promise<IWallet | null> {
@@ -101,6 +100,5 @@ class CustomerDashBoardRepository
   async saveWallet(wallet: IWallet): Promise<IWallet | null> {
     return Wallet.findOneAndUpdate({ userId: wallet.userId }, wallet, { new: true });
   }
-
 }
 export default CustomerDashBoardRepository;

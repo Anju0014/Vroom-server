@@ -23,9 +23,8 @@ const customerController = new CustomerController(customerService);
 
 const customerCarAndBookingRepository = new CustomerCarAndBookingRepository();
 
-const notificationRepository=new NotificationRepository()
+const notificationRepository = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepository);
-
 
 const customerCarAndBookingService = new CustomerCarAndBookingService(
   customerCarAndBookingRepository,

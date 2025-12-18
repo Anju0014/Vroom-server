@@ -1,45 +1,9 @@
-// import { Request, Response, NextFunction } from "express";
-// import JwtUtils from "../utils/jwtUtils";
-
-// export interface CustomRequest extends Request {
-//   userId?: string;
-//   email?:string;
-//   role?:string
-// }
-
-// const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
-//   try{
-//   const token = req.header("Authorization")?.replace("Bearer ", "").trim();
-//   if (!token) {
-//     res.status(401).json({ message: "Unauthorized. No token provided." });
-//     return
-//   }
-//   const decoded = JwtUtils.verifyToken(token);
-//   if (!decoded || typeof decoded !== "object") {
-//      res.status(403).json({ message: "Invalid token." });
-//      return
-//   }
-//   const { id,email,role} = decoded as { id: string ;email:string,role:string};
-//   if (!id) {
-//     res.status(403).json({ message: "Invalid token: missing user ID." });
-//     return
-//   }
-//   req.userId = id;
-//   req.email=email;
-//   req.role=role;
-//   next();
-// }catch(error){
-//   res.status(500).json({ message: "Internal server error." });
-//   return
-// }
-// };
-
-// export default authMiddleware;
-
 import { Request, Response, NextFunction } from 'express';
 import JwtUtils from '../utils/jwtUtils';
 import { Customer } from '../models/customer/customerModel';
 import { CarOwner } from '../models/carowner/carOwnerModel';
+import { StatusCode } from '../constants/statusCode';
+import logger from '../utils/logger';
 
 export interface CustomRequest extends Request {
   userId?: string;
@@ -52,13 +16,13 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     console.log('checking auth');
     const token = req.header('Authorization')?.replace('Bearer ', '').trim();
     if (!token) {
-      res.status(401).json({ message: 'Unauthorized. No token provided.' });
+      res.status(StatusCode.UNAUTHORIZED).json({ message: 'Unauthorized. No token provided.' });
       return;
     }
 
     const decoded = JwtUtils.verifyToken(token);
     if (!decoded || typeof decoded !== 'object') {
-      res.status(403).json({ message: 'Invalid token.' });
+      res.status(StatusCode.FORBIDDEN).json({ message: 'Invalid token.' });
       return;
     }
 
@@ -69,7 +33,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     };
 
     if (!id) {
-      res.status(403).json({ message: 'Invalid token: missing user ID.' });
+      res.status(StatusCode.FORBIDDEN).json({ message: 'Invalid token: missing user ID.' });
       return;
     }
 
@@ -78,7 +42,8 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     req.role = role;
     next();
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error.' });
+    logger.error(error);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
     return;
   }
 };
@@ -86,7 +51,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
 export const verifyRole = (allowedRoles: ('carOwner' | 'customer' | 'admin')[]) => {
   return (req: CustomRequest, res: Response, next: NextFunction): void => {
     if (!req.role || !allowedRoles.includes(req.role)) {
-      res.status(403).json({ message: 'Forbidden: Access denied.' });
+      res.status(StatusCode.FORBIDDEN).json({ message: 'Forbidden: Access denied.' });
       return;
     }
     next();
@@ -98,7 +63,9 @@ export const checkBlocked = async (req: CustomRequest, res: Response, next: Next
     const { userId, role } = req;
 
     if (!userId || !role) {
-      return res.status(401).json({ message: 'Unauthorized: Missing user data.' });
+      return res
+        .status(StatusCode.UNAUTHORIZED)
+        .json({ message: 'Unauthorized: Missing user data.' });
     }
 
     let user: any;
@@ -112,18 +79,20 @@ export const checkBlocked = async (req: CustomRequest, res: Response, next: Next
     }
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(StatusCode.NOT_FOUND).json({ message: 'User not found.' });
     }
 
     if (user.blockStatus === 1) {
       // assuming 1 = blocked, 0 = active
-      return res.status(403).json({ message: 'Your account is blocked. Contact support.' });
+      return res
+        .status(StatusCode.FORBIDDEN)
+        .json({ message: 'Your account is blocked. Contact support.' });
     }
 
     next();
   } catch (err) {
-    console.error('Block check error:', err);
-    res.status(500).json({ message: 'Internal server error.' });
+    logger.error('Block check error:', err);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
   }
 };
 

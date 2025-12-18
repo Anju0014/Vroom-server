@@ -27,29 +27,14 @@ import { CustomerListResponseDTO } from '../../../dtos/customer/customerList.res
 import { CarOwnerListResponseDTO } from '../../../dtos/carOwner/carOwnerList.response.dto';
 import { CustomerDTO } from '../../../dtos/customer/customer.dto';
 
-
 export interface IAdminService {
-  loginAdmin(
-    email: string,
-    password: string
-  ): Promise<AdminLoginResponseDTO>;
+  loginAdmin(email: string, password: string): Promise<AdminLoginResponseDTO>;
 
   logoutAdmin(refreshToken: string): Promise<void>;
 
-  listAllCustomers(
-    page: number,
-    limit: number,
-    search: string
-  ): Promise<CustomerListResponseDTO>;
+  listAllCustomers(page: number, limit: number, search: string): Promise<CustomerListResponseDTO>;
 
-  listAllCarOwners(
-    page: number,
-    limit: number,
-    search: string
-  ): Promise<CarOwnerListResponseDTO>;
+  listAllCarOwners(page: number, limit: number, search: string): Promise<CarOwnerListResponseDTO>;
 
-  updateCustomerBlockStatus(
-    customerId: string,
-    blockStatus: number
-  ): Promise<CustomerDTO>;
+  updateCustomerBlockStatus(customerId: string, blockStatus: number): Promise<CustomerDTO>;
 }

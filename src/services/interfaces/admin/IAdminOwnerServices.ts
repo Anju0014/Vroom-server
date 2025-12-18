@@ -33,20 +33,15 @@
 //   updateCarVerifyStatus(carId: string, verifyDetails: Partial<ICar>): Promise<ICar | null>;
 // }
 
-
-
-
 import {
   OwnerVerifyListItemDTO,
-  OwnerVerifyListResponseDTO
+  OwnerVerifyListResponseDTO,
 } from '../../../dtos/adminOwner/carOwnerVerifyList.response.dto';
 import {
   CarVerifyListItemDTO,
-  CarVerifyListResponseDTO
+  CarVerifyListResponseDTO,
 } from '../../../dtos/adminOwner/carVerifyList.response.dto';
-import {
-  BookingListResponseDTO
-} from '../../../dtos/adminOwner/bookingList.response.dto';
+import { BookingListResponseDTO } from '../../../dtos/adminOwner/bookingList.response.dto';
 import { UpdateOwnerVerifyStatusRequestDTO } from '../../../dtos/adminOwner/ownerStatusUpdate.response.dto';
 import { UpdateCarVerifyStatusRequestDTO } from '../../../dtos/adminOwner/carStatusUpdate.request.dto';
 
@@ -69,29 +64,19 @@ export interface IAdminOwnerService {
     search: string
   ): Promise<CarVerifyListResponseDTO>;
 
-  listAllBookings(
-    page: number,
-    limit: number,
-    search: string
-  ): Promise<BookingListResponseDTO>;
+  listAllBookings(page: number, limit: number, search: string): Promise<BookingListResponseDTO>;
 
   updateOwnerVerifyStatus(
     ownerId: string,
     data: UpdateOwnerVerifyStatusRequestDTO
   ): Promise<OwnerVerifyListItemDTO>;
 
-  updateOwnerBlockStatus(
-    ownerId: string,
-    blockStatus: number
-  ): Promise<OwnerVerifyListItemDTO>;
+  updateOwnerBlockStatus(ownerId: string, blockStatus: number): Promise<OwnerVerifyListItemDTO>;
 
   updateCarVerifyStatus(
     carId: string,
     data: UpdateCarVerifyStatusRequestDTO
   ): Promise<CarVerifyListItemDTO>;
 
-  updateCarBlockStatus(
-    carId: string,
-    blockStatus: number
-  ): Promise<CarVerifyListItemDTO>;
+  updateCarBlockStatus(carId: string, blockStatus: number): Promise<CarVerifyListItemDTO>;
 }

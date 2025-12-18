@@ -20,6 +20,3 @@ export class BookingMapper {
     return bookings.map(this.toCarOwnerBookingDTO);
   }
 }
-
-
-

@@ -1,4 +1,4 @@
-import { CustomerCarDTO } from "./customerCar.dto";
+import { CustomerCarDTO } from './customerCar.dto';
 
 export interface CustomerCarDetailDTO extends CustomerCarDTO {
   videos: string[];

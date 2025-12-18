@@ -75,7 +75,7 @@ const CarOwnerSchema = new Schema<ICarOwner>(
     },
     blockStatus: {
       type: Number,
-      enum: [0, 1],  // 0: Not Verified, 1: Doc Verified
+      enum: [0, 1], // 0: Not Verified, 1: Doc Verified
       default: 0,
     },
     verifyStatus: {

@@ -4,7 +4,7 @@ import { IAdminOwnerService } from '../../interfaces/admin/IAdminOwnerServices';
 import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 import { sendEmail } from '../../../utils/emailconfirm';
 import { ICar } from '../../../models/car/carModel';
-import { IBooking } from '../../../models/booking/bookingModel';
+
 import {
   carVerificationRejectedTemplate,
   verificationApprovedTemplate,
@@ -13,18 +13,15 @@ import {
 
 import {
   OwnerVerifyListItemDTO,
-  OwnerVerifyListResponseDTO
+  OwnerVerifyListResponseDTO,
 } from '../../../dtos/adminOwner/carOwnerVerifyList.response.dto';
 import {
   CarVerifyListItemDTO,
-  CarVerifyListResponseDTO
+  CarVerifyListResponseDTO,
 } from '../../../dtos/adminOwner/carVerifyList.response.dto';
-import {
-  BookingListResponseDTO
-} from '../../../dtos/adminOwner/bookingList.response.dto';
+import { BookingListResponseDTO } from '../../../dtos/adminOwner/bookingList.response.dto';
 import { AdminOwnerMapper } from '../../../mappers/adminOwner.mapper';
 import logger from '../../../utils/logger';
-
 
 class AdminOwnerService implements IAdminOwnerService {
   private _adminOwnerRepository: IAdminOwnerRepository;
@@ -39,13 +36,16 @@ class AdminOwnerService implements IAdminOwnerService {
     search: string
   ): Promise<OwnerVerifyListResponseDTO> {
     try {
-      
-      const { carOwners, total } = await this._adminOwnerRepository.getAllOwnerforVerify(page, limit, search);
+      const { carOwners, total } = await this._adminOwnerRepository.getAllOwnerforVerify(
+        page,
+        limit,
+        search
+      );
 
-  return {
-    carOwners: carOwners.map(AdminOwnerMapper.toOwnerVerifyDTO),
-    total,
-  };
+      return {
+        carOwners: carOwners.map(AdminOwnerMapper.toOwnerVerifyDTO),
+        total,
+      };
       // return await this._adminOwnerRepository.getAllOwnerforVerify(page, limit, search);
     } catch (error) {
       logger.error('Error in listAllCustomers:', error);
@@ -60,11 +60,15 @@ class AdminOwnerService implements IAdminOwnerService {
   ): Promise<CarVerifyListResponseDTO> {
     try {
       logger.info('reached222');
-      const { cars, total } =await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
+      const { cars, total } = await this._adminOwnerRepository.getAllCarsforVerify(
+        page,
+        limit,
+        search
+      );
       // return await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
       return {
-       cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
-       total,
+        cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
+        total,
       };
     } catch (error) {
       logger.error('Error in listAllCustomers:', error);
@@ -78,12 +82,15 @@ class AdminOwnerService implements IAdminOwnerService {
     search: string
   ): Promise<CarVerifyListResponseDTO> {
     try {
-     
-       const { cars, total } =await this._adminOwnerRepository.getAllVerifiedCars(page, limit, search);
+      const { cars, total } = await this._adminOwnerRepository.getAllVerifiedCars(
+        page,
+        limit,
+        search
+      );
       // return await this._adminOwnerRepository.getAllCarsforVerify(page, limit, search);
       return {
-       cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
-       total,
+        cars: cars.map(AdminOwnerMapper.toCarVerifyDTO),
+        total,
       };
       // return await this._adminOwnerRepository.getAllVerifiedCars(page, limit, search);
     } catch (error) {
@@ -98,14 +105,16 @@ class AdminOwnerService implements IAdminOwnerService {
     search: string
   ): Promise<BookingListResponseDTO> {
     try {
-    
-      const { bookings, total } =
-    await this._adminOwnerRepository.getAllBookings(page, limit, search);
+      const { bookings, total } = await this._adminOwnerRepository.getAllBookings(
+        page,
+        limit,
+        search
+      );
 
-  return {
-    bookings: bookings.map(AdminOwnerMapper.toBookingDTO),
-    total,
-  };
+      return {
+        bookings: bookings.map(AdminOwnerMapper.toBookingDTO),
+        total,
+      };
       // return await this._adminOwnerRepository.getAllBookings(page, limit, search);
     } catch (error) {
       logger.error('Error in listAllBookings:', error);
@@ -146,39 +155,43 @@ class AdminOwnerService implements IAdminOwnerService {
     // return updatedUser;
   }
 
-  async updateOwnerBlockStatus(ownerId: string, newStatus: number): Promise<OwnerVerifyListItemDTO> {
-   logger.info('Processing status update:', ownerId, newStatus);
+  async updateOwnerBlockStatus(
+    ownerId: string,
+    newStatus: number
+  ): Promise<OwnerVerifyListItemDTO> {
+    logger.info('Processing status update:', ownerId, newStatus);
     const user = await this._adminOwnerRepository.findCarOwnerById(ownerId);
     if (!user) throw new Error('User not found');
     // let updateData: Partial<ICarOwner> = { blockStatus: newStatus };
     // return await this._adminOwnerRepository.updateOwnerStatus(ownerId, updateData);
-     const updatedOwner =
-    await this._adminOwnerRepository.updateOwnerStatus(ownerId, {
+    const updatedOwner = await this._adminOwnerRepository.updateOwnerStatus(ownerId, {
       blockStatus: newStatus,
     });
 
-  if (!updatedOwner) throw new Error('Error updating owner block status');
+    if (!updatedOwner) throw new Error('Error updating owner block status');
 
-  return AdminOwnerMapper.toOwnerVerifyDTO(updatedOwner);
+    return AdminOwnerMapper.toOwnerVerifyDTO(updatedOwner);
   }
 
-  async updateCarBlockStatus(carId: string, newStatus: number):  Promise<CarVerifyListItemDTO>{
+  async updateCarBlockStatus(carId: string, newStatus: number): Promise<CarVerifyListItemDTO> {
     logger.info('Processing status update:', carId, newStatus);
     const car = await this._adminOwnerRepository.findCarById(carId);
     if (!car) throw new Error('Car not found');
     // let updateData: Partial<ICar> = { blockStatus: newStatus };
     // return await this._adminOwnerRepository.updateCarStatus(carId, updateData);
-     const updatedCar =
-    await this._adminOwnerRepository.updateCarStatus(carId, {
+    const updatedCar = await this._adminOwnerRepository.updateCarStatus(carId, {
       blockStatus: newStatus,
     });
 
-  if (!updatedCar) throw new Error('Error updating car block status');
+    if (!updatedCar) throw new Error('Error updating car block status');
 
-  return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
+    return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
   }
 
-  async updateCarVerifyStatus(carId: string, verifyDetails: Partial<ICar>): Promise<CarVerifyListItemDTO> {
+  async updateCarVerifyStatus(
+    carId: string,
+    verifyDetails: Partial<ICar>
+  ): Promise<CarVerifyListItemDTO> {
     const { verifyStatus, rejectionReason } = verifyDetails;
 
     if (verifyStatus === -1 && !rejectionReason) {
@@ -189,8 +202,8 @@ class AdminOwnerService implements IAdminOwnerService {
     if (!car) {
       throw new Error('Car not found');
     }
-    if(car.verifyStatus!==0){
-      throw new Error('Car has already Verified. Please try Later')
+    if (car.verifyStatus !== 0) {
+      throw new Error('Car has already Verified. Please try Later');
     }
     const updatedCar = await this._adminOwnerRepository.updateCarStatus(carId, verifyDetails);
     if (!updatedCar) {
@@ -211,9 +224,8 @@ class AdminOwnerService implements IAdminOwnerService {
         rejectionReason
       );
       await sendEmail({ to: updatedUser.email, ...emailContent });
-
     }
- return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
+    return AdminOwnerMapper.toCarVerifyDTO(updatedCar);
     // return updatedCar;
   }
 }

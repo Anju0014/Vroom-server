@@ -36,7 +36,6 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       const ownerId = req.userId;
 
       if (!ownerId) {
-        
         logger.warn('no owner');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
@@ -86,7 +85,7 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       };
       const newCar = await this._ownerscarService.registerNewCar(carData, ownerId);
 
-       const carResponse = CarMapper.toCarDTO(newCar);
+      const carResponse = CarMapper.toCarDTO(newCar);
       res.status(StatusCode.CREATED).json({
         success: true,
         message: MESSAGES.SUCCESS.CAR_UPLOADED,
@@ -121,9 +120,9 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       const total = await this._ownerscarService.getCarsCount(ownerId);
 
       const carDTOs = CarMapper.toCarDTOs(cars);
-  const response: CarListResponseDTO = { cars: carDTOs, total };
+      const response: CarListResponseDTO = { cars: carDTOs, total };
 
-  res.status(StatusCode.OK).json({ success: true, ...response });
+      res.status(StatusCode.OK).json({ success: true, ...response });
     } catch (error) {
       logger.error('Error fetching cars:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -319,15 +318,15 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       const { carId } = req.params;
       const booking = await this._ownerscarService.getActiveBookingForCar(carId);
       if (!booking) {
-       res.status(StatusCode.OK).json({
-        success: true,
-        booking: null, 
-      });
-      return
-    }
+        res.status(StatusCode.OK).json({
+          success: true,
+          booking: null,
+        });
+        return;
+      }
       const bookingDTOs = CarMapper.toCarBookingDTO(booking);
       logger.info('booking/ ', booking);
-      res.status(StatusCode.OK).json({ success: true, booking:bookingDTOs });
+      res.status(StatusCode.OK).json({ success: true, booking: bookingDTOs });
     } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
     }

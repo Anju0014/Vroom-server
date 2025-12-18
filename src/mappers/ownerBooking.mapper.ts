@@ -16,9 +16,9 @@ export async function toBookingDTO(booking: IBooking): Promise<BookingDTO> {
   return {
     id: booking._id.toString(),
     carId: booking.carId.toString(),
-    // carName: booking.carId.carName, 
+    // carName: booking.carId.carName,
     customerId: booking.userId.toString(),
-    // customerName: booking.userId.fullName, 
+    // customerName: booking.userId.fullName,
     carOwnerId: booking.carOwnerId.toString(),
     startDate: booking.startDate,
     endDate: booking.endDate,

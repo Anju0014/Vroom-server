@@ -5,7 +5,7 @@ interface ILocation {
   lng: number;
 }
 interface IBooking extends Document<Types.ObjectId> {
-  _id:Types.ObjectId
+  _id: Types.ObjectId;
   bookingId: string;
   carId: Types.ObjectId;
   userId: Types.ObjectId;
@@ -26,7 +26,6 @@ interface IBooking extends Document<Types.ObjectId> {
   currentLocation?: ILocation;
   receiptKey?: string;
   lockedUntil?: Date;
-  
 }
 
 const BookingSchema = new Schema<IBooking>(

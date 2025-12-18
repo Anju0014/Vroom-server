@@ -13,7 +13,6 @@ class ChatRepository extends BaseRepository<IChatMessage> implements IChatReposi
   }
 
   async saveMessage(data: Partial<IChatMessage>): Promise<IChatMessage> {
-   
     let user = await Customer.findById(data.senderId);
     if (!user) {
       user = await CarOwner.findById(data.senderId);
@@ -38,7 +37,7 @@ class ChatRepository extends BaseRepository<IChatMessage> implements IChatReposi
 
   async getActiveChatsByOwner(ownerId: string): Promise<IChatMessage[]> {
     const bookings = await Booking.find({ carOwnerId: ownerId }).select('bookingId');
-    logger.info("bookings",bookings);
+    logger.info('bookings', bookings);
     const bookingIds = bookings.map((b) => b.bookingId);
 
     const chats = await ChatMessage.find({ roomId: { $in: bookingIds } }).sort({ timestamp: 1 });

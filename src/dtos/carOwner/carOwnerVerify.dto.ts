@@ -15,7 +15,6 @@ export interface CarOwnerVerifyListResponseDTO {
   total: number;
 }
 
-
 export interface UpdateOwnerVerifyRequestDTO {
   verifyStatus: -1 | 1;
   rejectionReason?: string;

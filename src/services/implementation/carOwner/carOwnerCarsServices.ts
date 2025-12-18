@@ -1,6 +1,6 @@
 import ICarOwnerCarsRepository from '../../../repositories/interfaces/carOwner/ICarOwnerCarsRepository';
 import { ICarOwnerCarsService } from '../../interfaces/carOwner/ICarOwnerCarsServices';
-import { Car, ICar } from '../../../models/car/carModel';
+import { ICar } from '../../../models/car/carModel';
 import { IBooking } from '../../../models/booking/bookingModel';
 import mongoose from 'mongoose';
 import { INotificationService } from '../../interfaces/notification/INotificationServices';
@@ -11,24 +11,29 @@ import logger from '../../../utils/logger';
 
 class CarOwnerCarsService implements ICarOwnerCarsService {
   private _ownersCarRepository: ICarOwnerCarsRepository;
-  private _ownerRepository:ICarOwnerRepository;
-   private readonly _adminRepository: IAdminRepository;
+  private _ownerRepository: ICarOwnerRepository;
+  private readonly _adminRepository: IAdminRepository;
   private readonly _notificationService: INotificationService;
 
-  constructor(carRepository: ICarOwnerCarsRepository, ownerRepository:ICarOwnerRepository,adminRepository:IAdminRepository, notificationService:INotificationService) {
+  constructor(
+    carRepository: ICarOwnerCarsRepository,
+    ownerRepository: ICarOwnerRepository,
+    adminRepository: IAdminRepository,
+    notificationService: INotificationService
+  ) {
     this._ownersCarRepository = carRepository;
-    this._ownerRepository=ownerRepository;
-    this._adminRepository=adminRepository;
-    this._notificationService= notificationService;
+    this._ownerRepository = ownerRepository;
+    this._adminRepository = adminRepository;
+    this._notificationService = notificationService;
   }
 
   async registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar> {
     logger.info('registering car for owner', ownerId);
     if (!ownerId) throw new Error('Owner ID is required');
-      const owner=await this._ownerRepository.findById(ownerId)
-       if (!owner ){
-        throw new Error("Owner not found");
-      }
+    const owner = await this._ownerRepository.findById(ownerId);
+    if (!owner) {
+      throw new Error('Owner not found');
+    }
 
     const carData: Partial<ICar> = {
       ...carDetails,
@@ -40,21 +45,20 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
     const createdCar = await this._ownersCarRepository.createCar(carData);
     // return await this._ownersCarRepository.createCar(carData);
 
-     const admin=await this._adminRepository.findPrimaryAdmin()
-         if (!admin) {
-        throw new Error("Admin not found");
-      }
-  
-     const notifications=await this._notificationService.create(
-     NotificationTemplates.newCarForApproval(
-      admin._id.toString(),
-      createdCar.id.toString(),
-      owner.fullName || "Car Owner"
-    )
-  );
+    const admin = await this._adminRepository.findPrimaryAdmin();
+    if (!admin) {
+      throw new Error('Admin not found');
+    }
 
-  return createdCar;
+    await this._notificationService.create(
+      NotificationTemplates.newCarForApproval(
+        admin._id.toString(),
+        createdCar.id.toString(),
+        owner.fullName || 'Car Owner'
+      )
+    );
 
+    return createdCar;
   }
 
   async getCarsByOwner(ownerId: string, page: number, limit: number): Promise<ICar[]> {
@@ -108,7 +112,7 @@ class CarOwnerCarsService implements ICarOwnerCarsService {
   }
 
   async getActiveBookingForCar(carId: string) {
-    logger.info("booking for car with id",carId);
+    logger.info('booking for car with id', carId);
     const booking = await this._ownersCarRepository.findActiveBookingByCarId(carId);
     return booking;
   }

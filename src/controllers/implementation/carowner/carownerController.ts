@@ -39,7 +39,7 @@ class CarOwnerController implements ICarOwnerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_VERIFIED,
-        carOwner:CarOwnerMapper.toPublicDTO(carOwner),
+        carOwner: CarOwnerMapper.toPublicDTO(carOwner),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -96,7 +96,7 @@ class CarOwnerController implements ICarOwnerController {
         //   role: carOwner.role,
         //   profileImage: carOwner.profileImage,
         // },
-         user: CarOwnerMapper.toPublicDTO(carOwner!)
+        user: CarOwnerMapper.toPublicDTO(carOwner!),
       });
     } catch (error) {
       logger.error(error);
@@ -289,7 +289,7 @@ class CarOwnerController implements ICarOwnerController {
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         ownerAccessToken,
-        user: CarOwnerMapper.toPublicDTO(carOwner)
+        user: CarOwnerMapper.toPublicDTO(carOwner),
         // user: {
         //   id: carOwner._id,
         //   fullName: carOwner.fullName,
@@ -306,10 +306,9 @@ class CarOwnerController implements ICarOwnerController {
 
   async getOwnerProfile(req: CustomRequest, res: Response): Promise<void> {
     try {
-     
       const ownerId = req.userId;
       if (!ownerId) {
-        logger.warn("no ownerId")
+        logger.warn('no ownerId');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
           message: MESSAGES.ERROR.UNAUTHORIZED,
@@ -337,7 +336,7 @@ class CarOwnerController implements ICarOwnerController {
   async updateProfileOwner(req: CustomRequest, res: Response): Promise<void> {
     try {
       const carOwnerId = req.userId;
-      
+
       if (!carOwnerId) {
         logger.warn('carOwnerId is absent');
         res.status(StatusCode.FORBIDDEN).json({

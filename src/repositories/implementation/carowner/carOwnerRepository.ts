@@ -19,7 +19,7 @@ class CarOwnerRepository extends BaseRepository<ICarOwner> implements ICarOwnerR
   async updateRefreshToken(carOwnerId: string, refreshToken: string): Promise<void> {
     const result = await CarOwner.findByIdAndUpdate(carOwnerId, { refreshToken });
     if (!result) {
-     logger.warn('not updating');
+      logger.warn('not updating');
     }
   }
   async updatePassword(carOwnerId: string, password: string): Promise<void> {

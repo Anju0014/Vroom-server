@@ -1,4 +1,3 @@
-
 // import { ICar } from '../models/car/carModel';
 // import { RegisterCarResponseDTO } from '../dtos/car/registerCar.response.dto';
 // import { CarOwnerCarDTO } from '../dtos/car/carOwnerCar.dto';
@@ -34,7 +33,6 @@ import { CarDTO } from '../dtos/car/car.dto';
 import { CarBookingDTO } from '../dtos/car/carBooking.dto';
 
 export class CarMapper {
- 
   static toRegisterResponse(car: ICar): RegisterCarResponseDTO {
     return {
       id: car._id.toString(),
@@ -57,7 +55,6 @@ export class CarMapper {
     };
   }
 
-
   static toCarDTO(car: ICar): CarDTO {
     return {
       id: car._id.toString(),
@@ -76,8 +73,8 @@ export class CarMapper {
       },
       images: car.images || [],
       videos: car.videos || [],
-      rcBookProof: car.rcBookProof||'',
-      insuranceProof: car.insuranceProof||'',
+      rcBookProof: car.rcBookProof || '',
+      insuranceProof: car.insuranceProof || '',
       ownerId: car.owner.toString(),
       createdAt: car.createdAt,
       updatedAt: car.updatedAt,

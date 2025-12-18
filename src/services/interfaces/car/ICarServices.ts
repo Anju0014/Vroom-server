@@ -1,5 +1,4 @@
 import { ICar } from '../../../models/car/carModel';
-import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 
 export interface ICarService {
   registerNewCar(carDetails: Partial<ICar>, ownerId: string): Promise<ICar>;

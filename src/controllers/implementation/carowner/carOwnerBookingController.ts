@@ -1,15 +1,14 @@
-import { Response, urlencoded } from 'express';
+import { Response } from 'express';
 import { CustomRequest } from '../../../middlewares/authMiddleWare';
 import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import ICarOwnerBookingController from '../../interfaces/carowner/ICarOwnerBookingController';
 import { ICarOwnerBookingService } from '../../../services/interfaces/carOwner/ICarOwnerBookingServices';
 import { Booking } from '../../../models/booking/bookingModel';
-import { generatePresignedUrl, generateViewPresignedUrl, generateViewRecieptPresignedUrl } from '../../../services/s3Service';
+import { generateViewRecieptPresignedUrl } from '../../../services/s3Service';
 import { OwnerBookingListResponseDTO } from '../../../dtos/booking/carOwnerBookingList.response.dto';
 import { toBookingDTOs } from '../../../mappers/ownerBooking.mapper';
 import logger from '../../../utils/logger';
-
 
 class CarOwnerBookingController implements ICarOwnerBookingController {
   private _ownerBookingService: ICarOwnerBookingService;
@@ -42,94 +41,87 @@ class CarOwnerBookingController implements ICarOwnerBookingController {
       );
       const bookingDTOs = await toBookingDTOs(bookings);
       const response: OwnerBookingListResponseDTO = {
-      bookings: bookingDTOs,
-      total,
-    };
+        bookings: bookingDTOs,
+        total,
+      };
 
       res.status(StatusCode.OK).json({
         success: true,
-        ...response
+        ...response,
       });
-    } catch (error:any) {
+    } catch (error: any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+    }
   }
-}
 
+  async getReceiptUrl(req: CustomRequest, res: Response) {
+    try {
+      const { bookingId } = req.params;
+      logger.info('bookingId', bookingId);
+      const userId = req.userId;
+      if (!bookingId) {
+        res.status(StatusCode.BAD_REQUEST).json({
+          success: false,
+          message: MESSAGES.ERROR.INVALID_BOOKING_ID,
+        });
+        return;
+      }
 
+      if (!userId) {
+        res.status(StatusCode.UNAUTHORIZED).json({
+          success: false,
+          message: MESSAGES.ERROR.UNAUTHORIZED,
+        });
+        return;
+      }
 
-async getReceiptUrl(req: CustomRequest, res: Response) {
-  try {
-    const { bookingId } = req.params;
-    logger.info("bookingId",bookingId)
-    const userId = req.userId;
-    if (!bookingId) {
-      res.status(StatusCode.BAD_REQUEST).json({
-        success: false,
-        message: MESSAGES.ERROR.INVALID_BOOKING_ID,
+      const booking = await Booking.findById(bookingId);
+
+      if (!booking || !booking.receiptKey) {
+        res.status(StatusCode.NOT_FOUND).json({
+          success: false,
+          message: MESSAGES.ERROR.RECEIPT_NOT_FOUND,
+        });
+        return;
+      }
+
+      const isAuthorized =
+        booking.userId.toString() === userId || booking.carOwnerId.toString() === userId;
+
+      if (!isAuthorized) {
+        res.status(StatusCode.FORBIDDEN).json({
+          success: false,
+          message: MESSAGES.ERROR.FORBIDDEN,
+        });
+        return;
+      }
+
+      const url = await generateViewRecieptPresignedUrl(booking.receiptKey);
+
+      logger.info(url);
+      res.status(StatusCode.OK).json({
+        success: true,
+        url,
       });
-      return;
+    } catch (error) {
+      this.handleError(res, error);
     }
+  }
 
-    if (!userId) {
-      res.status(StatusCode.UNAUTHORIZED).json({
-        success: false,
-        message: MESSAGES.ERROR.UNAUTHORIZED,
-      });
-      return;
-    }
+  private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    logger.error('Error:', error);
 
-    const booking = await Booking.findById(bookingId);
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 
-    if (!booking || !booking.receiptKey) {
-      res.status(StatusCode.NOT_FOUND).json({
-        success: false,
-        message: MESSAGES.ERROR.RECEIPT_NOT_FOUND,
-      });
-      return;
-    }
-
-   
-    const isAuthorized =
-      booking.userId.toString() === userId ||
-      booking.carOwnerId.toString() === userId
-   
-
-    if (!isAuthorized) {
-      res.status(StatusCode.FORBIDDEN).json({
-        success: false,
-        message: MESSAGES.ERROR.FORBIDDEN,
-      });
-      return;
-    }
-
-    
-    const url = await generateViewRecieptPresignedUrl(booking.receiptKey);
-
-    logger.info(url)
-    res.status(StatusCode.OK).json({
-      success: true,
-      url,
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
     });
-  } catch (error) {
-    this.handleError(res, error);
   }
-}
-
-
-    private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      logger.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
 }
 
 export default CarOwnerBookingController;

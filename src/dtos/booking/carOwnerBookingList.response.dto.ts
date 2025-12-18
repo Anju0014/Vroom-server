@@ -6,7 +6,6 @@ export interface CarOwnerBookingListResponseDTO {
   total: number;
 }
 
-
 export interface OwnerBookingListResponseDTO {
   bookings: BookingDTO[];
   total: number;

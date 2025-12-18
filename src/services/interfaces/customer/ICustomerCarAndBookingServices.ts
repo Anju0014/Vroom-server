@@ -1,7 +1,6 @@
 import { IBooking } from '../../../models/booking/bookingModel';
 import { ICar } from '../../../models/car/carModel';
-import { ICarOwner } from '../../../models/carowner/carOwnerModel';
-import { BookingData, UpdateTrackingProps } from '../../../types/bookingData';
+import { BookingData } from '../../../types/bookingData';
 
 export interface ICustomerCarAndBookingService {
   getNearbyCars(lat: number, lng: number, maxDistance: number): Promise<ICar[]>;

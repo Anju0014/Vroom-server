@@ -244,7 +244,7 @@ class AdminOwnerRepository extends BaseRepository<IAdmin> implements IAdminOwner
   }
 
   async findCarOwnerById(ownerId: string): Promise<ICarOwner | null> {
-    let response = await CarOwner.findById(ownerId)
+    let response = await CarOwner.findById(ownerId);
     return response;
   }
 

@@ -169,7 +169,6 @@ class CustomerCarAndBookingRepository
     await Booking.deleteOne({ _id: bookingId });
   }
 
- 
   async findConflictingBooking(
     carId: string,
     startDate: Date,
@@ -187,7 +186,7 @@ class CustomerCarAndBookingRepository
           $or: [
             { startDate: { $lte: endDate, $gte: startDate } },
             { endDate: { $lte: endDate, $gte: startDate } },
-            { startDate: { $lte: startDate }, endDate: { $gte: endDate } }, 
+            { startDate: { $lte: startDate }, endDate: { $gte: endDate } },
           ],
         },
       ],

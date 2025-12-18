@@ -1,5 +1,3 @@
-import { ICar } from '../../models/car/carModel';
-
 export interface CarDTO {
   id: string;
   carName: string;

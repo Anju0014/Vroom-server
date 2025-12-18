@@ -19,11 +19,11 @@ router.post('/generate-upload-url', async (req: Request, res: Response): Promise
   }
 });
 
-router.get("/generate-view-url", async (req: Request, res: Response) => {
+router.get('/generate-view-url', async (req: Request, res: Response) => {
   const { key } = req.query;
 
   if (!key) {
-    res.status(400).json({ error: "Missing key" });
+    res.status(400).json({ error: 'Missing key' });
     return;
   }
 
@@ -32,9 +32,8 @@ router.get("/generate-view-url", async (req: Request, res: Response) => {
     res.json({ url });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to generate view URL" });
+    res.status(500).json({ error: 'Failed to generate view URL' });
   }
 });
 
 export default router;
-

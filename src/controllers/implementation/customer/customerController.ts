@@ -21,7 +21,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.CREATED).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_SENT,
-        email:  CustomerMapper.toBasicDTO(customer),
+        email: CustomerMapper.toBasicDTO(customer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -35,7 +35,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_VERIFIED,
-        customer:CustomerMapper.toDTO(customer),
+        customer: CustomerMapper.toDTO(customer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -159,7 +159,7 @@ class CustomerContoller implements ICustomerController {
   async changePassword(req: CustomRequest, res: Response): Promise<void> {
     try {
       const customerId = req.userId; // Set in middleware
-      
+
       if (!customerId) {
         logger.warn('customer not reached  at change password');
         res.status(StatusCode.UNAUTHORIZED).json({
@@ -175,13 +175,12 @@ class CustomerContoller implements ICustomerController {
         message,
       });
     } catch (error: unknown) {
-     this.handleError(res,error,StatusCode.INTERNAL_SERVER_ERROR)
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
   async logout(req: Request, res: Response): Promise<void> {
     try {
-     
       const refreshToken = req.cookies.customerRefreshToken;
 
       if (!refreshToken) {
@@ -274,7 +273,7 @@ class CustomerContoller implements ICustomerController {
     try {
       const customerId = req.userId;
       if (!customerId) {
-         logger.warn('no customerId');
+        logger.warn('no customerId');
         res.status(StatusCode.UNAUTHORIZED).json({
           success: false,
           message: MESSAGES.ERROR.UNAUTHORIZED,
@@ -282,22 +281,22 @@ class CustomerContoller implements ICustomerController {
         return;
       }
       const { customer } = await this._customerService.getCustomerProfile(customerId);
-      const mappedCustomer = {
-        id: customer._id,
-        fullName: customer.fullName,
-        email: customer.email,
-        phoneNumber: customer.phoneNumber,
-        isVerified: customer.isVerified,
-        role: customer.role,
-        processStatus: customer.processStatus,
-        blockStatus: customer.blockStatus,
-        verifyStatus: customer.verifyStatus,
-        status: customer.status,
-        idVerified: customer.idVerified,
-        idProof: customer.idProof,
-        createdAt: customer.createdAt,
-        updatedAt: customer.updatedAt,
-      };
+      // const mappedCustomer = {
+      //   id: customer._id,
+      //   fullName: customer.fullName,
+      //   email: customer.email,
+      //   phoneNumber: customer.phoneNumber,
+      //   isVerified: customer.isVerified,
+      //   role: customer.role,
+      //   processStatus: customer.processStatus,
+      //   blockStatus: customer.blockStatus,
+      //   verifyStatus: customer.verifyStatus,
+      //   status: customer.status,
+      //   idVerified: customer.idVerified,
+      //   idProof: customer.idProof,
+      //   createdAt: customer.createdAt,
+      //   updatedAt: customer.updatedAt,
+      // };
       res.status(StatusCode.OK).json({
         success: true,
         customer: CustomerMapper.toDTO(customer),

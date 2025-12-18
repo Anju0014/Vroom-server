@@ -175,7 +175,6 @@ export async function generateAndUploadReceipt(bookingId: string): Promise<strin
     })
   );
 
- 
   booking.receiptKey = key;
   await booking.save();
 

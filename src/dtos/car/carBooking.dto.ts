@@ -1,5 +1,3 @@
-import { IBooking } from '../../models/booking/bookingModel';
-
 export interface CarBookingDTO {
   id: string;
   carId: string;

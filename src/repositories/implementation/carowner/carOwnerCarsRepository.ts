@@ -40,12 +40,11 @@ class CarOwnerCarsRepository extends BaseRepository<ICar> implements ICarOwnerCa
 
   async findByCarId(carId: string, ownerId: string): Promise<IBooking[]> {
     try {
-     
       let bookinglist = await Booking.find({
         carId: carId,
         // carOwnerId: new Types.ObjectId(ownerId),
       }).exec();
-    
+
       return bookinglist;
     } catch (error) {
       throw new Error(`Failed to fetch bookings for car ${carId}: ${error}`);

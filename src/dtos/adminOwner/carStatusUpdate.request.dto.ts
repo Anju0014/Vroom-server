@@ -5,5 +5,5 @@ export interface UpdateCarVerifyStatusRequestDTO {
 }
 
 export interface UpdateCarBlockStatusRequestDTO {
-  blockStatus: number; 
+  blockStatus: number;
 }

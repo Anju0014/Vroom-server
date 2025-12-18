@@ -21,7 +21,6 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
   }
 
   async cancelBooking(bookingId: string): Promise<IBooking> {
-  
     const booking = await this._customerDashRepository.findBookingById(bookingId);
 
     if (!booking || booking.status !== 'confirmed') {
@@ -78,7 +77,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     // await this._customerDashRepository.saveBooking(booking);
 
     const updatedBooking = await this._customerDashRepository.saveBooking(booking);
-   logger.info('Booking cancelled and saved successfully.');
+    logger.info('Booking cancelled and saved successfully.');
     return updatedBooking;
   }
 }

@@ -58,7 +58,9 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
   } catch (err) {
     if (err instanceof Error && 'code' in err) {
       const statusCode =
-        'statusCode' in err && typeof err.statusCode === 'number' ? err.statusCode : StatusCode.BAD_REQUEST;
+        'statusCode' in err && typeof err.statusCode === 'number'
+          ? err.statusCode
+          : StatusCode.BAD_REQUEST;
       logger.error('Stripe error:', err.message, 'Code:', (err as any).code);
       res.status(statusCode).json({ error: err.message });
       return;

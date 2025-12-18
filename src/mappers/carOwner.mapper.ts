@@ -25,9 +25,8 @@ export class CarOwnerMapper {
   }
 
   static toDTOList(owners: ICarOwner[]): CarOwnerDTO[] {
-    return owners.map(owner => this.toDTO(owner));
+    return owners.map((owner) => this.toDTO(owner));
   }
-
 
   static toVerifyDTO(owner: ICarOwner): CarOwnerVerifyListDTO {
     return {
@@ -44,10 +43,9 @@ export class CarOwnerMapper {
   }
 
   static toVerifyDTOList(owners: ICarOwner[]): CarOwnerVerifyListDTO[] {
-    return owners.map(owner => this.toVerifyDTO(owner));
+    return owners.map((owner) => this.toVerifyDTO(owner));
   }
 
- 
   static toPublicDTO(owner: ICarOwner): CarOwnerPublicDTO {
     return {
       id: owner._id.toString(),

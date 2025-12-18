@@ -1,13 +1,11 @@
 import { ICarOwner } from '../models/carowner/carOwnerModel';
 import { ICar } from '../models/car/carModel';
 import { IBooking } from '../models/booking/bookingModel';
-import { CustomerDTO } from '../dtos/customer/customer.dto';
 import { OwnerVerifyListItemDTO } from '../dtos/adminOwner/carOwnerVerifyList.response.dto';
 import { CarVerifyListItemDTO } from '../dtos/adminOwner/carVerifyList.response.dto';
 import { BookingListItemDTO } from '../dtos/adminOwner/bookingList.response.dto';
 
 export class AdminOwnerMapper {
-
   static toOwnerVerifyDTO(owner: ICarOwner): OwnerVerifyListItemDTO {
     return {
       id: owner._id.toString(),
@@ -22,7 +20,6 @@ export class AdminOwnerMapper {
     };
   }
 
-
   static toCarVerifyDTO(car: ICar): CarVerifyListItemDTO {
     return {
       id: car._id.toString(),
@@ -35,13 +32,12 @@ export class AdminOwnerMapper {
     };
   }
 
- 
   static toBookingDTO(booking: IBooking): BookingListItemDTO {
     return {
       id: booking._id.toString(),
       bookingId: booking.bookingId,
       customerId: booking.userId.toString(), // <- correct field
-      carId: booking.carId.toString(), 
+      carId: booking.carId.toString(),
       startDate: booking.startDate,
       endDate: booking.endDate,
       status: booking.status,

@@ -16,7 +16,7 @@ export const initSockets = (server: http.Server) => {
 
   bookingSocket(io);
   chatSocket(io);
-  notificationSocket(io)
+  notificationSocket(io);
 
   return io;
 };

@@ -1,14 +1,14 @@
-import {IsString,IsOptional,IsBoolean,IsIn} from 'class-validator'
-import {Expose,Type} from 'class-transformer'
+import { IsString, IsOptional, IsIn } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
 
 export class CreateNotificationDto {
-    @IsString()
-    userId!:string;
+  @IsString()
+  userId!: string;
 
-    @IsIn(['ADMIN', 'OWNER', 'CUSTOMER'])
-     role!: 'ADMIN' | 'OWNER' | 'CUSTOMER';
+  @IsIn(['ADMIN', 'OWNER', 'CUSTOMER'])
+  role!: 'ADMIN' | 'OWNER' | 'CUSTOMER';
 
-     @IsString()
+  @IsString()
   title!: string;
 
   @IsString()
@@ -19,7 +19,6 @@ export class CreateNotificationDto {
 
   @IsOptional()
   metadata?: Record<string, any>;
-
 }
 export class NotificationResponseDto {
   @Expose() id!: string;

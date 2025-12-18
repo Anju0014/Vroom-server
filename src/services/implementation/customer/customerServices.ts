@@ -17,18 +17,17 @@ class CustomerService implements ICustomerService {
   async registerBasicDetails(
     customerDetails: Partial<ICustomer>
   ): Promise<{ customer: ICustomer }> {
-  
     const { fullName, email, password, phoneNumber } = customerDetails;
-  
+
     if (!fullName || !email || !password) {
-      logger.warn('All fields are requires')
+      logger.warn('All fields are requires');
       throw new Error('All fields are required');
     }
 
     const existingUser = await this._customerRepository.findUserByEmail(customerDetails.email!);
 
     if (existingUser) {
-     logger.warn('User already exists. Throwing error...');
+      logger.warn('User already exists. Throwing error...');
       throw new Error('Email already Exist');
     }
 
@@ -58,7 +57,6 @@ class CustomerService implements ICustomerService {
   }
 
   async otpVerify(email: string, otp: string): Promise<{ customer: ICustomer }> {
-   
     logger.info(`Verifying OTP for ${email}: ${otp}`);
 
     const customer = await this._customerRepository.findUserByEmail(email);
@@ -68,7 +66,7 @@ class CustomerService implements ICustomerService {
     }
 
     logger.info('Fetched customer from DB:', customer);
-   
+
     if (!customer) {
       throw new Error('User not found');
     }
@@ -88,7 +86,7 @@ class CustomerService implements ICustomerService {
 
     await this._customerRepository.updateCustomer(customer._id.toString(), customer);
 
-   logger.info('User OTP verified successfully!');
+    logger.info('User OTP verified successfully!');
     // return { success: true, message: "OTP Verified Successfully" };
     return { customer };
   }
@@ -112,7 +110,7 @@ class CustomerService implements ICustomerService {
     await sendEmail({ to: customer.email, ...otpContent });
 
     // await sendOTP(customer.email,newOtp);
-   logger.info('New OTP sent Successfully');
+    logger.info('New OTP sent Successfully');
     return { message: 'OTP resend successfully' };
   }
 
@@ -135,10 +133,9 @@ class CustomerService implements ICustomerService {
       throw new Error('Signup is not completed');
     }
 
-  
     const passwordTrue = await PasswordUtils.comparePassword(password, customer.password);
     if (!passwordTrue) {
-     logger.warn('not correct');
+      logger.warn('not correct');
       throw new Error('Invalid Credentials');
     }
     const customerAccessToken = JwtUtils.generateAccessToken({
@@ -167,7 +164,7 @@ class CustomerService implements ICustomerService {
       throw new Error('Refresh token expired');
     }
     if (!decoded.id) {
-     logger.warn('No ID in refresh token payload');
+      logger.warn('No ID in refresh token payload');
       throw new Error('Invalid refresh token');
     }
 
@@ -177,11 +174,11 @@ class CustomerService implements ICustomerService {
 
     const customer = await this._customerRepository.findById(decoded.id);
     logger.info('Car owner:', customer);
-     logger.info('Stored refresh token:', customer?.refreshToken);
-     logger.info('Provided refresh token:', oldRefreshToken);
+    logger.info('Stored refresh token:', customer?.refreshToken);
+    logger.info('Provided refresh token:', oldRefreshToken);
 
     if (!customer || customer.refreshToken !== oldRefreshToken) {
-       logger.warn('Refresh token mismatch');
+      logger.warn('Refresh token mismatch');
       throw new Error('Invalid refresh token');
     }
     const accessToken = JwtUtils.generateAccessToken({
@@ -209,7 +206,6 @@ class CustomerService implements ICustomerService {
     newPassword: string,
     role: 'customer' | 'carOwner'
   ): Promise<string> {
-   
     const decoded = JwtUtils.verifyResetToken(token);
 
     if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
@@ -227,11 +223,10 @@ class CustomerService implements ICustomerService {
     passwordDetails: { oldPassword: string; newPassword: string }
   ): Promise<string> {
     const { oldPassword, newPassword } = passwordDetails;
-   
 
     const customer = await this._customerRepository.findById(customerId);
     if (!customer) {
-      logger.warn('User not found'); 
+      logger.warn('User not found');
       throw new Error('Customer not found');
     }
 
@@ -249,7 +244,6 @@ class CustomerService implements ICustomerService {
   }
 
   async logoutCustomer(refreshToken: string): Promise<void> {
-  
     const customer = await this._customerRepository.findUserByRefreshToken(refreshToken);
     if (!customer) {
       logger.warn('error no customer');
@@ -265,8 +259,6 @@ class CustomerService implements ICustomerService {
     provider: string,
     role?: string
   ): Promise<{ customerAccessToken: string; refreshToken: string; customer: ICustomer | null }> {
-    
-  
     let customer = await this._customerRepository.findUserByEmail(email);
 
     logger.info('google login', customer);
@@ -295,7 +287,7 @@ class CustomerService implements ICustomerService {
     const refreshToken = JwtUtils.generateRefreshToken({ id: customer._id });
 
     await this._customerRepository.updateRefreshToken(customer._id.toString(), refreshToken);
-    let customer2 = await this._customerRepository.findUserByEmail(email);
+    // let customer2 = await this._customerRepository.findUserByEmail(email);
     return { customerAccessToken, refreshToken, customer };
   }
 

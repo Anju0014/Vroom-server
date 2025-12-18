@@ -6,15 +6,14 @@ import { BookedDateRangeDTO } from '../dtos/booking/bookedDateRange.dto';
 import { CustomerBookingDTO } from '../dtos/booking/customerBooking.dto';
 
 export class CustomerCarMapper {
-
   static toCarDTO(car: ICar): CustomerCarDTO {
     return {
       id: car._id.toString(),
       carName: car.carName,
       brand: car.brand,
       year: Number(car.year),
-      fuelType: car.fuelType||'',
-      carType: car.carType|| '',
+      fuelType: car.fuelType || '',
+      carType: car.carType || '',
       expectedWage: car.expectedWage,
       location: {
         address: car.location.address,
@@ -29,7 +28,6 @@ export class CustomerCarMapper {
     return cars.map(this.toCarDTO);
   }
 
-
   static toCarDetailDTO(car: ICar): CustomerCarDetailDTO {
     return {
       ...this.toCarDTO(car),
@@ -41,17 +39,13 @@ export class CustomerCarMapper {
     };
   }
 
-
-  static toBookedDateRangeDTO(
-    ranges: { start: Date; end: Date }[]
-  ): BookedDateRangeDTO[] {
-    return ranges.map(r => ({
+  static toBookedDateRangeDTO(ranges: { start: Date; end: Date }[]): BookedDateRangeDTO[] {
+    return ranges.map((r) => ({
       start: r.start,
       end: r.end,
     }));
   }
 
-  
   static toBookingDTO(booking: IBooking): CustomerBookingDTO {
     return {
       id: booking._id.toString(),

@@ -6,7 +6,6 @@ import PasswordUtils from '../../../utils/passwordUtils';
 import JwtUtils from '../../../utils/jwtUtils';
 
 import { otpTemplate } from '../../../templates/emailTemplates';
-import { getIO } from '../../../sockets/socket';
 import { NotificationTemplates } from '../../../templates/notificationTemplates';
 import IAdminRepository from '../../../repositories/interfaces/admin/IAdminRepository';
 import { INotificationService } from '../../interfaces/notification/INotificationServices';
@@ -17,16 +16,19 @@ class CarOwnerService implements ICarOwnerService {
   private readonly _adminRepository: IAdminRepository;
   private readonly _notificationService: INotificationService;
 
-  constructor(carOwnerRepository: ICarOwnerRepository, adminRepository:IAdminRepository, notificationService:INotificationService) {
+  constructor(
+    carOwnerRepository: ICarOwnerRepository,
+    adminRepository: IAdminRepository,
+    notificationService: INotificationService
+  ) {
     this._carOwnerRepository = carOwnerRepository;
-    this._adminRepository=adminRepository;
-    this._notificationService= notificationService;
+    this._adminRepository = adminRepository;
+    this._notificationService = notificationService;
   }
 
   async registerBasicDetails(
     carOwnerDetails: Partial<ICarOwner>
   ): Promise<{ carOwner: ICarOwner }> {
-    
     const { fullName, email, password, phoneNumber } = carOwnerDetails;
     logger.info(carOwnerDetails);
 
@@ -66,7 +68,6 @@ class CarOwnerService implements ICarOwnerService {
   }
 
   async otpVerify(email: string, otp: string): Promise<{ carOwner: ICarOwner }> {
-    
     logger.info(`Verifying OTP for ${email}: ${otp}`);
 
     const carOwner = await this._carOwnerRepository.findUserByEmail(email);
@@ -94,7 +95,7 @@ class CarOwnerService implements ICarOwnerService {
 
     await this._carOwnerRepository.updateCarOwner(carOwner._id.toString(), carOwner);
 
-  logger.info('User OTP verified successfully!');
+    logger.info('User OTP verified successfully!');
     return { carOwner };
   }
 
@@ -128,7 +129,7 @@ class CarOwnerService implements ICarOwnerService {
     const carOwner = await this._carOwnerRepository.findUserByEmail(email);
     logger.info(carOwner);
     if (!carOwner) {
-     logger.warn('not correct user- carowner');
+      logger.warn('not correct user- carowner');
       throw new Error('Invalid Credentials');
     }
 
@@ -170,7 +171,7 @@ class CarOwnerService implements ICarOwnerService {
       throw new Error('Invalid refresh token');
     }
     if (decoded.message === 'Token expired') {
-     logger.warn('Refresh token has expired');
+      logger.warn('Refresh token has expired');
       throw new Error('Refresh token expired');
     }
     if (!decoded.id) {
@@ -179,9 +180,9 @@ class CarOwnerService implements ICarOwnerService {
     }
 
     const carOwner = await this._carOwnerRepository.findById(decoded.id);
-   logger.info('Car owner:', carOwner);
+    logger.info('Car owner:', carOwner);
     logger.info('Stored refresh token:', carOwner?.refreshToken);
-   logger.info('Provided refresh token:', oldRefreshToken);
+    logger.info('Provided refresh token:', oldRefreshToken);
 
     if (!carOwner || carOwner.refreshToken !== oldRefreshToken) {
       logger.warn('Refresh token mismatch or user not found');
@@ -223,21 +224,21 @@ class CarOwnerService implements ICarOwnerService {
     if (!updatedOwner) {
       throw new Error('Car owner not found or update failed.');
     }
-  
+
     updatedOwner.processStatus = 2;
 
-    const admin=await this._adminRepository.findPrimaryAdmin()
-     if (!admin) {
-    throw new Error("Admin not found");
-  }
+    const admin = await this._adminRepository.findPrimaryAdmin();
+    if (!admin) {
+      throw new Error('Admin not found');
+    }
 
-     const notification=await this._notificationService.create(
-        NotificationTemplates.newCarOwnerForApproval(
-          admin._id.toString(),
-          ownerId.toString(),
-          updatedOwner.fullName
-        )
-      );
+    await this._notificationService.create(
+      NotificationTemplates.newCarOwnerForApproval(
+        admin._id.toString(),
+        ownerId.toString(),
+        updatedOwner.fullName
+      )
+    );
 
     return updatedOwner;
   }
@@ -258,7 +259,6 @@ class CarOwnerService implements ICarOwnerService {
     newPassword: string,
     role: 'customer' | 'carOwner'
   ): Promise<string> {
-    
     const decoded = JwtUtils.verifyResetToken(token);
 
     if (!decoded || typeof decoded !== 'object' || !decoded.userId) {
@@ -309,7 +309,6 @@ class CarOwnerService implements ICarOwnerService {
     provider: string,
     role?: string
   ): Promise<{ ownerAccessToken: string; refreshToken: string; carOwner: ICarOwner | null }> {
-   
     let carOwner = await this._carOwnerRepository.findUserByEmail(email);
 
     if (carOwner && carOwner.blockStatus === 1) {
@@ -340,11 +339,11 @@ class CarOwnerService implements ICarOwnerService {
     return { ownerAccessToken, refreshToken, carOwner };
   }
 
-  async getOwnerProfile(ownerId: string): Promise<ICarOwner > {
+  async getOwnerProfile(ownerId: string): Promise<ICarOwner> {
     const carOwner = await this._carOwnerRepository.findById(ownerId);
     if (!carOwner) throw new Error('Owner not found');
 
-    return carOwner ;
+    return carOwner;
   }
 
   async updateCarOwnerProfile(

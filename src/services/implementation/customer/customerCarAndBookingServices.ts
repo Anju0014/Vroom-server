@@ -2,14 +2,12 @@ import ICustomerCarAndBookingRepository from '../../../repositories/interfaces/c
 import { ICustomerCarAndBookingService } from '../../interfaces/customer/ICustomerCarAndBookingServices';
 import { Car, ICar } from '../../../models/car/carModel';
 import { BookingData, UpdateTrackingProps } from '../../../types/bookingData';
-import mongoose from 'mongoose';
 import generateTrackingToken from '../../../utils/trackingIDGenerator';
 import { getIO } from '../../../sockets/socket';
 import { endOfDay } from 'date-fns';
 
-import { Booking, IBooking } from '../../../models/booking/bookingModel';
+import { IBooking } from '../../../models/booking/bookingModel';
 import { NotificationTemplates } from '../../../templates/notificationTemplates';
-import INotificationRepository from '../../../repositories/interfaces/notification/INotificationRepository';
 import { INotificationService } from '../../interfaces/notification/INotificationServices';
 import logger from '../../../utils/logger';
 
@@ -129,7 +127,7 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
     }
     return booking._id.toString();
   }
-  
+
   async confirmBooking(bookingId: string, paymentIntentId: string): Promise<IBooking> {
     const booking = await this._customerCarRepository.findBookingById(bookingId);
     console.log('booking-old-confirm', booking);
@@ -153,9 +151,9 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 
     const updatedBooking = await this._customerCarRepository.saveBooking(booking);
     const car = await Car.findById(booking.carId);
-    const carModel = car?.carName ?? "Car";
+    const carModel = car?.carName ?? 'Car';
 
-    const notification=await this._notificationService.create(
+    await this._notificationService.create(
       NotificationTemplates.bookingConfirmed(
         booking.carOwnerId.toString(),
         bookingId,
@@ -164,11 +162,10 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
         booking.endDate
       )
     );
-  //   const io = getIO();
-  // io.to(booking.carOwnerId.toString()).emit("newNotification", notification);
+    //   const io = getIO();
+    // io.to(booking.carOwnerId.toString()).emit("newNotification", notification);
     return updatedBooking;
   }
-
 
   async failedBooking(bookingId: string): Promise<void> {
     const booking = await this._customerCarRepository.findBookingById(bookingId);

@@ -1,5 +1,5 @@
-import { CustomerBookingDTO } from "../dtos/customer/customerBooking.dto";
-import { IBooking } from "../models/booking/bookingModel";
+import { CustomerBookingDTO } from '../dtos/customer/customerBooking.dto';
+import { IBooking } from '../models/booking/bookingModel';
 
 export class CustomerBookingMapper {
   static toDTO(booking: IBooking): CustomerBookingDTO {
@@ -7,8 +7,8 @@ export class CustomerBookingMapper {
       id: booking._id.toString(),
 
       carId: booking.carId.toString(),
-    //   carName: booking.carId.name,     // optional snapshot
-    //   carImage: booking.carId?.image,
+      //   carName: booking.carId.name,     // optional snapshot
+      //   carImage: booking.carId?.image,
 
       startDate: booking.startDate,
       endDate: booking.endDate,

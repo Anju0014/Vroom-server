@@ -35,11 +35,13 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       const bookings = await this._customerDashService.getCustomerBookings(userId, page, limit);
       const total = await this._customerDashService.getCustomerBookingCount(userId);
       const bookingDTOs = CustomerBookingMapper.toDTOList(bookings);
-      res.status(200).json({success: true,
-      data: {
-        bookings: bookingDTOs,
-        total,
-      },});
+      res.status(200).json({
+        success: true,
+        data: {
+          bookings: bookingDTOs,
+          total,
+        },
+      });
       return;
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -52,27 +54,27 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
     try {
       let booking = await this._customerDashService.cancelBooking(bookingId);
       await generateAndUploadReceipt(bookingId);
-      logger.info("booking data",booking);
+      logger.info('booking data', booking);
       res.status(StatusCode.OK).json({ success: true });
-    } catch (error:any) {
+    } catch (error: any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
-    private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      logger.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
+  private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    logger.error('Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
 }
 
 export default CustomerDashBoardController;

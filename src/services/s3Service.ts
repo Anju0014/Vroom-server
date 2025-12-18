@@ -1,9 +1,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
-import { Booking } from '../models/booking/bookingModel';
-import { Response,Request } from 'express';
-import { CustomRequest } from '../middlewares/authMiddleWare';
+
 dotenv.config();
 
 const s3 = new S3Client({
@@ -28,9 +26,7 @@ export const generatePresignedUrl = async (fileName: string, fileType: string) =
   return { url, key };
 };
 
-
 export const generateViewPresignedUrl = async (key: string) => {
-  
   const command = new GetObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET_NAME!,
     Key: key,
@@ -43,7 +39,6 @@ export const generateViewPresignedUrl = async (key: string) => {
   return { url };
 };
 
-
 export const generateViewRecieptPresignedUrl = async (
   key: string,
   expiresIn = 60
@@ -55,7 +50,6 @@ export const generateViewRecieptPresignedUrl = async (
 
   return getSignedUrl(s3, command, { expiresIn });
 };
-
 
 // export const getReceiptViewUrl = async (req: Request, res: Response) => {
 //   const booking = await Booking.findById(req.params.bookingId);

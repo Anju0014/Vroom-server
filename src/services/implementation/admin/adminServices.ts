@@ -1,23 +1,17 @@
 import IAdminRepository from '../../../repositories/interfaces/admin/IAdminRepository';
 import { IAdminService } from '../../interfaces/admin/IAdminServices';
-import { IAdmin } from '../../../models/admin/adminModel';
 import PasswordUtils from '../../../utils/passwordUtils';
 import JwtUtils from '../../../utils/jwtUtils';
 import { ICustomer } from '../../../models/customer/customerModel';
-import { ICarOwner } from '../../../models/carowner/carOwnerModel';
-
-
 
 import { AdminLoginResponseDTO } from '../../../dtos/admin/adminLogin.response.dto';
 import { CustomerListResponseDTO } from '../../../dtos/customer/customerList.response.dto';
 import { CarOwnerListResponseDTO } from '../../../dtos/carOwner/carOwnerList.response.dto';
-// import { CustomerDTO }from '../../../dtos/customer/customerList.response.dto';
 import { AdminMapper } from '../../../mappers/admin.mapper';
 import { CustomerMapper } from '../../../mappers/customer.mapper';
 import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
 import { CustomerDTO } from '../../../dtos/customer/customer.dto';
 import logger from '../../../utils/logger';
-
 
 class AdminService implements IAdminService {
   private _adminRepository: IAdminRepository;
@@ -25,10 +19,7 @@ class AdminService implements IAdminService {
   constructor(adminRepository: IAdminRepository) {
     this._adminRepository = adminRepository;
   }
-  async loginAdmin(
-    email: string,
-    password: string
-  ): Promise<AdminLoginResponseDTO> {
+  async loginAdmin(email: string, password: string): Promise<AdminLoginResponseDTO> {
     logger.info(`checking login things`);
     const admin = await this._adminRepository.findUserByEmail(email);
     logger.info(admin);
@@ -52,14 +43,14 @@ class AdminService implements IAdminService {
     const admin2 = await this._adminRepository.findUserByRefreshToken(newRefreshToken);
     logger.info(admin2);
     logger.info(newRefreshToken);
-     return AdminMapper.toLoginResponse(admin, adminAccessToken, newRefreshToken);
+    return AdminMapper.toLoginResponse(admin, adminAccessToken, newRefreshToken);
     // return { adminAccessToken, refreshToken: newRefreshToken, admin };
   }
 
   async logoutAdmin(refreshToken: string): Promise<void> {
     logger.info(refreshToken);
     const admin = await this._adminRepository.findUserByRefreshToken(refreshToken);
-   logger.info(admin);
+    logger.info(admin);
     if (!admin) {
       logger.info(': no admin error');
       throw new Error('User not found');
@@ -71,16 +62,14 @@ class AdminService implements IAdminService {
     page: number,
     limit: number,
     search: string
-  ): Promise<CustomerListResponseDTO>{
+  ): Promise<CustomerListResponseDTO> {
     try {
-      
-    const { customers, total } =
-    await this._adminRepository.getAllCustomers(page, limit, search);
+      const { customers, total } = await this._adminRepository.getAllCustomers(page, limit, search);
 
-  return {
-    customers: CustomerMapper.toDTOList(customers),
-    total,
-  };
+      return {
+        customers: CustomerMapper.toDTOList(customers),
+        total,
+      };
       // return await this._adminRepository.getAllCustomers(page, limit, search);
     } catch (error) {
       logger.error('Error in listAllCustomers:', error);
@@ -93,13 +82,11 @@ class AdminService implements IAdminService {
     search: string
   ): Promise<CarOwnerListResponseDTO> {
     try {
-     
-        const { carOwners, total } =
-      await this._adminRepository.getAllOwners(page, limit, search);
-return {
-  carOwners: CarOwnerMapper.toDTOList(carOwners),
-  total,
-};
+      const { carOwners, total } = await this._adminRepository.getAllOwners(page, limit, search);
+      return {
+        carOwners: CarOwnerMapper.toDTOList(carOwners),
+        total,
+      };
       // return await this._adminRepository.getAllOwners(page, limit, search);
     } catch (error) {
       logger.error('Error in listAllCustomers:', error);
@@ -107,31 +94,28 @@ return {
     }
   }
 
-  async updateCustomerBlockStatus(
-    customerId: string,
-    newStatus: number
-  ): Promise<CustomerDTO> {
+  async updateCustomerBlockStatus(customerId: string, newStatus: number): Promise<CustomerDTO> {
     logger.info('Processing status update:', customerId, newStatus);
     // const user = await this._adminRepository.findCustomerById(customerId);
     // if (!user) throw new Error('User not found');
     // let updateData: Partial<ICustomer> = { blockStatus: newStatus };
     // return await this._adminRepository.updateCustomerStatus(customerId, updateData);
-    const customer =
-      await this._adminRepository.findCustomerById(customerId);
+    const customer = await this._adminRepository.findCustomerById(customerId);
 
     if (!customer) {
       throw new Error('User not found');
     }
     let updateData: Partial<ICustomer> = { blockStatus: newStatus };
 
-    const updatedCustomer =
-      await this._adminRepository.updateCustomerStatus(customerId, updateData);
+    const updatedCustomer = await this._adminRepository.updateCustomerStatus(
+      customerId,
+      updateData
+    );
 
     if (!updatedCustomer) {
       throw new Error('Failed to update status');
     }
 
-    
     return CustomerMapper.toDTO(updatedCustomer);
   }
 }
