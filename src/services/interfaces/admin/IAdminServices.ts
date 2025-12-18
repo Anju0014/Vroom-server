@@ -25,7 +25,8 @@
 import { AdminLoginResponseDTO } from '../../../dtos/admin/adminLogin.response.dto';
 import { CustomerListResponseDTO } from '../../../dtos/customer/customerList.response.dto';
 import { CarOwnerListResponseDTO } from '../../../dtos/carOwner/carOwnerList.response.dto';
-import { CustomerListItemDTO } from '../../../dtos/customer/customerList.response.dto';
+import { CustomerDTO } from '../../../dtos/customer/customer.dto';
+
 
 export interface IAdminService {
   loginAdmin(
@@ -50,5 +51,5 @@ export interface IAdminService {
   updateCustomerBlockStatus(
     customerId: string,
     blockStatus: number
-  ): Promise<CustomerListItemDTO>;
+  ): Promise<CustomerDTO>;
 }

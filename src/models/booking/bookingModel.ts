@@ -4,7 +4,8 @@ interface ILocation {
   lat: number;
   lng: number;
 }
-interface IBooking extends Document {
+interface IBooking extends Document<Types.ObjectId> {
+  _id:Types.ObjectId
   bookingId: string;
   carId: Types.ObjectId;
   userId: Types.ObjectId;

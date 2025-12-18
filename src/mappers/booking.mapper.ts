@@ -1,17 +1,17 @@
 import { IBooking } from '../models/booking/bookingModel';
-import { CarOwnerBookingDTO } from '../dto/booking/car-owner-booking.dto';
+import { CarOwnerBookingDTO } from '../dtos/booking/carOwnerBooking.dto';
 
 export class BookingMapper {
   static toCarOwnerBookingDTO(booking: IBooking): CarOwnerBookingDTO {
     return {
       id: booking._id.toString(),
-      carId: booking.car.toString(),
-      carName: booking.carName,
-      customerId: booking.customer.toString(),
+      bookingId: booking.bookingId,
+      carId: booking.carId.toString(),
+      customerId: booking.userId.toString(),
       startDate: booking.startDate,
       endDate: booking.endDate,
-      bookingStatus: booking.status,
-      totalAmount: booking.totalAmount,
+      status: booking.status,
+      totalPrice: booking.totalPrice,
       createdAt: booking.createdAt,
     };
   }
@@ -20,3 +20,6 @@ export class BookingMapper {
     return bookings.map(this.toCarOwnerBookingDTO);
   }
 }
+
+
+

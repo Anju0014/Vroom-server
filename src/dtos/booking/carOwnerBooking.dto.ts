@@ -1,11 +1,11 @@
 export interface CarOwnerBookingDTO {
   id: string;
+  bookingId: string;
   carId: string;
-  carName?: string;
   customerId: string;
   startDate: Date;
   endDate: Date;
-  bookingStatus: number;
-  totalAmount: number;
+  status: string;
+  totalPrice: number;
   createdAt?: Date;
 }

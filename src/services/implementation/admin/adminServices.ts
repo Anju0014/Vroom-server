@@ -11,10 +11,11 @@ import { ICarOwner } from '../../../models/carowner/carOwnerModel';
 import { AdminLoginResponseDTO } from '../../../dtos/admin/adminLogin.response.dto';
 import { CustomerListResponseDTO } from '../../../dtos/customer/customerList.response.dto';
 import { CarOwnerListResponseDTO } from '../../../dtos/carOwner/carOwnerList.response.dto';
-import { CustomerListItemDTO} from '../../../dtos/customer/customerList.response.dto';
+// import { CustomerDTO }from '../../../dtos/customer/customerList.response.dto';
 import { AdminMapper } from '../../../mappers/admin.mapper';
 import { CustomerMapper } from '../../../mappers/customer.mapper';
 import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
+import { CustomerDTO } from '../../../dtos/customer/customer.dto';
 
 
 class AdminService implements IAdminService {
@@ -72,13 +73,13 @@ class AdminService implements IAdminService {
   ): Promise<CustomerListResponseDTO>{
     try {
       console.log('reached222');
-      const { customers, total } =
-      await this._adminRepository.getAllCustomers(page, limit, search);
+    const { customers, total } =
+    await this._adminRepository.getAllCustomers(page, limit, search);
 
-    return {
-      customers: customers.map(CustomerMapper.toDTO),
-      total,
-    };
+  return {
+    customers: CustomerMapper.toDTOList(customers),
+    total,
+  };
       // return await this._adminRepository.getAllCustomers(page, limit, search);
     } catch (error) {
       console.error('Error in listAllCustomers:', error);
@@ -94,11 +95,10 @@ class AdminService implements IAdminService {
       console.log('reached222');
         const { carOwners, total } =
       await this._adminRepository.getAllOwners(page, limit, search);
-
-    return {
-      carOwners: carOwners.map(CarOwnerMapper.toDTO),
-      total,
-    };
+return {
+  carOwners: CarOwnerMapper.toDTOList(carOwners),
+  total,
+};
       // return await this._adminRepository.getAllOwners(page, limit, search);
     } catch (error) {
       console.error('Error in listAllCustomers:', error);
@@ -109,7 +109,7 @@ class AdminService implements IAdminService {
   async updateCustomerBlockStatus(
     customerId: string,
     newStatus: number
-  ): Promise<CustomerListItemDTO> {
+  ): Promise<CustomerDTO> {
     console.log('Processing status update:', customerId, newStatus);
     // const user = await this._adminRepository.findCustomerById(customerId);
     // if (!user) throw new Error('User not found');
@@ -130,6 +130,7 @@ class AdminService implements IAdminService {
       throw new Error('Failed to update status');
     }
 
+    
     return CustomerMapper.toDTO(updatedCustomer);
   }
 }

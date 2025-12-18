@@ -1,14 +1,16 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
-interface ICar extends Document {
+interface ICar extends Document<Types.ObjectId> {
+
+   _id: Types.ObjectId;
   carName: string;
   brand: string;
   year?: string;
   fuelType?: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
   rcBookNo?: string;
-  expectedWage: string;
-  rcBookProof: string;
-  insuranceProof: string;
+  expectedWage: number;
+  rcBookProof?: string;
+  insuranceProof?: string;
   location: {
     address: string;
     landmark: string;
@@ -20,8 +22,8 @@ interface ICar extends Document {
   make?: string;
   carModel?: string;
   carType?: string;
-  verifyStatus?: number;
-  blockStatus?: number;
+  verifyStatus: number;
+  blockStatus: number;
   images: string[];
   videos?: string[];
   owner: mongoose.Types.ObjectId;
@@ -29,6 +31,8 @@ interface ICar extends Document {
   isDeleted?: boolean;
   unavailableDates: Date[];
   rejectionReason: string;
+  createdAt:Date;
+  updatedAt: Date;
 }
 
 const CarSchema = new Schema<ICar>(
@@ -50,7 +54,7 @@ const CarSchema = new Schema<ICar>(
       default: 0,
     },
     rcBookNo: { type: String, unique: true },
-    expectedWage: { type: String, required: true },
+    expectedWage: { type: Number, required: true },
     rcBookProof: { type: String },
     insuranceProof: { type: String },
     location: {

@@ -1,7 +1,7 @@
 export interface CarOwnerCarDTO {
   id: string;
   carName: string;
-  pricePerDay: number;
+  expectedWage: number;
   verifyStatus: number;
   blockStatus: number;
   images?: string[];

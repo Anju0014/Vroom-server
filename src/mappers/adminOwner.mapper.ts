@@ -1,13 +1,13 @@
 import { ICarOwner } from '../models/carowner/carOwnerModel';
 import { ICar } from '../models/car/carModel';
 import { IBooking } from '../models/booking/bookingModel';
-
-import { OwnerVerifyListItemDTO } from '../dto/adminOwner/owner-verify-list.response.dto';
-import { CarVerifyListItemDTO } from '../dto/adminOwner/car-verify-list.response.dto';
-import { BookingListItemDTO } from '../dto/adminOwner/booking-list.response.dto';
+import { CustomerDTO } from '../dtos/customer/customer.dto';
+import { OwnerVerifyListItemDTO } from '../dtos/adminOwner/carOwnerVerifyList.response.dto';
+import { CarVerifyListItemDTO } from '../dtos/adminOwner/carVerifyList.response.dto';
+import { BookingListItemDTO } from '../dtos/adminOwner/bookingList.response.dto';
 
 export class AdminOwnerMapper {
-  // 👤 Owner
+
   static toOwnerVerifyDTO(owner: ICarOwner): OwnerVerifyListItemDTO {
     return {
       id: owner._id.toString(),
@@ -22,7 +22,7 @@ export class AdminOwnerMapper {
     };
   }
 
-  // 🚗 Car
+
   static toCarVerifyDTO(car: ICar): CarVerifyListItemDTO {
     return {
       id: car._id.toString(),
@@ -35,13 +35,13 @@ export class AdminOwnerMapper {
     };
   }
 
-  // 📦 Booking
+ 
   static toBookingDTO(booking: IBooking): BookingListItemDTO {
     return {
       id: booking._id.toString(),
       bookingId: booking.bookingId,
-      customerId: booking.customer.toString(),
-      carId: booking.car.toString(),
+      customerId: booking.userId.toString(), // <- correct field
+      carId: booking.carId.toString(), 
       startDate: booking.startDate,
       endDate: booking.endDate,
       status: booking.status,

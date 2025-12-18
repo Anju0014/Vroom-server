@@ -29,27 +29,29 @@ class AdminController implements IAdminController {
         return;
       }
 
-      const { adminAccessToken, refreshToken, admin } = await this._adminService.loginAdmin(
-        email,
-        password
-      );
+      // const { adminAccessToken, refreshToken, admin } = await this._adminService.loginAdmin(
+      //   email,
+      //   password
+      // );
+       const responseDTO =
+      await this._adminService.loginAdmin(email, password);
 
-      if (!admin) {
-        res.status(StatusCode.NOT_FOUND).json({
-          success: false,
-          message: MESSAGES.ERROR.ADMIN_NOT_FOUND,
-        });
-        return;
-      }
+      // if (!admin) {
+      //   res.status(StatusCode.NOT_FOUND).json({
+      //     success: false,
+      //     message: MESSAGES.ERROR.ADMIN_NOT_FOUND,
+      //   });
+      //   return;
+      // }
 
-      res.cookie('adminRefreshToken', refreshToken, getCookieOptions(true));
-      res.cookie('adminAccessToken', adminAccessToken, getCookieOptions(false));
+      res.cookie('adminRefreshToken', responseDTO.refreshToken, getCookieOptions(true));
+      res.cookie('adminAccessToken', responseDTO.adminAccessToken, getCookieOptions(false));
 
-       const responseDTO = AdminMapper.toLoginResponse(
-      admin,
-      adminAccessToken,
-      refreshToken
-    );
+    //    const responseDTO = AdminMapper.toLoginResponse(
+    //   admin,
+    //   adminAccessToken,
+    //   refreshToken
+    // );
 
     res.status(StatusCode.OK).json({
       success: true,
@@ -117,16 +119,15 @@ class AdminController implements IAdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
-      const { customers, total } = await this._adminService.listAllCustomers(page, limit, search);
-      //  const customerDTOs = customers.map(CustomerMapper.toDTO);
-       const customerDTOs = CustomerMapper.toDTOList(customers);
+   const { customers, total } =
+  await this._adminService.listAllCustomers(page, limit, search);
 
-      res.status(StatusCode.OK).json({
-        success: true,
-        message: MESSAGES.SUCCESS.CUSTOMERS_FETCHED || 'Customers fetched successfully',
-        data: customerDTOs,
-        total,
-      });
+res.status(StatusCode.OK).json({
+  success: true,
+  message: MESSAGES.SUCCESS.CUSTOMERS_FETCHED,
+  data: customers,
+  total,
+});
     } catch (error: any) {
       // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       //   success: false,
@@ -142,12 +143,12 @@ class AdminController implements IAdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
       const { carOwners, total } = await this._adminService.listAllCarOwners(page, limit, search);
-      const ownerDTOs = carOwners.map(CarOwnerMapper.toListDTO);
+      // const ownerDTOs = carOwners.map(CarOwnerMapper.toListDTO);
 
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OWNERS_FETCHED || 'Car owners fetched successfully',
-        data: ownerDTOs,
+        data: carOwners,
         total,
       });
     } catch (error: any) {
@@ -183,13 +184,11 @@ class AdminController implements IAdminController {
       return;
     }
 
-   
-    const customerDTO = CustomerMapper.toListDTO(updatedCustomer);
 
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Customer status updated successfully',
-        data: customerDTO,
+        data: updatedCustomer,
       });
     } catch (error:any) {
        this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
