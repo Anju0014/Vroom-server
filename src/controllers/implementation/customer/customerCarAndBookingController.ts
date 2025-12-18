@@ -19,7 +19,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
   async getNearbyCars(req: Request, res: Response): Promise<void> {
     const { lat, lng, maxDistance = '50' } = req.query;
-
+     
     if (!lat || !lng) {
       res.status(StatusCode.BAD_REQUEST).json({
         success: false,
@@ -57,8 +57,6 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       const search = req.query.search as string;
       const minPrice = parseFloat(req.query.minPrice as string) || 0;
       const maxPrice = parseFloat(req.query.maxPrice as string) || Infinity;
-      // const latitude = parseFloat(req.query.latitude as string);
-      // const longitude = parseFloat(req.query.longitude as string);
       const carType = req.query.carType as string;
       const location = req.query.location as string;
       const startDate = req.query.startDate as string;
@@ -149,7 +147,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       this.handleError(res, err);
     }
   }
-  // controller
+  
   async checkBookingAvailability(req: Request, res: Response): Promise<void> {
     logger.info('reached availability point');
     try {

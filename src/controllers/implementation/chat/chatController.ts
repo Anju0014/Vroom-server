@@ -22,7 +22,7 @@ class ChatController implements IChatController {
       res.status(StatusCode.OK).json(messages);
     } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
-      // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch chat history' });
+      
     }
   }
 

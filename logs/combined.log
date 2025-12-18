@@ -1,0 +1,3 @@
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2025-12-18 16:52:05"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2025-12-18 16:52:28"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2025-12-18 16:52:28"}

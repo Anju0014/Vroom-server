@@ -8,7 +8,7 @@ export default function notificationSocket(io: Server) {
       socket.join(userId);
       console.log(`User ${userId} joined notifications (socket: ${socket.id})`);
     }
-
+    
     socket.on('disconnect', () => {
       console.log(`User ${userId} disconnected from notifications`);
     });

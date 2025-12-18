@@ -51,27 +51,3 @@ export const generateViewRecieptPresignedUrl = async (
   return getSignedUrl(s3, command, { expiresIn });
 };
 
-// export const getReceiptViewUrl = async (req: Request, res: Response) => {
-//   const booking = await Booking.findById(req.params.bookingId);
-
-//   if (!booking?.receiptKey) {
-//     res.status(404).json({ message: "Receipt not found" });
-//     return
-//   }
-
-//   // ✅ permission check
-//   if (booking.userId.toString() !== req.userId) {
-//     return res.status(403).json({ message: "Forbidden" });
-//   }
-
-//   const command = new GetObjectCommand({
-//     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-//     Key: booking.receiptKey,
-//   });
-
-//   const url = await getSignedUrl(s3, command, {
-//     expiresIn: 60,
-//   });
-
-//   res.json({ url });
-// };

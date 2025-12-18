@@ -48,7 +48,7 @@ export const createPaymentData = async (req: Request, res: Response): Promise<vo
         carId,
         startDate,
         endDate,
-        bookingId, // Include bookingId in metadata
+        bookingId, //  bookingId in metadata
         integration_check: 'accept_a_payment',
       },
     });

@@ -249,25 +249,18 @@ class CustomerContoller implements ICustomerController {
         return;
       }
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         message: 'Login successful',
         customerAccessToken,
         user: customer ? CustomerMapper.toAuthDTO(customer) : null,
-        // user: {
-        //   id: customer._id,
-        //   fullName: customer.fullName,
-        //   email: customer.email,
-        //   profileImage: customer.profileImage,
-        //   role: customer.role,
-        // },
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
-  //  async googleSignOut(req: Request, res: Response): Promise<void> {}
+  
 
   async getCustomerProfile(req: CustomRequest, res: Response): Promise<void> {
     try {

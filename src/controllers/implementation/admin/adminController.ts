@@ -27,49 +27,17 @@ class AdminController implements IAdminController {
         return;
       }
 
-      // const { adminAccessToken, refreshToken, admin } = await this._adminService.loginAdmin(
-      //   email,
-      //   password
-      // );
       const responseDTO = await this._adminService.loginAdmin(email, password);
-
-      // if (!admin) {
-      //   res.status(StatusCode.NOT_FOUND).json({
-      //     success: false,
-      //     message: MESSAGES.ERROR.ADMIN_NOT_FOUND,
-      //   });
-      //   return;
-      // }
 
       res.cookie('adminRefreshToken', responseDTO.refreshToken, getCookieOptions(true));
       res.cookie('adminAccessToken', responseDTO.adminAccessToken, getCookieOptions(false));
 
-      //    const responseDTO = AdminMapper.toLoginResponse(
-      //   admin,
-      //   adminAccessToken,
-      //   refreshToken
-      // );
 
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         data: responseDTO,
       });
-
-      // if (!admin) {
-      //   res.status(400).json({ error: 'admin not found' });
-      //   return;
-      // }
-      // res.status(StatusCode.OK).json({
-      //   success: true,
-      //   message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
-      //   adminAccessToken,
-      //   user: {
-      //     id: admin._id,
-      //     email: admin.email,
-      //     role: 'admin',
-      //   },
-      // });
     } catch (error: any) {
       logger.error('LoginError from Admin:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);

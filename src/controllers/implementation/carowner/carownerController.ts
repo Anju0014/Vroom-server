@@ -33,8 +33,6 @@ class CarOwnerController implements ICarOwnerController {
     try {
       const { email, otp } = req.body;
 
-      console.log('reached pt3 ');
-
       const { carOwner } = await this._carOwnerService.otpVerify(email, otp);
       res.status(StatusCode.OK).json({
         success: true,
@@ -66,7 +64,6 @@ class CarOwnerController implements ICarOwnerController {
 
   async loginOwner(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reeached login1');
       const { email, password } = req.body;
       if (!email || !password) {
         res
@@ -89,13 +86,6 @@ class CarOwnerController implements ICarOwnerController {
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         ownerAccessToken,
-        // user: {
-        //   id: carOwner._id,
-        //   fullName: carOwner.fullName,
-        //   email: carOwner.email,
-        //   role: carOwner.role,
-        //   profileImage: carOwner.profileImage,
-        // },
         user: CarOwnerMapper.toPublicDTO(carOwner!),
       });
     } catch (error) {
@@ -290,13 +280,6 @@ class CarOwnerController implements ICarOwnerController {
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         ownerAccessToken,
         user: CarOwnerMapper.toPublicDTO(carOwner),
-        // user: {
-        //   id: carOwner._id,
-        //   fullName: carOwner.fullName,
-        //   email: carOwner.email,
-        //   role: carOwner.role,
-        //   profileImage: carOwner.profileImage,
-        // },
       });
     } catch (error) {
       logger.error('Google Sign-In Error:', error);
