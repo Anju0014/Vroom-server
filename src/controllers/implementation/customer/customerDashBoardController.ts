@@ -6,6 +6,7 @@ import { StatusCode } from '../../../constants/statusCode';
 import ICustomerDashBoardController from '../../interfaces/customer/ICustomerDashBoardController';
 import { ICustomerDashBoardService } from '../../../services/interfaces/customer/ICustomerDashBoardServices';
 import { generateAndUploadReceipt } from '../../../services/receiptService';
+import { CustomerBookingMapper } from '../../../mappers/customerBooking.mapper';
 
 class CustomerDashBoardController implements ICustomerDashBoardController {
   private _customerDashService: ICustomerDashBoardService;
@@ -32,7 +33,12 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       }
       const bookings = await this._customerDashService.getCustomerBookings(userId, page, limit);
       const total = await this._customerDashService.getCustomerBookingCount(userId);
-      res.status(200).json({ bookings, total });
+      const bookingDTOs = CustomerBookingMapper.toDTOList(bookings);
+      res.status(200).json({success: true,
+      data: {
+        bookings: bookingDTOs,
+        total,
+      },});
       return;
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);

@@ -5,6 +5,7 @@ import { CustomRequest } from '../../../middlewares/authMiddleWare';
 import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import { CustomerMapper } from '../../../mappers/customer.mapper';
 
 class CustomerContoller implements ICustomerController {
   private _customerService: ICustomerService;
@@ -19,7 +20,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.CREATED).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_SENT,
-        email: customer.email,
+        email:  CustomerMapper.toBasicDTO(customer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -33,7 +34,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_VERIFIED,
-        customer,
+        customer:CustomerMapper.toDTO(customer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -79,13 +80,14 @@ class CustomerContoller implements ICustomerController {
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         customerAccessToken,
-        user: {
-          id: customer._id,
-          fullName: customer.fullName,
-          email: customer.email,
-          role: customer.role,
-          profileImage: customer.profileImage,
-        },
+        user: customer ? CustomerMapper.toAuthDTO(customer) : null,
+        // user: {
+        //   id: customer._id,
+        //   fullName: customer.fullName,
+        //   email: customer.email,
+        //   role: customer.role,
+        //   profileImage: customer.profileImage,
+        // },
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -257,13 +259,14 @@ class CustomerContoller implements ICustomerController {
         success: true,
         message: 'Login successful',
         customerAccessToken,
-        user: {
-          id: customer._id,
-          fullName: customer.fullName,
-          email: customer.email,
-          profileImage: customer.profileImage,
-          role: customer.role,
-        },
+        user: customer ? CustomerMapper.toAuthDTO(customer) : null,
+        // user: {
+        //   id: customer._id,
+        //   fullName: customer.fullName,
+        //   email: customer.email,
+        //   profileImage: customer.profileImage,
+        //   role: customer.role,
+        // },
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -303,7 +306,7 @@ class CustomerContoller implements ICustomerController {
       };
       res.status(StatusCode.OK).json({
         success: true,
-        customer: mappedCustomer,
+        customer: CustomerMapper.toDTO(customer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -338,7 +341,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.PROFILE_UPDATED,
-        updatedCustomer,
+        updatedCustomer: CustomerMapper.toUpdateDTO(updatedCustomer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -376,7 +379,7 @@ class CustomerContoller implements ICustomerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.ID_PROOF_UPDATED,
-        updatedCustomer,
+        customer: CustomerMapper.toDTO(updatedCustomer),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);

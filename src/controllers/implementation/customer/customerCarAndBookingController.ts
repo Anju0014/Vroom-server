@@ -7,6 +7,7 @@ import ICustomerCarAndBookingController from '../../interfaces/customer/ICustome
 import { ICustomerCarAndBookingService } from '../../../services/interfaces/customer/ICustomerCarAndBookingServices';
 import { generateAndUploadReceipt } from '../../../services/receiptService';
 import { Booking } from '../../../models/booking/bookingModel';
+import { CustomerCarMapper } from '../../../mappers/customerCar.mapper';
 
 class CustomerCarAndBookingController implements ICustomerCarAndBookingController {
   private _customerCarService: ICustomerCarAndBookingService;
@@ -17,7 +18,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
   async getNearbyCars(req: Request, res: Response): Promise<void> {
     const { lat, lng, maxDistance = '50' } = req.query;
-    console.log('nearby cars');
+  
 
     if (!lat || !lng) {
       res.status(StatusCode.BAD_REQUEST).json({
@@ -33,7 +34,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
         parseFloat(lng as string),
         parseFloat(maxDistance as string)
       );
-      res.status(StatusCode.OK).json({ success: true, data: cars });
+      res.status(StatusCode.OK).json({ success: true, data: CustomerCarMapper.toCarDTOs(cars)});
     } catch (err) {
       this.handleError(res, err);
     }
@@ -43,7 +44,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
     try {
       console.log('featuredcars');
       const cars = await this._customerCarService.getFeaturedCars();
-      res.status(StatusCode.OK).json({ success: true, data: cars });
+      res.status(StatusCode.OK).json({ success: true, data:  CustomerCarMapper.toCarDTOs(cars) });
     } catch (err) {
       this.handleError(res, err);
     }
@@ -92,7 +93,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       });
       console.log('Cars:', cars, 'Total:', total);
 
-      res.status(StatusCode.OK).json({ data: cars, total });
+      res.status(StatusCode.OK).json({ data:  CustomerCarMapper.toCarDTOs(cars), total });
     } catch (error) {
       console.error('Failed to fetch cars:', error);
       res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
@@ -113,7 +114,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
         });
         return;
       }
-      res.status(StatusCode.OK).json({ success: true, data: car });
+      res.status(StatusCode.OK).json({ success: true, data: CustomerCarMapper.toCarDetailDTO(car) });
     } catch (err) {
       this.handleError(res, err);
     }
@@ -132,7 +133,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
 
       const bookedRanges = await this._customerCarService.getBookedDateRanges(carId);
       console.log('bookedRanges', bookedRanges);
-      res.status(StatusCode.OK).json({ success: true, data: bookedRanges });
+      res.status(StatusCode.OK).json({ success: true, data: CustomerCarMapper.toBookedDateRangeDTO(bookedRanges)});
     } catch (err) {
       this.handleError(res, err);
     }
