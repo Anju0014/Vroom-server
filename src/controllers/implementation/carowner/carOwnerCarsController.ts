@@ -6,6 +6,8 @@ import { StatusCode } from '../../../constants/statusCode';
 
 import ICarOwnerCarsController from '../../interfaces/carowner/ICarOwnerCarsController';
 import { ICarOwnerCarsService } from '../../../services/interfaces/carOwner/ICarOwnerCarsServices';
+import { CarMapper } from '../../../mappers/car.mapper';
+import { CarListResponseDTO } from '../../../dtos/car/carList.response.dto';
 
 class CarOwnerCarsController implements ICarOwnerCarsController {
   private _ownerscarService: ICarOwnerCarsService;
@@ -83,10 +85,11 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       };
       const newCar = await this._ownerscarService.registerNewCar(carData, ownerId);
 
+       const carResponse = CarMapper.toCarDTO(newCar);
       res.status(StatusCode.CREATED).json({
         success: true,
         message: MESSAGES.SUCCESS.CAR_UPLOADED,
-        car: newCar,
+        car: carResponse,
       });
     } catch (error) {
       console.log('Car upload error:', error);
@@ -116,10 +119,14 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       const cars = await this._ownerscarService.getCarsByOwner(ownerId, page, limit);
       const total = await this._ownerscarService.getCarsCount(ownerId);
 
-      res.status(StatusCode.OK).json({
-        cars,
-        total,
-      });
+      const carDTOs = CarMapper.toCarDTOs(cars);
+  const response: CarListResponseDTO = { cars: carDTOs, total };
+
+  res.status(StatusCode.OK).json({ success: true, ...response });
+      // res.status(StatusCode.OK).json({
+      //   cars,
+      //   total,
+      // });
     } catch (error) {
       console.error('Error fetching cars:', error);
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -147,11 +154,11 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
       }
 
       const bookings = await this._ownerscarService.getBookingsByCarId(carId, ownerId);
-
+      const bookingDTOs = CarMapper.toCarBookingDTOs(bookings);
       res.status(StatusCode.OK).json({
         success: true,
         message: 'Bookings fetched successfully',
-        data: bookings,
+        data: bookingDTOs,
       });
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -193,10 +200,11 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         ownerId,
         unavailableDates
       );
+      const carResponse = CarMapper.toCarDTO(car);
       res.status(StatusCode.OK).json({
         success: true,
         message: 'Availability updated successfully',
-        data: car,
+        data: carResponse,
       });
     } catch (error) {
       console.error('Error updating availability:', error);
@@ -215,10 +223,11 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
         return;
       }
       const deletedCar = await this._ownerscarService.deleteCar(carId);
+      const carResponse = CarMapper.toCarDTO(deletedCar);
       res.status(200).json({
         success: true,
         message: MESSAGES.SUCCESS.CAR_DELETED || 'Car deleted successfully',
-        car: deletedCar,
+        car: carResponse,
       });
     } catch (error) {
       console.error('Delete Error:', error);
@@ -296,10 +305,11 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
 
       const updatedCar = await this._ownerscarService.updateCar(carId, updatedCarData);
 
+      const carResponse = CarMapper.toCarDTO(updatedCar);
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.CAR_UPDATED,
-        car: updatedCar,
+        car: carResponse,
       });
     } catch (error) {
       console.error('Update Car Error:', error);
@@ -311,8 +321,16 @@ class CarOwnerCarsController implements ICarOwnerCarsController {
     try {
       const { carId } = req.params;
       const booking = await this._ownerscarService.getActiveBookingForCar(carId);
+      if (!booking) {
+       res.status(StatusCode.OK).json({
+        success: true,
+        booking: null, // explicitly say no active booking
+      });
+      return
+    }
+      const bookingDTOs = CarMapper.toCarBookingDTO(booking);
       console.log('booking/ ', booking);
-      res.status(StatusCode.OK).json({ success: true, booking });
+      res.status(StatusCode.OK).json({ success: true, booking:bookingDTOs });
     } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
     }

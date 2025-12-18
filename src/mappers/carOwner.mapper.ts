@@ -1,6 +1,8 @@
 import { ICarOwner } from '../models/carowner/carOwnerModel';
+
 import { CarOwnerDTO } from '../dtos/carOwner/carOwner.dto';
 import { CarOwnerVerifyListDTO } from '../dtos/carOwner/carOwnerVerify.dto';
+import { CarOwnerPublicDTO } from '../dtos/carOwner/carOwnerPublic.dto';
 
 export class CarOwnerMapper {
   static toDTO(owner: ICarOwner): CarOwnerDTO {
@@ -22,6 +24,11 @@ export class CarOwnerMapper {
     };
   }
 
+  static toDTOList(owners: ICarOwner[]): CarOwnerDTO[] {
+    return owners.map(owner => this.toDTO(owner));
+  }
+
+
   static toVerifyDTO(owner: ICarOwner): CarOwnerVerifyListDTO {
     return {
       id: owner._id.toString(),
@@ -36,7 +43,22 @@ export class CarOwnerMapper {
     };
   }
 
-  static toDTOList(owners: ICarOwner[]): CarOwnerDTO[] {
-    return owners.map(this.toDTO);
+  static toVerifyDTOList(owners: ICarOwner[]): CarOwnerVerifyListDTO[] {
+    return owners.map(owner => this.toVerifyDTO(owner));
+  }
+
+ 
+  static toPublicDTO(owner: ICarOwner): CarOwnerPublicDTO {
+    return {
+      id: owner._id.toString(),
+      fullName: owner.fullName,
+      email: owner.email,
+      phoneNumber: owner.phoneNumber,
+      role: owner.role,
+      profileImage: owner.profileImage,
+      blockStatus: owner.blockStatus,
+      processStatus: owner.processStatus,
+      createdAt: owner.createdAt,
+    };
   }
 }

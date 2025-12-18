@@ -32,8 +32,8 @@ interface ICarOwner extends Document {
   refreshToken: string;
   rejectionReason: string;
   role: 'carOwner';
-  updatedAt?: Date;
-  createdAt?: Date;
+  updatedAt: Date;
+  createdAt: Date;
 }
 
 const CarOwnerSchema = new Schema<ICarOwner>(

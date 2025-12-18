@@ -19,13 +19,14 @@ interface IBooking extends Document<Types.ObjectId> {
   cancellationFee: number;
   refundedAmount: number;
   cancelledAt?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
   trackingToken: string;
   trackingUrl: string;
   currentLocation?: ILocation;
   receiptKey?: string;
   lockedUntil?: Date;
+  
 }
 
 const BookingSchema = new Schema<IBooking>(

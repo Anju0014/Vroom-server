@@ -6,6 +6,8 @@ import ICarOwnerBookingController from '../../interfaces/carowner/ICarOwnerBooki
 import { ICarOwnerBookingService } from '../../../services/interfaces/carOwner/ICarOwnerBookingServices';
 import { Booking } from '../../../models/booking/bookingModel';
 import { generatePresignedUrl, generateViewPresignedUrl, generateViewRecieptPresignedUrl } from '../../../services/s3Service';
+import { OwnerBookingListResponseDTO } from '../../../dtos/booking/carOwnerBookingList.response.dto';
+import { toBookingDTOs } from '../../../mappers/ownerBooking.mapper';
 
 
 class CarOwnerBookingController implements ICarOwnerBookingController {
@@ -37,10 +39,15 @@ class CarOwnerBookingController implements ICarOwnerBookingController {
         page,
         limit
       );
+      const bookingDTOs = await toBookingDTOs(bookings);
+      const response: OwnerBookingListResponseDTO = {
+      bookings: bookingDTOs,
+      total,
+    };
+
       res.status(StatusCode.OK).json({
         success: true,
-        bookings,
-        total,
+        ...response
       });
     } catch (error:any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
@@ -88,7 +95,7 @@ console.log("reached at")
       return;
     }
 
-    // ✅ Business authorization
+   
     const isAuthorized =
       booking.userId.toString() === userId ||
       booking.carOwnerId.toString() === userId

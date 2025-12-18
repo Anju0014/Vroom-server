@@ -5,6 +5,7 @@ import { CustomRequest } from '../../../middlewares/authMiddleWare';
 import { MESSAGES } from '../../../constants/message';
 import { StatusCode } from '../../../constants/statusCode';
 import { getCookieOptions } from '../../../utils/cookieOptions';
+import { CarOwnerMapper } from '../../../mappers/carOwner.mapper';
 
 class CarOwnerController implements ICarOwnerController {
   private _carOwnerService: ICarOwnerService;
@@ -37,7 +38,7 @@ class CarOwnerController implements ICarOwnerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.OTP_VERIFIED,
-        carOwner,
+        carOwner:CarOwnerMapper.toPublicDTO(carOwner),
       });
     } catch (error) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
@@ -87,13 +88,14 @@ class CarOwnerController implements ICarOwnerController {
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         ownerAccessToken,
-        user: {
-          id: carOwner._id,
-          fullName: carOwner.fullName,
-          email: carOwner.email,
-          role: carOwner.role,
-          profileImage: carOwner.profileImage,
-        },
+        // user: {
+        //   id: carOwner._id,
+        //   fullName: carOwner.fullName,
+        //   email: carOwner.email,
+        //   role: carOwner.role,
+        //   profileImage: carOwner.profileImage,
+        // },
+         user: CarOwnerMapper.toPublicDTO(carOwner!)
       });
     } catch (error) {
       console.log(error);
@@ -286,13 +288,14 @@ class CarOwnerController implements ICarOwnerController {
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         ownerAccessToken,
-        user: {
-          id: carOwner._id,
-          fullName: carOwner.fullName,
-          email: carOwner.email,
-          role: carOwner.role,
-          profileImage: carOwner.profileImage,
-        },
+        user: CarOwnerMapper.toPublicDTO(carOwner)
+        // user: {
+        //   id: carOwner._id,
+        //   fullName: carOwner.fullName,
+        //   email: carOwner.email,
+        //   role: carOwner.role,
+        //   profileImage: carOwner.profileImage,
+        // },
       });
     } catch (error) {
       console.error('Google Sign-In Error:', error);
@@ -322,7 +325,7 @@ class CarOwnerController implements ICarOwnerController {
       }
       res.status(StatusCode.OK).json({
         success: true,
-        owner: ownerProfile,
+        owner: CarOwnerMapper.toPublicDTO(ownerProfile),
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -359,7 +362,8 @@ class CarOwnerController implements ICarOwnerController {
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.PROFILE_UPDATED,
-        updatedOwner,
+        // updatedOwner,
+        owner: CarOwnerMapper.toPublicDTO(updatedOwner),
       });
     } catch (error) {
       console.error('Error updating profile:', error);

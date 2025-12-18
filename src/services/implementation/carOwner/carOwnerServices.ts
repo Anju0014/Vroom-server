@@ -347,11 +347,11 @@ class CarOwnerService implements ICarOwnerService {
     return { ownerAccessToken, refreshToken, carOwner };
   }
 
-  async getOwnerProfile(ownerId: string): Promise<{ carOwner: ICarOwner }> {
+  async getOwnerProfile(ownerId: string): Promise<ICarOwner > {
     const carOwner = await this._carOwnerRepository.findById(ownerId);
     if (!carOwner) throw new Error('Owner not found');
 
-    return { carOwner };
+    return carOwner ;
   }
 
   async updateCarOwnerProfile(
