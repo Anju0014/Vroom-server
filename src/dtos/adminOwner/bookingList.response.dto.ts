@@ -6,6 +6,7 @@ export interface BookingListItemDTO {
   carId: string;
   startDate: Date;
   endDate: Date;
+  totalPrice:number;
   status: string | number;
   createdAt?: Date;
 }

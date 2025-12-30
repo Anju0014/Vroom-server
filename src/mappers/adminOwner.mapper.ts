@@ -42,6 +42,7 @@ export class AdminOwnerMapper {
       endDate: booking.endDate,
       status: booking.status,
       createdAt: booking.createdAt,
+      totalPrice:booking.totalPrice
     };
   }
 }
