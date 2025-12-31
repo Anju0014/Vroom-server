@@ -35,7 +35,7 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       const bookings = await this._customerDashService.getCustomerBookings(userId, page, limit);
       const total = await this._customerDashService.getCustomerBookingCount(userId);
       const bookingDTOs = CustomerBookingMapper.toDTOList(bookings);
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         data: {
           bookings: bookingDTOs,
@@ -60,6 +60,90 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
+
+
+
+  // async getCustomerwalletDetails(req: CustomRequest, res: Response): Promise<void> {
+  //   try {
+  //     const userId = req.userId;
+  //     if (!userId) {
+  //       res.status(StatusCode.NOT_FOUND).json({ message: 'User Id not found' });
+  //       return;
+  //     }
+  //     const page = parseInt(req.query.page as string) || 1;
+  //     const limit = parseInt(req.query.limit as string) || 9;
+  //     if (page < 1 || limit < 1 || limit > 100) {
+  //       res.status(StatusCode.BAD_REQUEST).json({
+  //         success: false,
+  //         message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+  //       });
+  //       return;
+  //     }
+  //     const wallets = await this._customerDashService.getCustomerWallets(userId, page, limit);
+  //     const total = await this._customerDashService.getCustomerWalletCount(userId);
+  //     const walletDTOs = CustomerWalletMapper.toDTOList(wallets);
+  //     res.status(StatusCode.OK).json({
+  //       success: true,
+  //       data: {
+  //         wallets: walletDTOs,
+  //         total,
+  //       },
+  //     });
+  //     return;
+  //   } catch (error) {
+  //     this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+
+async getCustomerwalletDetails(req: CustomRequest, res: Response): Promise<void> {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(StatusCode.NOT_FOUND).json({ message: 'User Id not found' });
+      return;
+    }
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 9;
+
+    if (page < 1 || limit < 1 || limit > 100) {
+      res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+      });
+      return;
+    }
+
+    const wallet = await this._customerDashService.getCustomerWallet(
+      userId,
+      page,
+      limit
+    );
+
+    if (!wallet) {
+      res.status(StatusCode.NOT_FOUND).json({
+        success: false,
+        message: 'Wallet not found',
+      });
+      return;
+    }
+
+    const total = await this._customerDashService.getCustomerWalletTransactionCount(userId);
+    const walletDTO = CustomerWalletMapper.toDTO(wallet);
+
+    res.status(StatusCode.OK).json({
+      success: true,
+      data: {
+        wallet: walletDTO,
+        total,
+        page,
+        limit,
+      },
+    });
+  } catch (error) {
+    this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+  }
+}
 
   private handleError(
     res: Response,

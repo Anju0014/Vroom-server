@@ -15,6 +15,8 @@ interface ICustomerDashBoardRepository {
   createWallet(userId: string): Promise<IWallet | null>;
   findWalletByUserId(userId: string): Promise<IWallet | null>;
   saveWallet(wallet: IWallet): Promise<IWallet | null>;
+  findWalletByUserWithTransactions(userId: string, page: number, limit: number): Promise<any>;
+  getTransactionCount(userId: string): Promise<number>;
 }
 
 export default ICustomerDashBoardRepository;

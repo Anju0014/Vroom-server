@@ -20,6 +20,31 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     return this._customerDashRepository.bookingsByUserCount(userId);
   }
 
+  // async getCustomerWallets(userId: string, page: number, limit: number): Promise<any[]> {
+  //   return this._customerDashRepository.findWalletsByUser(userId, page, limit);
+  // }
+
+  // async getCustomerWalletCount(userId: string): Promise<number> {
+  //   return this._customerDashRepository.walletsByUserCount(userId);
+  // }
+
+  async getCustomerWallet(
+  userId: string,
+  page: number,
+  limit: number
+) {
+  return this._customerDashRepository.findWalletByUserWithTransactions(
+    userId,
+    page,
+    limit
+  );
+}
+
+async getCustomerWalletTransactionCount(userId: string) {
+  return this._customerDashRepository.getTransactionCount(userId);
+}
+
+
   async cancelBooking(bookingId: string): Promise<IBooking> {
     const booking = await this._customerDashRepository.findBookingById(bookingId);
 
@@ -69,7 +94,7 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
       `Refund added to wallet after cancellation`
     );
 
-    // Mark the booking as cancelled
+    
     booking.status = 'cancelled';
     booking.cancellationFee = cancellationFee;
     booking.refundedAmount = refundAmount;
