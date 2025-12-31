@@ -14,6 +14,7 @@ import stripeRoutes from './routes/stripe/stripeRoutes';
 import { initSockets } from './sockets/socket';
 import './jobs/bookingTrackingJob';
 import notificationRouter from './routes/notification/notificationRoutes';
+import complaintRouter from './routes/complaints/complaintRoutes';
 
 dotenv.config();
 connectDB();
@@ -43,6 +44,7 @@ app.use('/api/s3', s3Routes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/chats', chatRouter);
 app.use('/notifications', notificationRouter);
+app.use('/complaints',complaintRouter);
 
 initSockets(server);
 

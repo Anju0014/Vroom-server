@@ -58,42 +58,100 @@ export const verifyRole = (allowedRoles: ('carOwner' | 'customer' | 'admin')[]) 
   };
 };
 
-export const checkBlocked = async (req: CustomRequest, res: Response, next: NextFunction) => {
+
+export const checkBlocked = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { userId, role } = req;
 
     if (!userId || !role) {
-      return res
+      res
         .status(StatusCode.UNAUTHORIZED)
-        .json({ message: 'Unauthorized: Missing user data.' });
+        .json({ message: "Unauthorized: Missing user data." });
+      return;
+    }
+
+    // Admins are never blocked
+    if (role === "admin") {
+      next();
+      return;
     }
 
     let user: any;
-    if (role === 'customer') {
+
+    if (role === "customer") {
       user = await Customer.findById(userId);
-    } else if (role === 'carOwner') {
+    } else if (role === "carOwner") {
       user = await CarOwner.findById(userId);
-    } else {
-      // Admins aren't blocked
-      return next();
     }
 
     if (!user) {
-      return res.status(StatusCode.NOT_FOUND).json({ message: 'User not found.' });
+      res
+        .status(StatusCode.NOT_FOUND)
+        .json({ message: "User not found." });
+      return;
     }
 
+    // 1 = blocked, 0 = active
     if (user.blockStatus === 1) {
-      // assuming 1 = blocked, 0 = active
-      return res
+      res
         .status(StatusCode.FORBIDDEN)
-        .json({ message: 'Your account is blocked. Contact support.' });
+        .json({
+          message: "Your account is blocked. Contact support.",
+        });
+      return;
     }
 
     next();
   } catch (err) {
-    logger.error('Block check error:', err);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+    logger.error("Block check error:", err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error." });
   }
 };
+
+
+
+// export const checkBlocked = async (req: CustomRequest, res: Response, next: NextFunction) => {
+//   try {
+//     const { userId, role } = req;
+
+//     if (!userId || !role) {
+//       return res
+//         .status(StatusCode.UNAUTHORIZED)
+//         .json({ message: 'Unauthorized: Missing user data.' });
+//     }
+
+//     let user: any;
+//     if (role === 'customer') {
+//       user = await Customer.findById(userId);
+//     } else if (role === 'carOwner') {
+//       user = await CarOwner.findById(userId);
+//     } else {
+//       // Admins aren't blocked
+//       return next();
+//     }
+
+//     if (!user) {
+//       return res.status(StatusCode.NOT_FOUND).json({ message: 'User not found.' });
+//     }
+
+//     if (user.blockStatus === 1) {
+//       // assuming 1 = blocked, 0 = active
+//       return res
+//         .status(StatusCode.FORBIDDEN)
+//         .json({ message: 'Your account is blocked. Contact support.' });
+//     }
+
+//     next();
+//   } catch (err) {
+//     logger.error('Block check error:', err);
+//     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+//   }
+// };
 
 export default authMiddleware;
