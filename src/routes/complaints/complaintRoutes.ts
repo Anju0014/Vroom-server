@@ -13,7 +13,7 @@ const complaintController = new ComplaintController(complaintService);
 
 
 
-complaintRouter.post("/",authMiddleware,checkBlocked, (req, res) => complaintController.createComplaint(req, res));
+complaintRouter.post("/", authMiddleware,(req, res) => complaintController.createComplaint(req, res));
 
 complaintRouter.get("/",authMiddleware,checkBlocked,(req, res) => complaintController.getMyComplaints(req, res));
 

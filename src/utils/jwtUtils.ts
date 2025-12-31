@@ -56,7 +56,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-/* ---------------- ENV VALIDATION ---------------- */
+
 
 const requiredEnv = [
   'ACCESS_TOKEN_SECRET',
@@ -73,13 +73,13 @@ requiredEnv.forEach((key) => {
   }
 });
 
-/* ---------------- SECRETS ---------------- */
+
 
 const accessSecret: Secret = process.env.ACCESS_TOKEN_SECRET!;
 const refreshSecret: Secret = process.env.REFRESH_TOKEN_SECRET!;
 const resetSecret: Secret = process.env.RESET_TOKEN_SECRET!;
 
-/* ---------------- OPTIONS ---------------- */
+
 
 const accessOptions: SignOptions = {
   expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as ms.StringValue,
@@ -93,7 +93,7 @@ const resetOptions: SignOptions = {
   expiresIn: process.env.JWT_RESET_EXPIRES_IN as ms.StringValue,
 };
 
-/* ---------------- JWT UTILS ---------------- */
+
 
 class JwtUtils {
   static generateAccessToken(payload: object): string {

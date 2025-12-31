@@ -16,8 +16,9 @@ class ComplaintController implements IComplaintController {
   }
 
   async createComplaint(req: CustomRequest, res: Response) {
+    console.log("report")
     const { userId, role } = req;
-
+    console.log(userId,role)
       if (!userId || !role) {
          res.status(StatusCode.UNAUTHORIZED).json({
           message: "Unauthorized",

@@ -16,6 +16,7 @@ const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): 
     console.log('checking auth');
     const token = req.header('Authorization')?.replace('Bearer ', '').trim();
     if (!token) {
+      console.log("no token")
       res.status(StatusCode.UNAUTHORIZED).json({ message: 'Unauthorized. No token provided.' });
       return;
     }

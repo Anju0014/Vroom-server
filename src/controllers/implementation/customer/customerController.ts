@@ -77,11 +77,12 @@ class CustomerContoller implements ICustomerController {
         res.status(StatusCode.NOT_FOUND).json({ error: 'Customer not found' });
         return;
       }
+      console.log(customerAccessToken)
       res.status(StatusCode.OK).json({
         success: true,
         message: MESSAGES.SUCCESS.LOGIN_SUCCESS,
         customerAccessToken,
-        user: customer ? CustomerMapper.toAuthDTO(customer) : null,
+        user: CustomerMapper.toAuthDTO(customer),
         // user: {
         //   id: customer._id,
         //   fullName: customer.fullName,
