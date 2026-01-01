@@ -3,7 +3,7 @@ import ICustomerDashBoardRepository from '../../interfaces/customer/ICustomerDas
 import { BaseRepository } from '../../base/BaseRepository';
 import { Booking, IBooking } from '../../../models/booking/bookingModel';
 
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Wallet, IWallet } from '../../../models/wallet/walletModel';
 
 class CustomerDashBoardRepository
@@ -85,6 +85,34 @@ class CustomerDashBoardRepository
   async findWalletByUserId(userId: string): Promise<IWallet | null> {
     return Wallet.findOne({ userId });
   }
+
+   async findWalletByUserWithTransactions(
+  userId: string,
+  page: number,
+  limit: number
+) {
+  const skip = (page - 1) * limit;
+
+  const result = await Wallet.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $project: {
+        balance: 1,
+        totalTransactions: { $size: "$transactions" },
+        transactions: {
+          $slice: ["$transactions", skip, limit],
+        },
+      },
+    },
+  ]);
+
+  return result[0] || null;
+}
+
+async getTransactionCount(userId: string): Promise<number> {
+  const wallet = await Wallet.findOne({ userId }, { transactions: 1 });
+  return wallet ? wallet.transactions.length : 0;
+}
 
   async createWallet(userId: string): Promise<IWallet> {
     const wallet = new Wallet({

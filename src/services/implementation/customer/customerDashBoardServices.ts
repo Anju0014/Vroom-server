@@ -80,5 +80,23 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     console.log('Booking cancelled and saved successfully.');
     return updatedBooking;
   }
+
+   async getCustomerWallet(
+  userId: string,
+  page: number,
+  limit: number
+) {
+  return this._customerDashRepository.findWalletByUserWithTransactions(
+    userId,
+    page,
+    limit
+  );
+}
+
+async getCustomerWalletTransactionCount(userId: string) {
+  return this._customerDashRepository.getTransactionCount(userId);
+}
+
+
 }
 export default CustomerDashBoardService;

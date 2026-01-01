@@ -120,6 +120,10 @@ customerRouter.patch(`/bookings/:bookingId/fail`, (req, res) =>
 customerRouter.get('/getCustomerBookingDetails', authMiddleware, (req, res) =>
   customerDashBoardController.getCustomerBookingDetails(req, res)
 );
+customerRouter.get('/getCustomerWalletDetails', authMiddleware, (req, res) =>
+  customerDashBoardController.getCustomerwalletDetails(req, res)
+);
+
 customerRouter.patch(`/bookings/:bookingId/cancel`, (req, res) =>
   customerDashBoardController.cancelBooking(req, res)
 );
