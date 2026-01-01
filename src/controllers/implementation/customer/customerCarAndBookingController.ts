@@ -180,7 +180,7 @@ class CustomerCarAndBookingController implements ICustomerCarAndBookingControlle
       return;
     } catch (err) {
       logger.error(err);
-      res.status(500).json({ message: 'Server error' });
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
   }
 

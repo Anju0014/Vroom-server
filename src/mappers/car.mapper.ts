@@ -85,7 +85,7 @@ export class CarMapper {
     return cars.map(this.toCarDTO);
   }
 
-  // --- Booking mappings ---
+  
   static toCarBookingDTO(booking: IBooking): CarBookingDTO {
     return {
       id: booking._id.toString(),

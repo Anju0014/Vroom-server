@@ -8,7 +8,7 @@ import { ICustomerDashBoardService } from '../../../services/interfaces/customer
 import { generateAndUploadReceipt } from '../../../services/receiptService';
 import { CustomerBookingMapper } from '../../../mappers/customerBooking.mapper';
 import logger from '../../../utils/logger';
-import { CustomerWalletMapper } from '../../../mappers/customerWallet,mapper';
+import { CustomerWalletMapper } from '../../../mappers/customerWallet.mapper';
 
 class CustomerDashBoardController implements ICustomerDashBoardController {
   private _customerDashService: ICustomerDashBoardService;

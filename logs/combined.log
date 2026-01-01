@@ -148,3 +148,80 @@
 {"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2025-12-31 21:16:19"}
 {"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2025-12-31 21:16:24"}
 {"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2025-12-31 21:23:03"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:47:32"}
+{"level":"info","message":"checking login things","service":"vroom-backend","timestamp":"2026-01-01 06:49:41"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:49:43"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:49:45"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:49:46"}
+{"level":"info","message":"checking login things","service":"vroom-backend","timestamp":"2026-01-01 06:50:40"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:50:41"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:50:41"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:50:42"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:57:21"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:57:29"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:57:34"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:57:43"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:57:45"}
+{"level":"info","message":"checking login things","service":"vroom-backend","timestamp":"2026-01-01 06:58:55"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:59:04"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 06:59:04"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 06:59:05"}
+{"level":"info","message":"checking login things","service":"vroom-backend","timestamp":"2026-01-01 07:00:14"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:00:17"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:00:17"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 07:00:17"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:03:50"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:03:55"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 07:04:01"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:07:13"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:09:58"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:10:05"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:10:18"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 07:10:21"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:34"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:44"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:45"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:46"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:47"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:48"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:49"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:50"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:51"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:51"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:51"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:52"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:52"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:53"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:53"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:15:53"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:16:01"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:16:02"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:16:06"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:16:07"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:16:09"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:16:09"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:17:11"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:17:12"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:17:22"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:17:22"}
+{"0":{"end":"2025-04-27T00:00:00.000Z","start":"2025-04-26T00:00:00.000Z"},"1":{"end":"2025-05-03T00:00:00.000Z","start":"2025-05-01T00:00:00.000Z"},"2":{"end":"2025-05-07T00:00:00.000Z","start":"2025-05-06T00:00:00.000Z"},"3":{"end":"2025-05-15T00:00:00.000Z","start":"2025-05-14T00:00:00.000Z"},"4":{"end":"2025-08-31T00:00:00.000Z","start":"2025-08-30T00:00:00.000Z"},"5":{"end":"2025-10-29T18:29:59.999Z","start":"2025-10-29T00:00:00.000Z"},"6":{"end":"2025-10-17T18:29:59.999Z","start":"2025-10-17T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:17:24"}
+{"0":{"end":"2025-04-27T00:00:00.000Z","start":"2025-04-26T00:00:00.000Z"},"1":{"end":"2025-05-03T00:00:00.000Z","start":"2025-05-01T00:00:00.000Z"},"2":{"end":"2025-05-07T00:00:00.000Z","start":"2025-05-06T00:00:00.000Z"},"3":{"end":"2025-05-15T00:00:00.000Z","start":"2025-05-14T00:00:00.000Z"},"4":{"end":"2025-08-31T00:00:00.000Z","start":"2025-08-30T00:00:00.000Z"},"5":{"end":"2025-10-29T18:29:59.999Z","start":"2025-10-29T00:00:00.000Z"},"6":{"end":"2025-10-17T18:29:59.999Z","start":"2025-10-17T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:17:25"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:17:29"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:17:29"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:21:20"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:21:22"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:21:24"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:21:24"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:21:29"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:21:34"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:21:38"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:21:38"}
+{"level":"info","message":"checking login things","service":"vroom-backend","timestamp":"2026-01-01 07:23:26"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:23:29"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:23:30"}
+{"level":"info","message":"featuredcars","service":"vroom-backend","timestamp":"2026-01-01 07:23:30"}
+{"level":"info","message":"reached at getAllCars controller","service":"vroom-backend","timestamp":"2026-01-01 07:23:35"}
+{"0":"T","1":"o","2":"t","3":"a","4":"l","5":":","level":"info","message":"Cars:","service":"vroom-backend","timestamp":"2026-01-01 07:23:35"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:23:37"}
+{"0":{"end":"2025-12-19T18:29:59.999Z","start":"2025-12-19T00:00:00.000Z"},"1":{"end":"2025-12-11T18:29:59.999Z","start":"2025-12-11T00:00:00.000Z"},"2":{"end":"2025-12-13T18:29:59.999Z","start":"2025-12-13T00:00:00.000Z"},"3":{"end":"2025-12-30T18:29:59.999Z","start":"2025-12-30T00:00:00.000Z"},"level":"info","message":"bookedRanges","service":"vroom-backend","timestamp":"2026-01-01 07:23:37"}
+{"level":"info","message":"block status checking..................","service":"vroom-backend","timestamp":"2026-01-01 07:23:39"}

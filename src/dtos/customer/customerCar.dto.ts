@@ -6,6 +6,10 @@ export interface CustomerCarDTO {
   fuelType: string;
   carType: string;
   expectedWage: number;
+  rcBookNo:string;
+  verifyStatus:number;
+  isDeleted:boolean|undefined;
+  available:boolean|undefined;
   location: {
     address: string;
     landmark?: string;
