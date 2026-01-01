@@ -3,6 +3,7 @@ import http from 'http';
 import bookingSocket from './bookingSocket';
 import chatSocket from './chatSocket';
 import notificationSocket from './notificationSocket';
+import videoCallSocket from './videoCallSocket';
 
 let io: Server;
 
@@ -16,7 +17,8 @@ export const initSockets = (server: http.Server) => {
 
   bookingSocket(io);
   chatSocket(io);
-  notificationSocket(io)
+  notificationSocket(io);
+  videoCallSocket(io);
 
   return io;
 };
