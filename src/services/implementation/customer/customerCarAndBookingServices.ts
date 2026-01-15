@@ -204,9 +204,9 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
 
     const updatedBooking = await this._customerCarRepository.saveBooking(booking);
     const car = await Car.findById(booking.carId);
-    const carModel = car?.carName ?? "Car";
+    const carModel = car?.carName ?? 'Car';
 
-    const notification=await this._notificationService.create(
+    const notification = await this._notificationService.create(
       NotificationTemplates.bookingConfirmed(
         booking.carOwnerId.toString(),
         bookingId,
@@ -215,11 +215,10 @@ class CustomerCarAndBookingService implements ICustomerCarAndBookingService {
         booking.endDate
       )
     );
-  //   const io = getIO();
-  // io.to(booking.carOwnerId.toString()).emit("newNotification", notification);
+    //   const io = getIO();
+    // io.to(booking.carOwnerId.toString()).emit("newNotification", notification);
     return updatedBooking;
   }
-
 
   async failedBooking(bookingId: string): Promise<void> {
     const booking = await this._customerCarRepository.findBookingById(bookingId);

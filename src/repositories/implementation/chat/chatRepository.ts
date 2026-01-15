@@ -18,49 +18,47 @@ class ChatRepository extends BaseRepository<IChatMessage> implements IChatReposi
 
   // };
 
-// async saveMessage(senderId: string, receiverId: string, message: string):Promise<IChatMessage> {
-//   const roomId = [senderId, receiverId].sort().join("_");
+  // async saveMessage(senderId: string, receiverId: string, message: string):Promise<IChatMessage> {
+  //   const roomId = [senderId, receiverId].sort().join("_");
 
-//   const sender =
-//     (await Customer.findById(senderId)) ||
-//     (await CarOwner.findById(senderId));
+  //   const sender =
+  //     (await Customer.findById(senderId)) ||
+  //     (await CarOwner.findById(senderId));
 
-//   if (!sender) throw new Error("Sender not found");
+  //   if (!sender) throw new Error("Sender not found");
 
-//   return await ChatMessage.create({
-//     roomId,
-//     senderId,
-//     receiverId,
-//     participants: [senderId, receiverId],
-//     senderName: sender.fullName,
-//     senderRole: sender.role,
-//     message,
-//     timestamp: new Date(),
-//   });
-// }
+  //   return await ChatMessage.create({
+  //     roomId,
+  //     senderId,
+  //     receiverId,
+  //     participants: [senderId, receiverId],
+  //     senderName: sender.fullName,
+  //     senderRole: sender.role,
+  //     message,
+  //     timestamp: new Date(),
+  //   });
+  // }
 
+  async saveMessage(
+    roomId: string,
+    senderId: string,
+    receiverId: string,
+    message: string
+  ): Promise<IChatMessage> {
+    const user = (await Customer.findById(senderId)) || (await CarOwner.findById(senderId));
+    if (!user) throw new Error('Sender not found');
 
-async saveMessage(
-  roomId: string,
-  senderId: string,
-  receiverId: string,
-  message: string
-): Promise<IChatMessage> {
-  const user = (await Customer.findById(senderId)) || (await CarOwner.findById(senderId));
-  if (!user) throw new Error("Sender not found");
-
-  return await ChatMessage.create({
-    roomId,
-    senderId,
-    receiverId,
-    participants: [senderId, receiverId],
-    senderName: user.fullName,
-    senderRole: user.role,
-    message,
-    timestamp: new Date(),
-  });
-}
-
+    return await ChatMessage.create({
+      roomId,
+      senderId,
+      receiverId,
+      participants: [senderId, receiverId],
+      senderName: user.fullName,
+      senderRole: user.role,
+      message,
+      timestamp: new Date(),
+    });
+  }
 
   // async saveMessage(data: Partial<IChatMessage>): Promise<IChatMessage> {
   //   // Try to find the user in Customer first, then CarOwner
@@ -97,28 +95,23 @@ async saveMessage(
   //   return chats;
   // }
 
-
   // async getActiveChatsByOwner(ownerId: string): Promise<IChatMessage[]> {
-  
+
   async getActiveChatsByOwner(ownerId: string): Promise<IChatMessage[]> {
-  // Find all messages where owner is a participant
-  const messages = await ChatMessage.find({ participants: ownerId })
-    .sort({ timestamp: 1 })
-    .lean();
+    // Find all messages where owner is a participant
+    const messages = await ChatMessage.find({ participants: ownerId })
+      .sort({ timestamp: 1 })
+      .lean();
 
-  return messages;
-}
+    return messages;
+  }
 
+  async getActiveChatsByCustomer(customerId: string): Promise<IChatMessage[]> {
+    const messages = await ChatMessage.find({ participants: customerId })
+      .sort({ timestamp: 1 })
+      .lean();
 
-
-async getActiveChatsByCustomer(customerId: string): Promise<IChatMessage[]> {
- const messages = await ChatMessage.find({ participants: customerId })
-    .sort({ timestamp: 1 })
-    .lean();
-
-  return messages;
-}
-
-
+    return messages;
+  }
 }
 export default ChatRepository;

@@ -36,9 +36,6 @@
 
 // export default authMiddleware;
 
-
-
-
 import { Request, Response, NextFunction } from 'express';
 import JwtUtils from '../utils/jwtUtils';
 import { Customer } from '../models/customer/customerModel';
@@ -53,11 +50,7 @@ export interface CustomRequest extends Request {
 /**
  * JWT Authentication Middleware
  */
-const authMiddleware = (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): void => {
+const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
   try {
     console.log('Auth Header:', req.header('Authorization'));
 
@@ -106,9 +99,7 @@ const authMiddleware = (
 /**
  * Role Authorization Middleware
  */
-export const verifyRole = (
-  allowedRoles: ('carOwner' | 'customer' | 'admin')[]
-) => {
+export const verifyRole = (allowedRoles: ('carOwner' | 'customer' | 'admin')[]) => {
   return (req: CustomRequest, res: Response, next: NextFunction): void => {
     if (!req.role || !allowedRoles.includes(req.role)) {
       res.status(403).json({ message: 'Forbidden: Access denied.' });

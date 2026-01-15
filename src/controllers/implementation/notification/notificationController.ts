@@ -22,18 +22,18 @@ class NotificationController implements INotificationController {
         data: notification,
       });
     } catch (error: any) {
-      console.error("Create Notification Error:", error);
- this.handleError(res, error, StatusCode.BAD_REQUEST);
+      console.error('Create Notification Error:', error);
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
 
   async getByUser(req: Request, res: Response): Promise<void> {
     try {
-        console.log("reachedHere")
+      console.log('reachedHere');
       const userId = req.query.userId as string;
 
       if (!userId) {
-        res.status(StatusCode.BAD_REQUEST).json({ message: "UserId is required" });
+        res.status(StatusCode.BAD_REQUEST).json({ message: 'UserId is required' });
         return;
       }
 
@@ -44,13 +44,13 @@ class NotificationController implements INotificationController {
         data: notifications,
       });
     } catch (error: any) {
-      console.error("Get Notifications Error:", error);
+      console.error('Get Notifications Error:', error);
 
-       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
-    async markAsRead(req: Request, res: Response): Promise<void> {
+  async markAsRead(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const userId = req.query.userId as string;
@@ -58,7 +58,7 @@ class NotificationController implements INotificationController {
       if (!id || !userId) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
-          message: "Notification id and userId are required",
+          message: 'Notification id and userId are required',
         });
         return;
       }
@@ -70,12 +70,11 @@ class NotificationController implements INotificationController {
         data: updated,
       });
     } catch (error: any) {
-      console.error("Mark As Read Error:", error);
- this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+      console.error('Mark As Read Error:', error);
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
-   
-  
+
   async getUnreadCount(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.query.userId as string;
@@ -83,7 +82,7 @@ class NotificationController implements INotificationController {
       if (!userId) {
         res.status(StatusCode.BAD_REQUEST).json({
           success: false,
-          message: "userId is required",
+          message: 'userId is required',
         });
         return;
       }
@@ -95,27 +94,26 @@ class NotificationController implements INotificationController {
         count,
       });
     } catch (error: any) {
-      console.error("Unread Count Error:", error);
+      console.error('Unread Count Error:', error);
 
-       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
-      
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
   }
 
   private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      console.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    console.error('Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
 }
 
-export default NotificationController
+export default NotificationController;

@@ -49,11 +49,9 @@
 // //   io.to(`chat_${roomId}`).emit('receiveChatMessage', savedMessage);
 // // });
 
-
 // //     socket.on('disconnect', () => {
 // //       console.log(`Chat socket disconnected: ${socket.id}`);
 // //     });
-
 
 // //     socket.on("leaveChatRoom", (roomId) => {
 // //      socket.leave(roomId);
@@ -62,11 +60,9 @@
 //   });
 // }
 
-
-
-import { Server, Socket } from "socket.io";
-import ChatService from "../services/implementation/chat/chatServices";
-import ChatRepository from "../repositories/implementation/chat/chatRepository";
+import { Server, Socket } from 'socket.io';
+import ChatService from '../services/implementation/chat/chatServices';
+import ChatRepository from '../repositories/implementation/chat/chatRepository';
 
 const chatService = new ChatService(new ChatRepository());
 
@@ -80,44 +76,37 @@ interface SendMessagePayload extends JoinRoomPayload {
 }
 
 export default function chatSocket(io: Server) {
-  io.on("connection", (socket: Socket) => {
-    console.log("Chat socket connected:", socket.id);
+  io.on('connection', (socket: Socket) => {
+    console.log('Chat socket connected:', socket.id);
 
-    socket.on("joinChatRoom", ({ senderId, receiverId }: JoinRoomPayload) => {
-      const roomId = [senderId, receiverId].sort().join("_");
+    socket.on('joinChatRoom', ({ senderId, receiverId }: JoinRoomPayload) => {
+      const roomId = [senderId, receiverId].sort().join('_');
       socket.join(`chat_${roomId}`);
       console.log(`Socket ${socket.id} joined chat_${roomId}`);
     });
 
-    socket.on(
-      "sendChatMessage",
-      async ({ senderId, receiverId, message }: SendMessagePayload) => {
-        if (!message?.trim()) return;
+    socket.on('sendChatMessage', async ({ senderId, receiverId, message }: SendMessagePayload) => {
+      if (!message?.trim()) return;
 
-        const roomId = [senderId, receiverId].sort().join("_");
+      const roomId = [senderId, receiverId].sort().join('_');
 
-        try {
-          const savedMessage = await chatService.addMessage(
-            senderId,
-            receiverId,
-            message
-          );
+      try {
+        const savedMessage = await chatService.addMessage(senderId, receiverId, message);
 
-          io.to(`chat_${roomId}`).emit("receiveChatMessage", savedMessage);
-        } catch (error) {
-          console.error("SendChatMessage error:", error);
-          socket.emit("chatError", "Message not sent");
-        }
+        io.to(`chat_${roomId}`).emit('receiveChatMessage', savedMessage);
+      } catch (error) {
+        console.error('SendChatMessage error:', error);
+        socket.emit('chatError', 'Message not sent');
       }
-    );
+    });
 
-    socket.on("leaveChatRoom", ({ senderId, receiverId }: JoinRoomPayload) => {
-      const roomId = [senderId, receiverId].sort().join("_");
+    socket.on('leaveChatRoom', ({ senderId, receiverId }: JoinRoomPayload) => {
+      const roomId = [senderId, receiverId].sort().join('_');
       socket.leave(`chat_${roomId}`);
     });
 
-    socket.on("disconnect", () => {
-      console.log("Chat socket disconnected:", socket.id);
+    socket.on('disconnect', () => {
+      console.log('Chat socket disconnected:', socket.id);
     });
   });
 }

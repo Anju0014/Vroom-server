@@ -16,60 +16,52 @@ class ComplaintController implements IComplaintController {
   }
 
   async createComplaint(req: CustomRequest, res: Response) {
-    console.log("report")
+    console.log('report');
     const { userId, role } = req;
-    console.log(userId,role)
-      if (!userId || !role) {
-         res.status(StatusCode.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-        return
-      }
-    if (role === "admin") {
-     res.status(StatusCode.FORBIDDEN).json({
-      message: "Admins cannot create complaints",
-    });
-    return
-  }
- console.log("sending data")
-      const complaint = await this._complaintService.createComplaint(
-        req.body,
-        userId,
-        role
-      );
-      console.log("complaint",complaint)
-      
+    console.log(userId, role);
+    if (!userId || !role) {
+      res.status(StatusCode.UNAUTHORIZED).json({
+        message: 'Unauthorized',
+      });
+      return;
+    }
+    if (role === 'admin') {
+      res.status(StatusCode.FORBIDDEN).json({
+        message: 'Admins cannot create complaints',
+      });
+      return;
+    }
+    console.log('sending data');
+    const complaint = await this._complaintService.createComplaint(req.body, userId, role);
+    console.log('complaint', complaint);
 
-     res.status(StatusCode.CREATED).json({
-      message: "Complaint created successfully",
+    res.status(StatusCode.CREATED).json({
+      message: 'Complaint created successfully',
       complaint: mapComplaintToResponse(complaint),
     });
-    return
+    return;
   }
 
+  async getMyComplaints(req: CustomRequest, res: Response) {
+    const { userId, role } = req;
+    if (!userId || !role) {
+      res.status(StatusCode.UNAUTHORIZED).json({
+        message: 'Unauthorized',
+      });
+      return;
+    }
+    if (role === 'admin') {
+      res.status(StatusCode.FORBIDDEN).json({
+        message: 'Admins cannot create complaints',
+      });
+      return;
+    }
 
-   async getMyComplaints(req: CustomRequest, res: Response) {
-    const {userId,role} = req;
-      if (!userId || !role) {
-        res.status(StatusCode.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-         return
-      }
-      if (role === "admin") {
-     res.status(StatusCode.FORBIDDEN).json({
-      message: "Admins cannot create complaints",
-    });
-     return
+    const complaints = await this._complaintService.getMyComplaints(userId, role);
+
+    res.status(StatusCode.OK).json(complaints);
+    return;
   }
-
-    const complaints =
-      await this._complaintService.getMyComplaints(userId,role);
-
-     res.status(StatusCode.OK).json(complaints);
-      return
-  }
-
 
   // async getAllComplaints(req: Request, res: Response) {
   //   const complaints =
@@ -78,40 +70,33 @@ class ComplaintController implements IComplaintController {
   //  res.status(StatusCode.OK).json(complaints);
   //   return
   // }
-async getAllComplaints(req: Request, res: Response) {
-  const page = Number(req.query.page) || 1;
-  const itemsPerPage = Number(req.query.itemsPerPage) || 10;
-  const search = (req.query.search as string)?.trim() || "";
-  console.log("reached at complaints")
+  async getAllComplaints(req: Request, res: Response) {
+    const page = Number(req.query.page) || 1;
+    const itemsPerPage = Number(req.query.itemsPerPage) || 10;
+    const search = (req.query.search as string)?.trim() || '';
+    console.log('reached at complaints');
 
-  const complaints = await this._complaintService.getAllComplaints(
-    // page,
-    // itemsPerPage,
-    // { search }
-  );
+    const complaints = await this._complaintService
+      .getAllComplaints
+      // page,
+      // itemsPerPage,
+      // { search }
+      ();
 
-  res.status(StatusCode.OK).json(complaints);
-}
+    res.status(StatusCode.OK).json(complaints);
+  }
 
-
-  async updateComplaintByAdmin(
-    req: Request,
-    res: Response
-  ) {
+  async updateComplaintByAdmin(req: Request, res: Response) {
     const { id } = req.params;
 
-    const updatedComplaint =
-      await this._complaintService.updateComplaintByAdmin(
-        id,
-        req.body
-      );
+    const updatedComplaint = await this._complaintService.updateComplaintByAdmin(id, req.body);
 
-   res.status(StatusCode.OK).json({
-      message: "Complaint updated successfully",
+    res.status(StatusCode.OK).json({
+      message: 'Complaint updated successfully',
       updatedComplaint,
     });
-     return
+    return;
   }
 }
 
-export default ComplaintController
+export default ComplaintController;

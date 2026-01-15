@@ -20,8 +20,7 @@ class ChatController implements IChatController {
       console.log(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,', roomId);
       const messages = await this._chatService.fetchMessages(roomId);
       res.status(StatusCode.OK).json(messages);
-    } catch (error:any) 
-    {
+    } catch (error: any) {
       this.handleError(res, error, StatusCode.BAD_REQUEST);
       // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch chat history' });
     }
@@ -39,13 +38,12 @@ class ChatController implements IChatController {
       const chats = await this._chatService.fetchOwnerChats(ownerId);
       console.log('ChatService', chats);
       res.status(StatusCode.OK).json(chats);
-    } catch(error:any) {
+    } catch (error: any) {
       // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch owner chats' });
-    this.handleError(res, error, StatusCode.BAD_REQUEST);
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
   async getCustomerChats(req: CustomRequest, res: Response) {
-
     const customerId = req.userId;
     if (!customerId) {
       console.log('missing');
@@ -56,24 +54,24 @@ class ChatController implements IChatController {
       const chats = await this._chatService.fetchCustomerChats(customerId);
       console.log('ChatService', chats);
       res.status(StatusCode.OK).json(chats);
-    } catch(error:any) {
+    } catch (error: any) {
       // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch owner chats' });
-    this.handleError(res, error, StatusCode.BAD_REQUEST);
+      this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
-   private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      console.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
+  private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    console.error('Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
 }
 export default ChatController;

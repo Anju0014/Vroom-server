@@ -1,6 +1,4 @@
-
-
-import { IComplaint } from "../../../models/complaints/complaintModel";
+import { IComplaint } from '../../../models/complaints/complaintModel';
 
 interface IComplaintRepository {
   create(data: Partial<IComplaint>): Promise<IComplaint>;
@@ -11,9 +9,6 @@ interface IComplaintRepository {
 
   findById(id: string): Promise<IComplaint | null>;
 
-  updateById(
-    id: string,
-    update: Partial<IComplaint>
-  ): Promise<IComplaint | null>;
+  updateById(id: string, update: Partial<IComplaint>): Promise<IComplaint | null>;
 }
-export default IComplaintRepository
+export default IComplaintRepository;

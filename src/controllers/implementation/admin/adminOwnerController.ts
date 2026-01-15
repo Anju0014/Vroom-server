@@ -139,7 +139,7 @@ class AdminOwnerController implements IAdminOwnerController {
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Owner status updated successfully',
         user: updatedUser,
       });
-    } catch (error:any) {
+    } catch (error: any) {
       // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       //   success: false,
       //   message: MESSAGES.ERROR.SERVER_ERROR,
@@ -201,7 +201,6 @@ class AdminOwnerController implements IAdminOwnerController {
       // });
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
-
   }
 
   async updateCarVerifyStatus(req: Request, res: Response): Promise<void> {
@@ -233,19 +232,19 @@ class AdminOwnerController implements IAdminOwnerController {
     }
   }
 
-   private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      console.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
+  private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    console.error('Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
 }
 export default AdminOwnerController;

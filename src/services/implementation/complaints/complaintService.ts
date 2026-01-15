@@ -1,11 +1,7 @@
-
 // import {CreateComplaintDTO,UpdateComplaintByAdminDTO}  from '../../../dtos/complaints/complaint.dto'
-
-
 
 // import IComplaintRepository from '../../../repositories/interfaces/complaints/IComplaintRepository';
 // import IComplaintService  from '../../interfaces/complaints/IComplaintServices';
-
 
 // import logger from '../../../utils/logger';
 // import { Types } from 'mongoose';
@@ -16,7 +12,6 @@
 //   constructor(complaintRepository: IComplaintRepository) {
 //     this._complaintRepository = complaintRepository;
 //   }
-
 
 //   async createComplaint(
 //     data: CreateComplaintDTO,

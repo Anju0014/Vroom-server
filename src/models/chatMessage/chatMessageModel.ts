@@ -5,8 +5,8 @@ export interface IChatMessage extends Document {
   senderId: string;
   senderName: string;
   senderRole: string;
-  receiverId: string;        
-  participants: string[]; 
+  receiverId: string;
+  participants: string[];
   message: string;
   timestamp: Date;
 }

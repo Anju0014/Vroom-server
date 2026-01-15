@@ -52,7 +52,7 @@ class AdminController implements IAdminController {
           role: 'admin',
         },
       });
-    } catch (error:any) {
+    } catch (error: any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       // console.log('LoginError from Admin:', error);
       // res.status(StatusCode.NOT_FOUND).json({ error: error instanceof Error ? error.message : 'Login failed' });
@@ -128,7 +128,6 @@ class AdminController implements IAdminController {
         total,
       });
     } catch (error: any) {
-  
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       //   success: false,
@@ -157,8 +156,8 @@ class AdminController implements IAdminController {
         message: MESSAGES.SUCCESS.STATUS_UPDATED || 'Customer status updated successfully',
         user: updatedUser,
       });
-    } catch (error:any) {
-       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
+    } catch (error: any) {
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       // res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       //   success: false,
       //   message: MESSAGES.ERROR.SERVER_ERROR,
@@ -166,9 +165,7 @@ class AdminController implements IAdminController {
     }
   }
 
-
-
-   private handleError(
+  private handleError(
     res: Response,
     error: unknown,
     statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR

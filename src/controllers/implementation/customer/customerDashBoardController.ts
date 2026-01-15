@@ -53,7 +53,7 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
       await generateAndUploadReceipt(bookingId);
       console.log(booking);
       res.status(StatusCode.OK).json({ success: true });
-    } catch (error:any) {
+    } catch (error: any) {
       this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
       // res
       //   .status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -62,71 +62,65 @@ class CustomerDashBoardController implements ICustomerDashBoardController {
   }
 
   async getCustomerwalletDetails(req: CustomRequest, res: Response): Promise<void> {
-  try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(StatusCode.NOT_FOUND).json({ message: 'User Id not found' });
-      return;
-    }
+    try {
+      const userId = req.userId;
+      if (!userId) {
+        res.status(StatusCode.NOT_FOUND).json({ message: 'User Id not found' });
+        return;
+      }
 
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 9;
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 9;
 
-    if (page < 1 || limit < 1 || limit > 100) {
-      res.status(StatusCode.BAD_REQUEST).json({
-        success: false,
-        message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+      if (page < 1 || limit < 1 || limit > 100) {
+        res.status(StatusCode.BAD_REQUEST).json({
+          success: false,
+          message: MESSAGES.ERROR.INVALID_PAGE_OR_LIMIT,
+        });
+        return;
+      }
+
+      const wallet = await this._customerDashService.getCustomerWallet(userId, page, limit);
+
+      if (!wallet) {
+        res.status(StatusCode.NOT_FOUND).json({
+          success: false,
+          message: 'Wallet not found',
+        });
+        return;
+      }
+
+      const total = await this._customerDashService.getCustomerWalletTransactionCount(userId);
+      const walletDTO = CustomerWalletMapper.toDTO(wallet);
+
+      res.status(StatusCode.OK).json({
+        success: true,
+        data: {
+          wallet: walletDTO,
+          total,
+          page,
+          limit,
+        },
       });
-      return;
+    } catch (error) {
+      this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
     }
-
-    const wallet = await this._customerDashService.getCustomerWallet(
-      userId,
-      page,
-      limit
-    );
-
-    if (!wallet) {
-      res.status(StatusCode.NOT_FOUND).json({
-        success: false,
-        message: 'Wallet not found',
-      });
-      return;
-    }
-
-    const total = await this._customerDashService.getCustomerWalletTransactionCount(userId);
-    const walletDTO = CustomerWalletMapper.toDTO(wallet);
-
-    res.status(StatusCode.OK).json({
-      success: true,
-      data: {
-        wallet: walletDTO,
-        total,
-        page,
-        limit,
-      },
-    });
-  } catch (error) {
-    this.handleError(res, error, StatusCode.INTERNAL_SERVER_ERROR);
   }
-}
 
+  private handleError(
+    res: Response,
+    error: unknown,
+    statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
+  ): void {
+    console.error('Error:', error);
 
+    const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
 
-    private handleError(
-      res: Response,
-      error: unknown,
-      statusCode: StatusCode = StatusCode.INTERNAL_SERVER_ERROR
-    ): void {
-      console.error('Error:', error);
-  
-      const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.SERVER_ERROR;
-  
-      res.status(statusCode).json({
-        success: false,
-        message: errorMessage,
-      });
-    }
+    res.status(statusCode).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
 }
 
 export default CustomerDashBoardController;

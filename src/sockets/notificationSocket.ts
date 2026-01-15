@@ -1,7 +1,7 @@
-import { Server, Socket } from "socket.io";
+import { Server, Socket } from 'socket.io';
 
 export default function notificationSocket(io: Server) {
-  io.on("connection", (socket: Socket) => {
+  io.on('connection', (socket: Socket) => {
     const userId = socket.handshake.query.userId as string;
 
     if (userId) {
@@ -9,7 +9,7 @@ export default function notificationSocket(io: Server) {
       console.log(`User ${userId} joined notifications (socket: ${socket.id})`);
     }
 
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
       console.log(`User ${userId} disconnected from notifications`);
     });
   });

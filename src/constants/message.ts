@@ -42,8 +42,7 @@ export const MESSAGES = {
     MISSING_CAR_ID: 'Car ID is required',
     MISSING_PAYMENT_INTENT: 'Payment Intent ID is required',
     INVALID_PAGE_OR_LIMIT: 'Invalid page or limit',
-    RECEIPT_NOT_FOUND:'Receipt Not Found',
-    INVALID_BOOKING_ID:'Invalid Booking ID',
-
+    RECEIPT_NOT_FOUND: 'Receipt Not Found',
+    INVALID_BOOKING_ID: 'Invalid Booking ID',
   },
 };

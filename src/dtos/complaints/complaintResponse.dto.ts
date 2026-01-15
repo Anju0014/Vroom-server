@@ -1,4 +1,4 @@
-import { IComplaint } from "../../models/complaints/complaintModel";
+import { IComplaint } from '../../models/complaints/complaintModel';
 
 export const mapComplaintToResponse = (complaint: IComplaint) => ({
   id: complaint._id,
@@ -13,6 +13,6 @@ export const mapComplaintToResponse = (complaint: IComplaint) => ({
   adminResponse: complaint.adminResponse || null,
   resolvedAt: complaint.resolvedAt || null,
   createdAt: complaint.createdAt,
-  complaintProof:complaint.complaintProof,
+  complaintProof: complaint.complaintProof,
   updatedAt: complaint.updatedAt,
 });

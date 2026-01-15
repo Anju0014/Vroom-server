@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
 
-interface IComplaintController {
-  
-}
+interface IComplaintController {}
 export default IComplaintController;

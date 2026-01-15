@@ -17,17 +17,26 @@ import AdminRepository from '../../repositories/implementation/admin/adminReposi
 
 const carOwnerRouter = Router();
 
-const notificationRepository=new NotificationRepository()
+const notificationRepository = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepository);
 
-const adminRepository=new AdminRepository()
+const adminRepository = new AdminRepository();
 
 const carOwnerRepository = new CarOwnerRepository();
-const carOwnerService = new CarOwnerService(carOwnerRepository,adminRepository,notificationService);
+const carOwnerService = new CarOwnerService(
+  carOwnerRepository,
+  adminRepository,
+  notificationService
+);
 const carOwnerController = new CarOwnerController(carOwnerService);
 
 const carOwnerCarsRepository = new CarOwnerCarsRepository();
-const carOwnerCarsService = new CarOwnerCarsService(carOwnerCarsRepository, carOwnerRepository,adminRepository,notificationService);
+const carOwnerCarsService = new CarOwnerCarsService(
+  carOwnerCarsRepository,
+  carOwnerRepository,
+  adminRepository,
+  notificationService
+);
 const carOwnerCarsController = new CarOwnerCarsController(carOwnerCarsService);
 
 const carOwnerBookingRepository = new CarOwnerBookingRepository();
@@ -121,7 +130,7 @@ carOwnerRouter.get('/activebooking/:carId', authMiddleware, (req, res) =>
   carOwnerCarsController.getActiveBooking(req, res)
 );
 
- carOwnerRouter.get('/booking/:bookingId/receipt-url', authMiddleware, (req, res) =>
+carOwnerRouter.get('/booking/:bookingId/receipt-url', authMiddleware, (req, res) =>
   carOwnerBookingController.getReceiptUrl(req, res)
 );
 

@@ -16,10 +16,14 @@ class CarOwnerService implements ICarOwnerService {
   private readonly _adminRepository: IAdminRepository;
   private readonly _notificationService: INotificationService;
 
-  constructor(carOwnerRepository: ICarOwnerRepository, adminRepository:IAdminRepository, notificationService:INotificationService) {
+  constructor(
+    carOwnerRepository: ICarOwnerRepository,
+    adminRepository: IAdminRepository,
+    notificationService: INotificationService
+  ) {
     this._carOwnerRepository = carOwnerRepository;
-    this._adminRepository=adminRepository;
-    this._notificationService= notificationService;
+    this._adminRepository = adminRepository;
+    this._notificationService = notificationService;
   }
 
   async registerBasicDetails(
@@ -230,21 +234,21 @@ class CarOwnerService implements ICarOwnerService {
     if (!updatedOwner) {
       throw new Error('Car owner not found or update failed.');
     }
-  
+
     updatedOwner.processStatus = 2;
 
-    const admin=await this._adminRepository.findPrimaryAdmin()
-     if (!admin) {
-    throw new Error("Admin not found");
-  }
+    const admin = await this._adminRepository.findPrimaryAdmin();
+    if (!admin) {
+      throw new Error('Admin not found');
+    }
 
-     const notification=await this._notificationService.create(
-        NotificationTemplates.newCarOwnerForApproval(
-          admin._id.toString(),
-          ownerId.toString(),
-          updatedOwner.fullName
-        )
-      );
+    const notification = await this._notificationService.create(
+      NotificationTemplates.newCarOwnerForApproval(
+        admin._id.toString(),
+        ownerId.toString(),
+        updatedOwner.fullName
+      )
+    );
 
     return updatedOwner;
   }

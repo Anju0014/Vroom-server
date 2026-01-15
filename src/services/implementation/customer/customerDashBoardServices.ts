@@ -81,22 +81,12 @@ class CustomerDashBoardService implements ICustomerDashBoardService {
     return updatedBooking;
   }
 
-   async getCustomerWallet(
-  userId: string,
-  page: number,
-  limit: number
-) {
-  return this._customerDashRepository.findWalletByUserWithTransactions(
-    userId,
-    page,
-    limit
-  );
-}
+  async getCustomerWallet(userId: string, page: number, limit: number) {
+    return this._customerDashRepository.findWalletByUserWithTransactions(userId, page, limit);
+  }
 
-async getCustomerWalletTransactionCount(userId: string) {
-  return this._customerDashRepository.getTransactionCount(userId);
-}
-
-
+  async getCustomerWalletTransactionCount(userId: string) {
+    return this._customerDashRepository.getTransactionCount(userId);
+  }
 }
 export default CustomerDashBoardService;

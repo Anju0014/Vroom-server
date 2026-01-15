@@ -23,21 +23,17 @@ class ChatService implements IChatService {
   //   });
   // }
 
-  async addMessage(
-  senderId: string,
-  receiverId: string,
-  message: string
-): Promise<IChatMessage> {
-  // Create roomId for this pair
-  const roomId = [senderId, receiverId].sort().join("_");
+  async addMessage(senderId: string, receiverId: string, message: string): Promise<IChatMessage> {
+    // Create roomId for this pair
+    const roomId = [senderId, receiverId].sort().join('_');
 
-  // Fetch sender
-  const user = (await Customer.findById(senderId)) || (await CarOwner.findById(senderId));
-  if (!user) throw new Error("Sender not found");
+    // Fetch sender
+    const user = (await Customer.findById(senderId)) || (await CarOwner.findById(senderId));
+    if (!user) throw new Error('Sender not found');
 
-  // Save message
-  return await this._chatRepository.saveMessage(roomId, senderId, receiverId, message);
-}
+    // Save message
+    return await this._chatRepository.saveMessage(roomId, senderId, receiverId, message);
+  }
 
   async fetchMessages(roomId: string): Promise<IChatMessage[]> {
     return await this._chatRepository.getMessagesByRoom(roomId);

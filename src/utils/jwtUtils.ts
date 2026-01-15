@@ -50,22 +50,21 @@
 
 // export default JwtUtils;
 
-
-import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
-import ms from "ms";
-import dotenv from "dotenv";
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
+import ms from 'ms';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 /* ---------------- ENV VALIDATION ---------------- */
 
 const requiredEnv = [
-  "ACCESS_TOKEN_SECRET",
-  "REFRESH_TOKEN_SECRET",
-  "RESET_TOKEN_SECRET",
-  "JWT_ACCESS_EXPIRES_IN",
-  "JWT_REFRESH_EXPIRES_IN",
-  "JWT_RESET_EXPIRES_IN",
+  'ACCESS_TOKEN_SECRET',
+  'REFRESH_TOKEN_SECRET',
+  'RESET_TOKEN_SECRET',
+  'JWT_ACCESS_EXPIRES_IN',
+  'JWT_REFRESH_EXPIRES_IN',
+  'JWT_RESET_EXPIRES_IN',
 ];
 
 requiredEnv.forEach((key) => {
@@ -132,10 +131,7 @@ class JwtUtils {
       return null;
     }
   }
-  static verifyToken(
-    token: string,
-    isRefreshToken = false
-  ): JwtPayload | null {
+  static verifyToken(token: string, isRefreshToken = false): JwtPayload | null {
     try {
       const secret = isRefreshToken ? refreshSecret : accessSecret;
       return jwt.verify(token, secret) as JwtPayload;
@@ -146,4 +142,3 @@ class JwtUtils {
 }
 
 export default JwtUtils;
-

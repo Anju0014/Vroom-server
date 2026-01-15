@@ -7,4 +7,4 @@ interface ICarController {
   updateCar(req: Request, res: Response): Promise<void>;
 }
 
-export default ICarController
+export default ICarController;

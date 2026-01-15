@@ -1,18 +1,17 @@
-import { Schema, model, Types, Document } from "mongoose";
+import { Schema, model, Types, Document } from 'mongoose';
 
-export type ComplaintStatus =| "open"| "in_review"| "resolved"| "rejected";
+export type ComplaintStatus = 'open' | 'in_review' | 'resolved' | 'rejected';
 
-export type ComplaintCategory =| "car"| "payment"| "app"| "behavior"| "other";
+export type ComplaintCategory = 'car' | 'payment' | 'app' | 'behavior' | 'other';
 
-export type ComplaintPriority = "low" | "medium" | "high";
-
+export type ComplaintPriority = 'low' | 'medium' | 'high';
 
 export interface IComplaint extends Document<Types.ObjectId> {
   _id: Types.ObjectId;
   bookingId: string;
-//   carId: Types.ObjectId;
+  //   carId: Types.ObjectId;
   raisedBy: Types.ObjectId;
-  raisedByRole: "customer" | "carOwner";
+  raisedByRole: 'customer' | 'carOwner';
   title: string;
   description: string;
   category: ComplaintCategory;
@@ -20,7 +19,7 @@ export interface IComplaint extends Document<Types.ObjectId> {
   priority: ComplaintPriority;
   adminResponse?: string;
   resolvedAt?: Date;
-  complaintProof?:string;
+  complaintProof?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,7 +28,7 @@ const complaintSchema = new Schema<IComplaint>(
   {
     bookingId: {
       type: String,
-      ref: "Booking",
+      ref: 'Booking',
       required: true,
     },
 
@@ -46,7 +45,7 @@ const complaintSchema = new Schema<IComplaint>(
 
     raisedByRole: {
       type: String,
-      enum: ["customer", "carOwner"],
+      enum: ['customer', 'carOwner'],
       required: true,
     },
 
@@ -67,20 +66,20 @@ const complaintSchema = new Schema<IComplaint>(
 
     category: {
       type: String,
-      enum: ["car", "payment", "app", "behavior", "other"],
+      enum: ['car', 'payment', 'app', 'behavior', 'other'],
       required: true,
     },
 
     status: {
       type: String,
-      enum: ["open", "in_review", "resolved", "rejected"],
-      default: "open",
+      enum: ['open', 'in_review', 'resolved', 'rejected'],
+      default: 'open',
     },
 
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
     },
 
     adminResponse: {
@@ -94,8 +93,4 @@ const complaintSchema = new Schema<IComplaint>(
   { timestamps: true }
 );
 
-export const Complaint = model<IComplaint>("Complaint",complaintSchema);
-
-
-
-
+export const Complaint = model<IComplaint>('Complaint', complaintSchema);

@@ -43,8 +43,8 @@ app.use('/admin', adminRouter);
 app.use('/api/s3', s3Routes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/chats', chatRouter);
-app.use('/notifications',notificationRouter)
-app.use('/complaints',complaintRouter)
+app.use('/notifications', notificationRouter);
+app.use('/complaints', complaintRouter);
 
 initSockets(server);
 
