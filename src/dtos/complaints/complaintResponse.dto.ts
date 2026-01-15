@@ -13,5 +13,6 @@ export const mapComplaintToResponse = (complaint: IComplaint) => ({
   adminResponse: complaint.adminResponse || null,
   resolvedAt: complaint.resolvedAt || null,
   createdAt: complaint.createdAt,
+  complaintProof:complaint.complaintProof,
   updatedAt: complaint.updatedAt,
 });

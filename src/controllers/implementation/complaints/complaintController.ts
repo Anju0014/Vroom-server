@@ -31,12 +31,14 @@ class ComplaintController implements IComplaintController {
     });
     return
   }
-
+ console.log("sending data")
       const complaint = await this._complaintService.createComplaint(
         req.body,
         userId,
         role
       );
+      console.log("complaint",complaint)
+      
 
      res.status(StatusCode.CREATED).json({
       message: "Complaint created successfully",

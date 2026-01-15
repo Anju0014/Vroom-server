@@ -14,5 +14,6 @@ chatRouter.get('/room/:roomId', authMiddleware, (req, res) =>
 );
 
 chatRouter.get('/ownerchats', authMiddleware, (req, res) => chatController.getOwnerChats(req, res));
+chatRouter.get('/customerchats', authMiddleware, (req, res) => chatController.getCustomerChats(req, res));
 
 export default chatRouter;

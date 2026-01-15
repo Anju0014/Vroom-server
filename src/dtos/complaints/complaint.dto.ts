@@ -3,6 +3,7 @@ export interface CreateComplaintDTO {
   title: string;
   description: string;
   category: "car" | "payment" | "app" | "behavior" | "other";
+  complaintProof:string;
 }
 
 export interface UpdateComplaintByAdminDTO {

@@ -99,8 +99,20 @@ class CustomerDashBoardRepository
       $project: {
         balance: 1,
         totalTransactions: { $size: "$transactions" },
+        // transactions: {
+        //   $slice: ["$transactions", skip, limit],
+        // },
         transactions: {
-          $slice: ["$transactions", skip, limit],
+          $slice: [
+            {
+              $sortArray: {
+                input: "$transactions",
+                sortBy: { date: -1 }, 
+              },
+            },
+            skip,
+            limit,
+          ],
         },
       },
     },

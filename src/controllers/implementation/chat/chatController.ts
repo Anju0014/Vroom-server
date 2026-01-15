@@ -44,6 +44,23 @@ class ChatController implements IChatController {
     this.handleError(res, error, StatusCode.BAD_REQUEST);
     }
   }
+  async getCustomerChats(req: CustomRequest, res: Response) {
+
+    const customerId = req.userId;
+    if (!customerId) {
+      console.log('missing');
+      return;
+    }
+
+    try {
+      const chats = await this._chatService.fetchCustomerChats(customerId);
+      console.log('ChatService', chats);
+      res.status(StatusCode.OK).json(chats);
+    } catch(error:any) {
+      // res.status(StatusCode.BAD_REQUEST).json({ message: 'Failed to fetch owner chats' });
+    this.handleError(res, error, StatusCode.BAD_REQUEST);
+    }
+  }
    private handleError(
       res: Response,
       error: unknown,

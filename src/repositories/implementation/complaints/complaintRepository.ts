@@ -13,8 +13,11 @@ import  IComplaintRepository  from "../../interfaces/complaints/IComplaintReposi
   }
 
   async findAll(): Promise<IComplaint[]> {
+    // return await Complaint.find()
+    //   .sort({ createdAt: -1 });
     return await Complaint.find()
-      .sort({ createdAt: -1 });
+        .populate("raisedBy", "fullName email phoneNumber")
+        .sort({ createdAt: -1 });
   }
 
   async findById(id: string): Promise<IComplaint | null> {

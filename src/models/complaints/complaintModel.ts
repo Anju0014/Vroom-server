@@ -7,7 +7,8 @@ export type ComplaintCategory =| "car"| "payment"| "app"| "behavior"| "other";
 export type ComplaintPriority = "low" | "medium" | "high";
 
 
-export interface IComplaint extends Document {
+export interface IComplaint extends Document<Types.ObjectId> {
+  _id: Types.ObjectId;
   bookingId: string;
 //   carId: Types.ObjectId;
   raisedBy: Types.ObjectId;
@@ -19,6 +20,7 @@ export interface IComplaint extends Document {
   priority: ComplaintPriority;
   adminResponse?: string;
   resolvedAt?: Date;
+  complaintProof?:string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +59,10 @@ const complaintSchema = new Schema<IComplaint>(
     description: {
       type: String,
       required: true,
+    },
+
+    complaintProof: {
+      type: String,
     },
 
     category: {

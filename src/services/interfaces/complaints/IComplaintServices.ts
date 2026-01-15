@@ -1,4 +1,6 @@
 import { CreateComplaintDTO, UpdateComplaintByAdminDTO } from "../../../dtos/complaints/complaint.dto";
+import { ComplaintAdminResponseDTO } from "../../../dtos/complaints/complaintAdminResponse.dto";
+
 import { IComplaint } from "../../../models/complaints/complaintModel";
 
 interface IComplaintService {
@@ -13,7 +15,7 @@ interface IComplaintService {
     role: "customer" | "carOwner"
   ): Promise<IComplaint[]|null>;
 
-  getAllComplaints(): Promise<IComplaint[]>;
+  getAllComplaints(): Promise<ComplaintAdminResponseDTO[]>;
 
   updateComplaintByAdmin(
     complaintId: string,
