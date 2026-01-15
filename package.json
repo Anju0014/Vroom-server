@@ -10,7 +10,9 @@
     "seed:admin": "ts-node src/seeds/adminSeeder.ts",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,json,md}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,json,md}\"",
+    "clear:logs": "node scripts/clearLogs.js"
+
   },
   "author": "",
   "license": "ISC",
