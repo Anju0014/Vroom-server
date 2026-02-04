@@ -18,7 +18,7 @@ class CustomerDashBoardRepository
     const bookings = await Booking.find({ userId, status: { $ne: 'pending' } })
       .populate({
         path: 'carId',
-        select: 'carName brand location.address rcBookNo',
+        select: 'carName brand location.address location.coordinates.coordinates rcBookNo',
       })
       .populate({
         path: 'carOwnerId',
@@ -43,6 +43,7 @@ class CustomerDashBoardRepository
       carName: booking.carId.carName,
       brand: booking.carId.brand,
       pickupLocation: booking.carId.location.address,
+      pickupCoordinates:booking.carId.location.coordinates.coordinates,
       carNumber: booking.carId.rcBookNo,
       ownerName: booking.carOwnerId.fullName,
       ownerContact: booking.carOwnerId.phone,

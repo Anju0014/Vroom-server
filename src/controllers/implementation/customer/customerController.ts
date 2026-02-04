@@ -295,6 +295,7 @@ class CustomerContoller implements ICustomerController {
         processStatus: customer.processStatus,
         blockStatus: customer.blockStatus,
         verifyStatus: customer.verifyStatus,
+        profileImage:customer.profileImage,
         status: customer.status,
         idVerified: customer.idVerified,
         idProof: customer.idProof,
